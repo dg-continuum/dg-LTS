@@ -48,9 +48,11 @@ import java.util.Arrays;
 public class PacketListener extends ChannelDuplexHandler {
     private final SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
 
+    public static long lastPacketReceived;
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Packet packet = (Packet) msg;
+        lastPacketReceived = System.currentTimeMillis();
         if (skyblockStatus.isOnSkyblock()
                 && msg instanceof S04PacketEntityEquipment
                 && FeatureRegistry.FIX_SPIRIT_BOOTS.isEnabled()) { // Inventory packet name
