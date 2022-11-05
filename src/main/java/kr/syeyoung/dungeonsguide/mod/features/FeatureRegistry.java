@@ -176,7 +176,7 @@ public class FeatureRegistry {
 
     public static FeatureCollectScore ETC_COLLECT_SCORE;
 
-
+    public static FeaturePing PINGER;
 
 
 
@@ -246,6 +246,7 @@ public class FeatureRegistry {
             SOLVER_BOX = register(new FeatureSolverBox());
             SOLVER_SILVERFISH = register(new FeatureSolverSilverfish());
             SOLVER_ICEPATH = register(new FeatureSolverIcefill());
+            PINGER = register(new FeaturePing());
             SOLVER_BLAZE = register(new FeatureSolverBlaze());
             SOLVER_TELEPORT = register(new FeatureSolverTeleport());
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
