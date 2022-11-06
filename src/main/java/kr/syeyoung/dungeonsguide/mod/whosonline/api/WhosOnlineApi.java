@@ -5,6 +5,8 @@ import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C02IsOnline;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C04OnlineCheckBulk;
 import lombok.val;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +29,8 @@ public class WhosOnlineApi {
         executor = ex;
     }
 
+    Logger logger = LogManager.getLogger("WhosOnlineApi");
+
 
     /**
      * @return -s if websocket is ok
@@ -46,6 +50,8 @@ public class WhosOnlineApi {
             val message = WhosOnlineManager.gson.toJson(new C02IsOnline(new C02IsOnline.OBJ(uuid, messageId)));
 
             client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
+
+            logger.info("Is online: {} uuid: {} ", uuid , WhosOnlineCache.onlineppl.getOrDefault(uuid, false));
 
             return WhosOnlineCache.onlineppl.getOrDefault(uuid, false);
 

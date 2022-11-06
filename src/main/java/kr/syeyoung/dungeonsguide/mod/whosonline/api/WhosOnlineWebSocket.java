@@ -58,6 +58,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
             val stringTupleEntry = iterator.next();
             long whenToTimeout = stringTupleEntry.getValue().getFirst();
             if (whenToTimeout < System.currentTimeMillis()) {
+                stringTupleEntry.getValue().getSecond().countDown();
                 iterator.remove();
             }
         }
@@ -133,14 +134,11 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
     }
 
-    void releaseAsyncGet(String id) {
-        if (id == null) return;
-
-
+    void releaseAsyncGet(@NotNull String id) {
         Tuple<Long, CountDownLatch> longCountDownLatchTuple = sentMessages.get(id);
-        if (longCountDownLatchTuple != null) {
-            longCountDownLatchTuple.getSecond().countDown();
-        }
+
+        longCountDownLatchTuple.getSecond().countDown();
+
         sentMessages.remove(id);
     }
 
@@ -177,7 +175,9 @@ public class WhosOnlineWebSocket extends WebSocketClient {
         this.send(message);
 
         try {
+            logger.info("waiting for {}", id);
             c.await();
+            logger.info("finished waiting for {}", id);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
