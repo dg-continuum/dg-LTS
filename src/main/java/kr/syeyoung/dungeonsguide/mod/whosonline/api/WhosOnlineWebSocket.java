@@ -32,6 +32,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     private final Logger logger = LogManager.getLogger("WhosOnlineWebSocket");
     private final String playerUuid;
     private final ConcurrentHashMap<String, Tuple<Long, CountDownLatch>> sentMessages = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService se;
     @Getter
     private StompClient.StompClientStatus status = StompClient.StompClientStatus.CONNECTING;
     private boolean sendPingLock;
@@ -40,15 +41,15 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     private long ping;
     private ScheduledFuture<?> heartbeat = null;
 
-    public WhosOnlineWebSocket(final String remote, final String playerUuid) {
+    private ScheduledFuture<?> update = null;
+
+    public WhosOnlineWebSocket(final String remote, ScheduledExecutorService se, final String playerUuid) {
         super(URI.create(remote));
         this.playerUuid = playerUuid;
 
         setConnectionLostTimeout(0);
 
-        val namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg WhosOnline update pool").build();
-        val scheduler = Executors.newScheduledThreadPool(1, namedThreadFactory);
-        scheduler.scheduleAtFixedRate(this::update, 5, 20, TimeUnit.MILLISECONDS);
+        this.se = se;
     }
 
     void update() {
@@ -74,8 +75,9 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
         send(WhosOnlineManager.gson.toJson(new C00Connect(playerUuid)));
 
-        val ex = Executors.newSingleThreadScheduledExecutor();
-        heartbeat = ex.scheduleAtFixedRate(() -> {
+        update = se.scheduleAtFixedRate(this::update, 5, 20, TimeUnit.MILLISECONDS);
+
+        heartbeat = se.scheduleAtFixedRate(() -> {
             if (sendPingLock) {
                 sendPingLock = false;
                 send(WhosOnlineManager.gson.toJson(new C06Ping(System.currentTimeMillis())));
@@ -140,6 +142,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
+        if(update != null) update.cancel(true);
         if (heartbeat != null) heartbeat.cancel(true);
         logger.info("Websocket closed code: {}  reason: {}", code, reason);
         status = StompClient.StompClientStatus.DISCONNECTED;
