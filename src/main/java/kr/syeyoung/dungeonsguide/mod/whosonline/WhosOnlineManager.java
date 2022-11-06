@@ -47,8 +47,24 @@ public class WhosOnlineManager {
 
     }
 
+    boolean closed = false;
+
+    public void close(){
+        closed = true;
+        try {
+            this.websocketManager.close();
+            this.websocketManager = null;
+            this.whosOnlineApi = null;
+            ex.awaitTermination(1,TimeUnit.SECONDS);
+            se.awaitTermination(1,TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @SubscribeEvent
     public void websocketdied(WhosOnlineDied e){
+        if(closed) return;
         logger.info("Who'sOnline websocket died, trying again in 4 seconds");
         se.schedule(this::init, 4, TimeUnit.SECONDS);
     }

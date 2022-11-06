@@ -73,6 +73,8 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     public void onOpen(ServerHandshake handshakedata) {
         logger.info("WebSocket opened");
 
+        logger.info("sending welcome message: {}", WhosOnlineManager.gson.toJson(new C00Connect(playerUuid)));
+
         send(WhosOnlineManager.gson.toJson(new C00Connect(playerUuid)));
 
         update = se.scheduleAtFixedRate(this::update, 5, 20, TimeUnit.MILLISECONDS);
@@ -87,6 +89,8 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
+
+        logger.info("Received message: {}", message);
 
         AbstractMessage res = MessageParser.parse(message);
 

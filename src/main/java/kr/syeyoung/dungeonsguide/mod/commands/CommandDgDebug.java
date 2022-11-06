@@ -74,7 +74,6 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 public class CommandDgDebug extends CommandBase {
-    private WhosOnlineManager whois;
 
     @Override
     public String getCommandName() {
@@ -431,14 +430,15 @@ public class CommandDgDebug extends CommandBase {
             System.out.println(stringBuilder.toString());
             System.out.println(stringBuilder2.toString());
         } else if ("connectwhois".equals(arg)) {
-            this.whois = new WhosOnlineManager("ws://localhost:3000/ws");
-            this.whois.init();
+            DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().close();
+            DungeonsGuide.getDungeonsGuide().setWhosOnlineManager(new WhosOnlineManager("wss://virginity.kokoniara.software/ws"));
+            DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().init();
         } else if ("isonline".equals(arg)) {
             if(args.length > 2){
                 sender.addChatMessage(new ChatComponentText("TOO LITTLE ARGS"));
             }
 
-            if(this.whois == null){
+            if(DungeonsGuide.getDungeonsGuide().getWhosOnlineManager() == null){
                 sender.addChatMessage(new ChatComponentText("didnt init manager"));
             }
 
@@ -446,7 +446,7 @@ public class CommandDgDebug extends CommandBase {
             val tocheck = args[1];
 
             (new Thread(() -> {
-                Future<Boolean> online = this.whois.getWhosOnlineApi().isOnline(tocheck);
+                Future<Boolean> online = DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().getWhosOnlineApi().isOnline(tocheck);
                 if(online != null){
                     boolean aBoolean = false;
                     try {
