@@ -1,37 +1,38 @@
 package kr.syeyoung.dungeonsguide.mod.whosonline.api;
 
-import com.google.gson.Gson;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompClient;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl.COnlineCheck;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl.COnlineCheckBulk;
+import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C02IsOnline;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C04OnlineCheckBulk;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * Api wrapper for whos online websocket server
+ * @author Eryk Ruta
+ */
 public class WhosOnlineApi {
     private static final long TIMEOUT_VALUE = 500;
     private final WhosOnlineWebSocket client;
     private final ExecutorService executor;
-    private final Gson gson;
 
-    public WhosOnlineApi(WhosOnlineWebSocket client) {
+    public WhosOnlineApi(WhosOnlineWebSocket client, ExecutorService ex) {
         this.client = client;
-        gson = client.getGson();
 
-        executor = Executors.newCachedThreadPool();
+        executor = ex;
     }
 
 
     /**
-     * @return true if everything is ok
+     * @return -s if websocket is ok
      */
     boolean stateCheck() {
-        return client.getStatus() == StompClient.StompClientStatus.CONNECTED;
+        return client.getStatus() != StompClient.StompClientStatus.CONNECTED;
     }
 
     /**
@@ -39,10 +40,10 @@ public class WhosOnlineApi {
      * @return true if player is online with dg
      */
     public @Nullable Future<Boolean> isOnline(@NotNull final String uuid) {
-        if (!stateCheck()) return null;
+        if (stateCheck()) return null;
         return executor.submit(() -> {
             val messageId = UUID.randomUUID().toString();
-            val message = gson.toJson(new COnlineCheck(new COnlineCheck.OBJ(uuid, messageId)));
+            val message = WhosOnlineManager.gson.toJson(new C02IsOnline(new C02IsOnline.OBJ(uuid, messageId)));
 
             client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
 
@@ -56,10 +57,10 @@ public class WhosOnlineApi {
      * @return array of their statuses
      */
     public @Nullable Future<Boolean[]> areOnline(@NotNull final String[] uuids) {
-        if (!stateCheck()) return null;
+        if (stateCheck()) return null;
         return executor.submit(() -> {
             val messageId = UUID.randomUUID().toString();
-            val message = gson.toJson(new COnlineCheckBulk(new COnlineCheckBulk.OBJ(uuids, messageId)));
+            val message = WhosOnlineManager.gson.toJson(new C04OnlineCheckBulk(new C04OnlineCheckBulk.OBJ(uuids, messageId)));
 
             client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
 
@@ -74,7 +75,6 @@ public class WhosOnlineApi {
 
         });
     }
-
 
 
 }

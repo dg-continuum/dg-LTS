@@ -1,9 +1,9 @@
-package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl;
+package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client;
 
 import lombok.Data;
 
 @Data
-public class COnlineCheck {
+public class C02IsOnline {
     public final String t = "/is_online";
 
     /**

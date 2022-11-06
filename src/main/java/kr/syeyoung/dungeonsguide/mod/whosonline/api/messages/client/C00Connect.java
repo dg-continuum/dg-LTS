@@ -1,9 +1,9 @@
-package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl;
+package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client;
 
 import lombok.Data;
 
 @Data
-public class CConnect  {
+public class C00Connect {
     public final String t = "/connect";
 
     /**
