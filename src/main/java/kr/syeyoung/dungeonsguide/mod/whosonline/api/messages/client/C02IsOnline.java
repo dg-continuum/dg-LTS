@@ -14,7 +14,7 @@ public class C02IsOnline {
     @Data
     public static class OBJ {
         public final String uuid;
-        public final String nouce;
+        public final String nonce;
     }
 
 }
