@@ -4,15 +4,17 @@ import com.google.gson.Gson;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompClient;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl.COnlineCheck;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl.COnlineCheckBulk;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class WhosOnlineApi {
-    private static final float TIMEOUT_VALUE = 500;
+    private static final long TIMEOUT_VALUE = 500;
     private final WhosOnlineWebSocket client;
     private final ExecutorService executor;
     private final Gson gson;
@@ -37,24 +39,12 @@ public class WhosOnlineApi {
      * @return true if player is online with dg
      */
     public @Nullable Future<Boolean> isOnline(@NotNull final String uuid) {
-        if (stateCheck()) return null;
+        if (!stateCheck()) return null;
         return executor.submit(() -> {
-            client.send(gson.toJson(new COnlineCheck(uuid)));
+            val messageId = UUID.randomUUID().toString();
+            val message = gson.toJson(new COnlineCheck(new COnlineCheck.OBJ(uuid, messageId)));
 
-            long started = System.currentTimeMillis();
-            boolean shouldStop = false;
-
-            while (!shouldStop) {
-                if (!WhosOnlineCache.onlineppl.containsKey(uuid)) {
-                    if (started + TIMEOUT_VALUE < System.currentTimeMillis()) {
-                        shouldStop = true;
-                    } else {
-                        Thread.sleep(20);
-                    }
-                } else {
-                    shouldStop = true;
-                }
-            }
+            client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
 
             return WhosOnlineCache.onlineppl.getOrDefault(uuid, false);
 
@@ -65,31 +55,18 @@ public class WhosOnlineApi {
      * @param uuids uuids of player to check
      * @return array of their statuses
      */
-    @Nullable
-    public Future<Boolean[]> areOnline(final String[] uuids) {
-        if (stateCheck()) return null;
+    public @Nullable Future<Boolean[]> areOnline(@NotNull final String[] uuids) {
+        if (!stateCheck()) return null;
         return executor.submit(() -> {
-            client.send(gson.toJson(new COnlineCheckBulk(uuids)));
+            val messageId = UUID.randomUUID().toString();
+            val message = gson.toJson(new COnlineCheckBulk(new COnlineCheckBulk.OBJ(uuids, messageId)));
 
-//            long started = System.currentTimeMillis();
-//            boolean shouldStop = false;
+            client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
 
-//            while (!shouldStop) {
-//                if (!WhosOnlineCache.onlineppl.containsKey(uuid)) {
-//                    if (started + TIMEOUT_VALUE < System.currentTimeMillis()) {
-//                        shouldStop = true;
-//                    } else {
-//                        Thread.sleep(20);
-//                    }
-//                } else {
-//                    shouldStop = true;
-//                }
-//            }
-
-            final Boolean[] returnVals = new Boolean[uuids.length];
+            val returnVals = new Boolean[uuids.length];
 
             for (int i = 0; i < uuids.length; i++) {
-                String uuid = uuids[i];
+                val uuid = uuids[i];
                 returnVals[i] = WhosOnlineCache.onlineppl.getOrDefault(uuid, false);
             }
 

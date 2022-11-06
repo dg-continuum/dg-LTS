@@ -25,7 +25,9 @@ import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.party.PartyContext;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.utils.*;
+import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
+import lombok.val;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -52,9 +54,13 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 public class CommandDgDebug extends CommandBase {
+    private WhosOnlineManager whois;
+
     @Override
     public String getCommandName() {
         return "dgdebug";
@@ -409,6 +415,40 @@ public class CommandDgDebug extends CommandBase {
             }
             System.out.println(stringBuilder.toString());
             System.out.println(stringBuilder2.toString());
+        } else if ("connectwhois".equals(arg)) {
+            this.whois = new WhosOnlineManager("ws://localhost:3000/ws");
+            this.whois.init();
+        } else if ("isonline".equals(arg)) {
+            if(args.length > 2){
+                sender.addChatMessage(new ChatComponentText("TOO LITTLE ARGS"));
+            }
+
+            if(this.whois == null){
+                sender.addChatMessage(new ChatComponentText("didnt init manager"));
+            }
+
+
+            val tocheck = args[1];
+
+            (new Thread(() -> {
+                Future<Boolean> online = this.whois.getWhosOnlineApi().isOnline(tocheck);
+                if(online != null){
+                    boolean aBoolean = false;
+                    try {
+                        aBoolean = online.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+                    ChatTransmitter.addToQueue(tocheck + " is " + (aBoolean ? "online" : "offline"));
+                }else {
+                    ChatTransmitter.addToQueue("NULL");
+                }
+
+
+            })).start();
+
+
         } else if ("readmap".equals(arg)) {
             try {
                 int fromX = Integer.parseInt(args[1]);

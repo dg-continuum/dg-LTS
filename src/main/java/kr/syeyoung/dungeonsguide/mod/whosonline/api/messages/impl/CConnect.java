@@ -1,11 +1,10 @@
 package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl;
 
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.AbstractMessage;
 import lombok.Data;
 
 @Data
-public class CConnect extends AbstractMessage {
-    public static final String t = "/connect";
+public class CConnect  {
+    public final String t = "/connect";
 
     /**
      * Clients player uuid

@@ -1,14 +1,20 @@
 package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.impl;
 
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.AbstractMessage;
 import lombok.Data;
 
 @Data
-public class COnlineCheckBulk extends AbstractMessage {
-    public static final String t = "/is_online/bulk";
+public class COnlineCheckBulk {
+    public final String t = "/is_online/bulk";
 
     /**
      * array of uuids to check if they are online
      */
-    public final String[] c;
+    public final OBJ c;
+
+    @Data
+    public static class OBJ {
+        public final String[] uuids;
+        public final String nonce;
+    }
+
 }

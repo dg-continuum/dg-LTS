@@ -16,7 +16,7 @@ public class WhosOnlineManager {
         remoteHost = host;
     }
 
-    void init(){
+    public void init(){
         this.websocketManager = new WhosOnlineWebSocket(remoteHost, Minecraft.getMinecraft().getSession().getPlayerID());
         websocketManager.connect();
         this.whosOnlineApi = new WhosOnlineApi(websocketManager);
