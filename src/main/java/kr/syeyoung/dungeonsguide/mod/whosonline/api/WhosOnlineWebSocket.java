@@ -170,6 +170,19 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     public void onClose(int code, String reason, boolean remote) {
         if (update != null) update.cancel(true);
         logger.info("Websocket closed code: {}  reason: {}", code, reason);
+
+        for (val i : sentMessages.entrySet()) {
+            val j = i.getValue();
+            if(j != null){
+                CountDownLatch k = j.getSecond();
+                if(k != null){
+                    k.countDown();
+                }
+            }
+        }
+
+        sentMessages.clear();
+
         status = StompClient.StompClientStatus.DISCONNECTED;
         MinecraftForge.EVENT_BUS.post(new WhosOnlineManager.WhosOnlineDied());
     }
