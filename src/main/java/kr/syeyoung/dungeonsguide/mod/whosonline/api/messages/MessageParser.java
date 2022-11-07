@@ -50,7 +50,7 @@ public class MessageParser {
                 return new S08Broadcast(m.c.getAsString());
 
             case "/pong":
-                return new S07Pong(m.c.getAsLong());
+                return new S07Pong(Long.parseLong(m.c.getAsString()));
 
             default:
                 return null;
