@@ -4,9 +4,6 @@ import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.AbstractMessage;
 import lombok.Data;
 
 @Data
-public class S03IsOnlineAck implements AbstractMessage {
-    public final boolean is_online;
-    public final String uuid;
-    public final String nonce;
-
+public class S00ConnectAck implements AbstractMessage {
+    public final boolean sucess;
 }

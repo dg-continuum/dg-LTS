@@ -6,11 +6,11 @@ import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.AbstractMessage;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.MessageParser;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C00Connect;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C06Ping;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S01ConnectAck;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S03IsOnlineAck;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S05areOnlineAck;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S07Pong;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C03Ping;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S00ConnectAck;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S01IsOnlineAck;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S02areOnlineAck;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.server.S04Pong;
 import lombok.Getter;
 import lombok.val;
 import net.minecraft.util.Tuple;
@@ -86,7 +86,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
         if (this.status == StompClient.StompClientStatus.CONNECTED) {
             if (nextPing > now) return;
 
-            String msg = WhosOnlineManager.gson.toJson(new C06Ping(String.valueOf(now)));
+            String msg = WhosOnlineManager.gson.toJson(new C03Ping(String.valueOf(now)));
             send(msg);
             nextPing = now + 10000;
         }
@@ -121,21 +121,21 @@ public class WhosOnlineWebSocket extends WebSocketClient {
             return;
         }
 
-        if (res instanceof S01ConnectAck) {
+        if (res instanceof S00ConnectAck) {
             if (status == StompClient.StompClientStatus.CONNECTING) {
                 status = StompClient.StompClientStatus.CONNECTED;
                 logger.info("Connection established");
             } else {
                 logger.info("Received unexpected \"connected\" ");
             }
-        } else if (res instanceof S03IsOnlineAck) {
-            S03IsOnlineAck c = (S03IsOnlineAck) res;
+        } else if (res instanceof S01IsOnlineAck) {
+            S01IsOnlineAck c = (S01IsOnlineAck) res;
 
             cache.putInCache(c.uuid, c.is_online);
 
             releaseAsyncGet(c.nonce);
-        } else if (res instanceof S05areOnlineAck) {
-            S05areOnlineAck c = (S05areOnlineAck) res;
+        } else if (res instanceof S02areOnlineAck) {
+            S02areOnlineAck c = (S02areOnlineAck) res;
 
             val entries = c.getUsers();
 
@@ -144,8 +144,8 @@ public class WhosOnlineWebSocket extends WebSocketClient {
             }
 
             releaseAsyncGet(c.getNonce());
-        } else if (res instanceof S07Pong) {
-            S07Pong c = (S07Pong) res;
+        } else if (res instanceof S04Pong) {
+            S04Pong c = (S04Pong) res;
 
             long started = c.getC();
             this.ping = System.currentTimeMillis() - started;

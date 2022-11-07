@@ -3,7 +3,7 @@ package kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client;
 import lombok.Data;
 
 @Data
-public class C02IsOnline {
+public class C01IsOnline {
     public final String t = "/is_online";
 
     /**

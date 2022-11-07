@@ -2,15 +2,13 @@ package kr.syeyoung.dungeonsguide.mod.whosonline.api;
 
 import kr.syeyoung.dungeonsguide.mod.stomp.StompClient;
 import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C02IsOnline;
-import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C04OnlineCheckBulk;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C01IsOnline;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.client.C02OnlineCheckBulk;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -59,7 +57,7 @@ public class WhosOnlineApi {
         return executor.submit(() -> {
 
             val messageId = UUID.randomUUID().toString();
-            val message = WhosOnlineManager.gson.toJson(new C02IsOnline(new C02IsOnline.OBJ(uuid, messageId)));
+            val message = WhosOnlineManager.gson.toJson(new C01IsOnline(new C01IsOnline.OBJ(uuid, messageId)));
 
             client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
 
@@ -111,7 +109,7 @@ public class WhosOnlineApi {
         return executor.submit(() -> {
             val messageId = UUID.randomUUID().toString();
 
-            val message = WhosOnlineManager.gson.toJson(new C04OnlineCheckBulk(new C04OnlineCheckBulk.OBJ((String[]) notCached.toArray(), messageId)));
+            val message = WhosOnlineManager.gson.toJson(new C02OnlineCheckBulk(new C02OnlineCheckBulk.OBJ((String[]) notCached.toArray(), messageId)));
 
             client.sendAndBlock(message, messageId, TIMEOUT_VALUE);
 

@@ -21,20 +21,20 @@ public class MessageParser {
 
     /**
      * @param s message string received from server
-     * @return instance of {@link AbstractMessage}  example: {@link S07Pong}
+     * @return instance of {@link AbstractMessage}  example: {@link S04Pong}
      */
     public static @Nullable AbstractMessage parse(@NotNull String s) {
         val m = gson.fromJson(s, ServerMessage.class);
         switch (m.t) {
             case "/connected":
-                return new S01ConnectAck(m.c.getAsBoolean());
+                return new S00ConnectAck(m.c.getAsBoolean());
 
             case "/is_online":
                 val isOnline = m.c.getAsJsonObject().get("is_online").getAsBoolean();
                 val uuid = m.c.getAsJsonObject().get("uuid").getAsString();
                 val nonce = m.c.getAsJsonObject().get("nonce").getAsString();
 
-                return new S03IsOnlineAck(isOnline, uuid, nonce);
+                return new S01IsOnlineAck(isOnline, uuid, nonce);
 
             case "/is_online/bulk":
 
@@ -44,13 +44,13 @@ public class MessageParser {
                 }
 
                 val nonce1 = m.c.getAsJsonObject().get("nonce").getAsString();
-                return new S05areOnlineAck(Collections.unmodifiableMap(users), nonce1);
+                return new S02areOnlineAck(Collections.unmodifiableMap(users), nonce1);
 
             case "/broadcast":
-                return new S08Broadcast(m.c.getAsString());
+                return new S05Broadcast(m.c.getAsString());
 
             case "/pong":
-                return new S07Pong(Long.parseLong(m.c.getAsString()));
+                return new S04Pong(Long.parseLong(m.c.getAsString()));
 
             default:
                 return null;
