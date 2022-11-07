@@ -17,9 +17,7 @@ import net.minecraft.util.Tuple;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,11 +41,14 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
     private ScheduledFuture<?> update = null;
     private long nextPing;
+    private WhosOnlineCache cache;
 
     public WhosOnlineWebSocket(@NotNull final String remote,
                                @NotNull final ScheduledExecutorService se,
+                               WhosOnlineCache cache,
                                @NotNull final String playerUuid) {
         super(URI.create(remote));
+        this.cache = cache;
         setConnectionLostTimeout(0);
 
 
@@ -130,7 +131,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
         } else if (res instanceof S03IsOnlineAck) {
             S03IsOnlineAck c = (S03IsOnlineAck) res;
 
-            WhosOnlineCache.onlineppl.put(c.uuid, c.is_online);
+            cache.putInCache(c.uuid, c.is_online);
 
             releaseAsyncGet(c.nonce);
         } else if (res instanceof S05areOnlineAck) {
@@ -138,7 +139,9 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
             val entries = c.getUsers();
 
-            WhosOnlineCache.onlineppl.putAll(entries);
+            for (val stringBooleanEntry : entries.entrySet()) {
+                cache.putInCache(stringBooleanEntry.getKey(), stringBooleanEntry.getValue());
+            }
 
             releaseAsyncGet(c.getNonce());
         } else if (res instanceof S07Pong) {

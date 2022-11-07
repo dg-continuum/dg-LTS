@@ -3,6 +3,7 @@ package kr.syeyoung.dungeonsguide.mod.whosonline;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.WhosOnlineApi;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.WhosOnlineCache;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.WhosOnlineWebSocket;
 import lombok.Getter;
 import lombok.val;
@@ -31,6 +32,8 @@ public class WhosOnlineManager {
     private WhosOnlineWebSocket websocketManager;
     @Getter
     private WhosOnlineApi whosOnlineApi;
+    @Getter
+    private WhosOnlineCache cache;
 
     public WhosOnlineManager(String host) {
         remoteHost = host;
@@ -43,9 +46,10 @@ public class WhosOnlineManager {
     }
 
     public void init() {
-        this.websocketManager = new WhosOnlineWebSocket(remoteHost, se, Minecraft.getMinecraft().getSession().getPlayerID());
+        this.cache = new WhosOnlineCache();
+        this.websocketManager = new WhosOnlineWebSocket(remoteHost, se, cache, Minecraft.getMinecraft().getSession().getPlayerID());
         websocketManager.connect();
-        this.whosOnlineApi = new WhosOnlineApi(websocketManager, ex);
+        this.whosOnlineApi = new WhosOnlineApi(websocketManager, cache,ex);
 
     }
 
