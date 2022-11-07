@@ -52,6 +52,9 @@ public class MessageParser {
             case "/pong":
                 return new S04Pong(Long.parseLong(m.c.getAsString()));
 
+            case "/cosmetics/ack":
+                return new S03CosmeticRefresh();
+
             default:
                 return null;
 
