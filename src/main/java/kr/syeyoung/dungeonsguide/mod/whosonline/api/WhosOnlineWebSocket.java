@@ -88,7 +88,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
             String msg = WhosOnlineManager.gson.toJson(new C06Ping(String.valueOf(now)));
             send(msg);
-            nextPing = now + 3000;
+            nextPing = now + 10000;
         }
 
 
