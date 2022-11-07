@@ -86,7 +86,6 @@ public class WhosOnlineWebSocket extends WebSocketClient {
             if (nextPing > now) return;
 
             String msg = WhosOnlineManager.gson.toJson(new C06Ping(String.valueOf(now)));
-            logger.info("sending ping {}", msg);
             send(msg);
             nextPing = now + 3000;
         }
@@ -110,8 +109,9 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     @Override
     public void onMessage(String message) {
 
-
-        logger.info("Received message: {}", message);
+        if(!message.startsWith("{\"t\":\"/pong\"")) {
+            logger.info("Received message: {}", message);
+        }
 
         AbstractMessage res = MessageParser.parse(message);
 
@@ -146,7 +146,6 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
             long started = c.getC();
             this.ping = System.currentTimeMillis() - started;
-            logger.info("Ping to server: {}ms", ping);
             this.lastPong = System.currentTimeMillis();
         } else {
             logger.error("failed to parse message: {}", message);
@@ -178,16 +177,6 @@ public class WhosOnlineWebSocket extends WebSocketClient {
         logger.error(ex);
     }
 
-    @Override
-    public void onWebsocketPong(WebSocket conn, Framedata f) {
-        logger.info("received a pong");
-    }
-
-
-    @Override
-    public void onWebsocketPing(WebSocket conn, Framedata f) {
-        logger.info("recived a ping");
-    }
 
     public void sendAndBlock(String message, String id, long timeout) {
         val c = new CountDownLatch(1);
