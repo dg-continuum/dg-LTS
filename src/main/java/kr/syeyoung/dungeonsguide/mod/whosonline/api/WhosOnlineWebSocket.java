@@ -1,7 +1,7 @@
 package kr.syeyoung.dungeonsguide.mod.whosonline.api;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompClient;
+import kr.syeyoung.dungeonsguide.mod.utils.SimpleFuse;
 import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.AbstractMessage;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.messages.MessageParser;
@@ -21,6 +21,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.util.Iterator;
@@ -31,29 +32,34 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
     private final Logger logger = LogManager.getLogger("WhosOnlineWebSocket");
     private final String playerUuid;
-    private final ConcurrentHashMap<String, Tuple<Long, CountDownLatch>> sentMessages = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Tuple<Long, CountDownLatch>> sentMessages;
     private final ScheduledExecutorService se;
+    private final SimpleFuse timeoutFuse;
+    long lastPong = -1;
     @Getter
-    private StompClient.StompClientStatus status = StompClient.StompClientStatus.CONNECTING;
-    private boolean sendPingLock;
-    volatile long lastPong = -1;
+    private StompClient.StompClientStatus status;
     @Getter
     private long ping;
-    private ScheduledFuture<?> heartbeat = null;
 
     private ScheduledFuture<?> update = null;
+    private long nextPing;
 
-    public WhosOnlineWebSocket(final String remote, ScheduledExecutorService se, final String playerUuid) {
+    public WhosOnlineWebSocket(@NotNull final String remote,
+                               @NotNull final ScheduledExecutorService se,
+                               @NotNull final String playerUuid) {
         super(URI.create(remote));
-        this.playerUuid = playerUuid;
-
         setConnectionLostTimeout(0);
 
+
+        this.playerUuid = playerUuid;
         this.se = se;
+        status = StompClient.StompClientStatus.CONNECTING;
+        timeoutFuse = new SimpleFuse();
+        sentMessages = new ConcurrentHashMap<>();
     }
 
     void update() {
-        // clear TimedOut Requests
+        // clear TimedOut'ed  Requests
         for (Iterator<Map.Entry<String, Tuple<Long, CountDownLatch>>> iterator = sentMessages.entrySet().iterator(); iterator.hasNext(); ) {
             val stringTupleEntry = iterator.next();
             long whenToTimeout = stringTupleEntry.getValue().getFirst();
@@ -64,10 +70,28 @@ public class WhosOnlineWebSocket extends WebSocketClient {
         }
 
         // check for timeout
-        if (lastPong != -1 && System.currentTimeMillis() - lastPong > (10 * 1000)) {
-            this.close();
-            logger.info("Channel timed out");
+        if (!timeoutFuse.isBlown()) {
+            long msPassedSincePong = System.currentTimeMillis() - lastPong;
+            if (lastPong != -1 && msPassedSincePong > (60 * 1000)) {
+                timeoutFuse.blow();
+                this.close();
+                logger.info("Channel timed out");
+            }
+
         }
+
+        // send pings
+        long now = System.currentTimeMillis();
+        if (this.status == StompClient.StompClientStatus.CONNECTED) {
+            if (nextPing > now) return;
+
+            String msg = WhosOnlineManager.gson.toJson(new C06Ping(String.valueOf(now)));
+            logger.info("sending ping {}", msg);
+            send(msg);
+            nextPing = now + 3000;
+        }
+
+
     }
 
     @Override
@@ -80,22 +104,18 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
         update = se.scheduleAtFixedRate(this::update, 5, 20, TimeUnit.MILLISECONDS);
 
-        heartbeat = se.scheduleAtFixedRate(() -> {
-            if (sendPingLock) {
-                sendPingLock = false;
-                send(WhosOnlineManager.gson.toJson(new C06Ping(System.currentTimeMillis())));
-            }
-        }, 1, 3, TimeUnit.SECONDS);
+        nextPing = System.currentTimeMillis() + 3000;
     }
 
     @Override
     public void onMessage(String message) {
 
+
         logger.info("Received message: {}", message);
 
         AbstractMessage res = MessageParser.parse(message);
 
-        if(res == null){
+        if (res == null) {
             logger.error("failed to parse message: {}", message);
             return;
         }
@@ -126,26 +146,27 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
             long started = c.getC();
             this.ping = System.currentTimeMillis() - started;
+            logger.info("Ping to server: {}ms", ping);
             this.lastPong = System.currentTimeMillis();
-            this.sendPingLock = true;
         } else {
             logger.error("failed to parse message: {}", message);
         }
+
 
     }
 
     void releaseAsyncGet(@NotNull String id) {
         Tuple<Long, CountDownLatch> longCountDownLatchTuple = sentMessages.get(id);
 
-        longCountDownLatchTuple.getSecond().countDown();
+        if (longCountDownLatchTuple != null && longCountDownLatchTuple.getSecond() != null)
+            longCountDownLatchTuple.getSecond().countDown();
 
         sentMessages.remove(id);
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        if(update != null) update.cancel(true);
-        if (heartbeat != null) heartbeat.cancel(true);
+        if (update != null) update.cancel(true);
         logger.info("Websocket closed code: {}  reason: {}", code, reason);
         status = StompClient.StompClientStatus.DISCONNECTED;
         MinecraftForge.EVENT_BUS.post(new WhosOnlineManager.WhosOnlineDied());
@@ -184,5 +205,4 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
 
     }
-
 }

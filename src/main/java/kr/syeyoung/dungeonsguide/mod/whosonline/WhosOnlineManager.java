@@ -10,6 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,7 +39,7 @@ public class WhosOnlineManager {
         val namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg WhosOnline pool").build();
 
         ex = Executors.newCachedThreadPool(namedThreadFactory);
-        se = Executors.newSingleThreadScheduledExecutor(namedThreadFactory);
+        se = Executors.newScheduledThreadPool(2, namedThreadFactory);
     }
 
     public void init() {
