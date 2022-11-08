@@ -2,6 +2,9 @@ package kr.syeyoung.dungeonsguide.mod.whosonline.api;
 
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.api.ApiFetcher;
 import kr.syeyoung.dungeonsguide.mod.whosonline.api.data.ActiveUser;
+import kr.syeyoung.dungeonsguide.mod.whosonline.api.data.CosmeticCacheObject;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -9,6 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class WhosOnlineCache {
+
+    @Getter @Setter
+    private CosmeticCacheObject cms;
 
     // 2 minutes
     private static final long TIME_TO_EXPIRE = 120000;
