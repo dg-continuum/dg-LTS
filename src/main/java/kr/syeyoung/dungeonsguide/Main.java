@@ -18,6 +18,7 @@
 
 package kr.syeyoung.dungeonsguide;
 
+import cc.polyfrost.oneconfig.events.EventManager;
 import kr.syeyoung.dungeonsguide.auth.AuthManager;
 import kr.syeyoung.dungeonsguide.auth.InvalidDungeonsGuideCredentialsException;
 import kr.syeyoung.dungeonsguide.auth.ResourceManager;
@@ -141,6 +142,9 @@ public class Main {
             progressBar.step("Initializing");
 
             dgInstance = new DungeonsGuide();
+
+            EventManager.INSTANCE.register(dgInstance);
+
             dgInstance.preinit();
 
             finishUpProgressBar(progressBar);

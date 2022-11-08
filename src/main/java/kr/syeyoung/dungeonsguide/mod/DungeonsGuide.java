@@ -18,6 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.mod;
 
+import cc.polyfrost.oneconfig.events.EventManager;
+import cc.polyfrost.oneconfig.events.event.InitializationEvent;
+import cc.polyfrost.oneconfig.events.event.LocrawEvent;
+import cc.polyfrost.oneconfig.libs.eventbus.Subscribe;
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.IDungeonGuide;
 import kr.syeyoung.dungeonsguide.Main;
@@ -44,6 +48,7 @@ import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -51,6 +56,7 @@ import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -65,6 +71,7 @@ import java.util.Set;
 
 public class DungeonsGuide implements IDungeonGuide {
 
+    public static DgOneCongifConfig config;
     @Getter
     private static boolean firstTimeUsingDG = false;
     Logger logger = LogManager.getLogger("DungeonsGuide");
@@ -93,6 +100,14 @@ public class DungeonsGuide implements IDungeonGuide {
 
     @Getter
     CommandReparty commandReparty;
+
+    @Subscribe
+    public void onLocraw(LocrawEvent event) {
+        // print out the location of the player
+        System.out.println("got location: " + event.info.toString());
+
+    }
+
 
 
 
@@ -186,6 +201,12 @@ public class DungeonsGuide implements IDungeonGuide {
 
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(resourceManager -> GLCursors.setupCursors());
     }
+
+    @Subscribe
+    public void onInit(InitializationEvent event) {
+        config = new DgOneCongifConfig();
+    }
+
 
     private boolean showedStartUpGuide;
     @SubscribeEvent

@@ -20,7 +20,6 @@ package kr.syeyoung.dungeonsguide.mod.commands;
 
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
-import kr.syeyoung.dungeonsguide.mod.config.guiconfig.GuiConfigV2;
 import kr.syeyoung.dungeonsguide.mod.cosmetics.CosmeticsManager;
 import kr.syeyoung.dungeonsguide.mod.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
@@ -30,7 +29,6 @@ import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompPayload;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -158,7 +156,8 @@ public class CommandDungeonsGuide extends CommandBase {
         try {
             if (openConfig && e.phase == TickEvent.Phase.START) {
                 openConfig = false;
-                Minecraft.getMinecraft().displayGuiScreen(new GuiConfigV2());
+//                Minecraft.getMinecraft().displayGuiScreen(new GuiConfigV2());
+                DungeonsGuide.config.openGui();
             }
         } catch (Throwable t) {
             t.printStackTrace();
