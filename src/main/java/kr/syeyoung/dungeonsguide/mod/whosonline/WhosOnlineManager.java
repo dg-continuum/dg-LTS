@@ -35,10 +35,13 @@ public class WhosOnlineManager {
     private WhosOnlineCache cache;
     private WhosOnlineRest restClient;
 
-    boolean useDebugServers = true;
+    boolean useDebugServers = false;
 
     public WhosOnlineManager(String host) {
         remoteHost = host;
+        if(host.startsWith("localhost")){
+            useDebugServers = true;
+        }
         MinecraftForge.EVENT_BUS.register(this);
 
         val namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg WhosOnline pool").build();

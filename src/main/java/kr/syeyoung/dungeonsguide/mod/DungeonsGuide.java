@@ -125,7 +125,8 @@ public class DungeonsGuide implements IDungeonGuide {
 
         (new FeatureRegistry()).init();
 
-        this.whosOnlineManager = new WhosOnlineManager("wss://virginity.kokoniara.software/ws");
+//        this.whosOnlineManager = new WhosOnlineManager("virginity.kokoniara.software");
+        this.whosOnlineManager = new WhosOnlineManager("localhost:3000");
 
         this.whosOnlineManager.init();
 
