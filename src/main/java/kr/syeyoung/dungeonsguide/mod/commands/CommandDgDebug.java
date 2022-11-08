@@ -1,10 +1,8 @@
 package kr.syeyoung.dungeonsguide.mod.commands;
 
-import com.google.common.base.Throwables;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
-import kr.syeyoung.dungeonsguide.mod.config.guiconfig.GuiConfigV2;
 import kr.syeyoung.dungeonsguide.mod.config.guiconfig.NestedCategory;
 import kr.syeyoung.dungeonsguide.mod.cosmetics.data.ActiveCosmetic;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
@@ -28,15 +26,15 @@ import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.party.PartyContext;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.utils.*;
+import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
+import lombok.val;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockHalfStoneSlab;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -45,13 +43,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.Session;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -66,10 +62,12 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 public class CommandDgDebug extends CommandBase {
+
     @Override
     public String getCommandName() {
         return "dgdebug";
@@ -424,6 +422,41 @@ public class CommandDgDebug extends CommandBase {
             }
             System.out.println(stringBuilder.toString());
             System.out.println(stringBuilder2.toString());
+        } else if ("connectwhois".equals(arg)) {
+            DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().close();
+            DungeonsGuide.getDungeonsGuide().setWhosOnlineManager(new WhosOnlineManager("wss://virginity.kokoniara.software/ws"));
+            DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().init();
+        } else if ("isonline".equals(arg)) {
+            if(args.length > 2){
+                sender.addChatMessage(new ChatComponentText("TOO LITTLE ARGS"));
+            }
+
+            if(DungeonsGuide.getDungeonsGuide().getWhosOnlineManager() == null){
+                sender.addChatMessage(new ChatComponentText("didnt init manager"));
+            }
+
+
+            val tocheck = args[1];
+
+            (new Thread(() -> {
+                Future<Boolean> online = DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().getWebsocketClient().isOnline(tocheck);
+                if(online != null){
+                    boolean aBoolean = false;
+                    try {
+                        aBoolean = online.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+                    ChatTransmitter.addToQueue(tocheck + " is " + (aBoolean ? "online" : "offline"));
+                }else {
+                    ChatTransmitter.addToQueue("NULL");
+                }
+
+
+            })).start();
+
+
         } else if ("readmap".equals(arg)) {
             try {
                 int fromX = Integer.parseInt(args[1]);

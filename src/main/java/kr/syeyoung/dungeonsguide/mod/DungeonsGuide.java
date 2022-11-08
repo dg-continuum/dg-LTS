@@ -40,8 +40,10 @@ import kr.syeyoung.dungeonsguide.mod.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.mod.utils.TimeScoreUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TitleRender;
 import kr.syeyoung.dungeonsguide.mod.utils.cursor.GLCursors;
+import kr.syeyoung.dungeonsguide.mod.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -77,6 +79,8 @@ public class DungeonsGuide implements IDungeonGuide {
 
     @Getter
     private BlockCache blockCache;
+    @Getter @Setter
+    private WhosOnlineManager whosOnlineManager;
 
     public DungeonsGuide(){
         instance = this;
@@ -105,6 +109,10 @@ public class DungeonsGuide implements IDungeonGuide {
 
 
         (new FeatureRegistry()).init();
+
+        this.whosOnlineManager = new WhosOnlineManager("wss://virginity.kokoniara.software/ws");
+
+        this.whosOnlineManager.init();
 
         new ChatTransmitter();
 
