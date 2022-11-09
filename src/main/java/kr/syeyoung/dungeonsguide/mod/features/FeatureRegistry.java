@@ -105,7 +105,6 @@ public class FeatureRegistry {
     public static FeatureSolverTictactoe SOLVER_TICTACTOE;
     public static SimpleFeature SOLVER_WATERPUZZLE;
     public static SimpleFeature SOLVER_CREEPER;
-    public static FeatureSolverTeleport SOLVER_TELEPORT;
 
 
 
@@ -229,7 +228,6 @@ public class FeatureRegistry {
 //            TEST_PEPOLE = register(new FeatureTestPepole());
             DUNGEON_MAP = register(new FeatureDungeonMap());
             PINGER = register(new FeaturePing());
-            SOLVER_TELEPORT = register(new FeatureSolverTeleport());
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
             SOLVER_WATERPUZZLE = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Waterboard (Advanced)", "Calculates solution for waterboard puzzle and displays it to user", "solver.waterboard"));
             SOLVER_TICTACTOE = register(new FeatureSolverTictactoe());

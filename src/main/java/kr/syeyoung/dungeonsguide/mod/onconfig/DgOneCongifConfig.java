@@ -10,10 +10,7 @@ import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.config.data.PageLocation;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.IceFillPage;
-import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.KahootPage;
-import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Silverfish;
-import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Weirdos;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.*;
 
 import java.util.function.Supplier;
 
@@ -294,6 +291,23 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Silverfish (Advanced)"
     )
     public Silverfish c = new Silverfish();
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Shows teleport pads you've visited in a teleport maze room",
+            category = "Solvers",
+            subcategory = "Teleport"
+    )
+    public static boolean teleportSolver = true;
+    @Page(
+            name = "options",
+            location = PageLocation.BOTTOM,
+            category = "Solvers",
+            subcategory = "Teleport"
+    )
+    public Teleport d = new Teleport();
 
 
 
