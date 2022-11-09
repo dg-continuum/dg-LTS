@@ -18,19 +18,31 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.config.annotations.Checkbox;
+import cc.polyfrost.oneconfig.config.annotations.Color;
+import cc.polyfrost.oneconfig.config.annotations.Slider;
+import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.hud.BasicHud;
+import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
+import kr.syeyoung.dungeonsguide.mod.config.guiconfig.location.GuiGuiLocationConfig;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.mod.events.impl.BossroomEnterEvent;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonLeftEvent;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonStartedEvent;
+import kr.syeyoung.dungeonsguide.mod.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
+import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.GuiFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.BossroomEnterListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonEndListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonStartListener;
+import kr.syeyoung.dungeonsguide.mod.features.listener.ScreenRenderListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TabListUtil;
 import net.minecraft.block.material.MapColor;
@@ -38,6 +50,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -50,6 +63,10 @@ import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.*;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.MapData;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.MinecraftDummyContainer;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
@@ -58,37 +75,96 @@ import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.util.List;
 
-public class FeatureDungeonMap extends GuiFeature implements DungeonEndListener, DungeonStartListener, BossroomEnterListener {
-    private AColor backgroudColor;
-    private AColor playerColor;
-    private boolean shouldCacheMap;
+public class FeatureDungeonMap extends BasicHud {
+
+    @Color(name = "Color of the border")
+    private OneColor border_color = new OneColor(255, 255, 255, 255);
+
+    @Color(name = "Color of the background")
+    private OneColor backgroudColor = new OneColor(34, 0, 0,255);
+
+    @Color(name = "Color of the player border")
+    private OneColor playerColor = new OneColor(255, 255, 255, 0);
+    @Checkbox(name = "Should cache map data")
+    private boolean shouldCacheMap = true;
+    @Slider(
+            name = "Player head scale",
+            description = "Scale factor of player heads, defaults to 1",
+            min = 1,
+            max = 10
+    )
     private float playerHeadScale;
-    private boolean shouldShowOtherPlayers;
+    @Checkbox(
+            name = "Show other players",
+            description = "Option to show other players in map"
+    )
+    private boolean shouldShowOtherPlayers = true;
+    @Slider(
+            name = "Text scale",
+            description = "Scale factor of texts on map, defaults to 1",
+            min = 1,
+            max = 10
+    )
     private float textScale;
+    @Checkbox(
+            name = "Show Total secrets in the room",
+            description = "Option to overlay total secrets in the specific room"
+    )
     private boolean showSecretCount;
-    private boolean showPlayerHeads;
-    private boolean shouldRotateWithPlayer;
-    private boolean shouldScale;
-    private float postscaleOfMap;
-    private boolean centerMapOnPlayer;
+    @Checkbox(
+            name = "Use player heads instead of arrows"
+    )
+    private boolean showPlayerHeads = false;
+    @Checkbox(
+            name = "Rotate map centered at player"
+    )
+    private boolean shouldRotateWithPlayer = true;
+
+    @Checkbox(
+            name = "shouldScale"
+    )
+    private boolean shouldScale = false;
+
+    @Slider(
+            name = "Scale factor of map",
+            min = 1,
+            max = 5
+    )
+    private float postscaleOfMap = 1;
+    @Checkbox(
+            name = "Center map at player"
+    )
+    private boolean centerMapOnPlayer = true;
 
     public FeatureDungeonMap() {
-        super("Dungeon", "Dungeon Map", "Display dungeon map!", "dungeon.map", true, 128, 128);
-        this.setEnabled(false);
-        addParameter("scale", new FeatureParameter<>("scale", "Scale map", "Whether to scale map to fit screen", true, "boolean", nval -> shouldScale = nval));
-        addParameter("cacheMap", new FeatureParameter<>("cacheMap", "Should cache map data", "name", true, "boolean", nval -> shouldCacheMap = nval));
-        addParameter("playerCenter", new FeatureParameter<>("playerCenter", "Center map at player", "Render you in the center", false, "boolean", nval -> centerMapOnPlayer = nval));
-        addParameter("rotate", new FeatureParameter<>("rotate", "Rotate map centered at player", "Only works with Center map at player enabled", false, "boolean", nval -> shouldRotateWithPlayer = nval));
-        addParameter("postScale", new FeatureParameter<>("postScale", "Scale factor of map", "Only works with Center map at player enabled", 1.0f, "float", nval -> postscaleOfMap = nval));
-        addParameter("useplayerheads", new FeatureParameter<>("useplayerheads", "Use player heads instead of arrows", "Option to use player heads instead of arrows", true, "boolean", nval -> showPlayerHeads = nval));
-        addParameter("showotherplayers", new FeatureParameter<>("showotherplayers", "Show other players", "Option to show other players in map", true, "boolean", nval -> shouldShowOtherPlayers = nval));
-        addParameter("showtotalsecrets", new FeatureParameter<>("showtotalsecrets", "Show Total secrets in the room", "Option to overlay total secrets in the specific room", true, "boolean", nval -> showSecretCount = nval));
-        addParameter("playerheadscale", new FeatureParameter<>("playerheadscale", "Player head scale", "Scale factor of player heads, defaults to 1", 1.0f, "float", nval -> playerHeadScale = nval));
-        addParameter("textScale", new FeatureParameter<>("textScale", "Text scale", "Scale factor of texts on map, defaults to 1", 1.0f, "float", nval -> textScale = nval));
+        super();
 
-        addParameter("border_color", new FeatureParameter<>("border_color", "Color of the border", "Same as name", new AColor(255, 255, 255, 255), "acolor"));
-        addParameter("background_color", new FeatureParameter<>("background_color", "Color of the background", "Same as name", new AColor(0x22000000, true), "acolor", nval -> backgroudColor = nval));
-        addParameter("player_color", new FeatureParameter<>("player_color", "Color of the player border", "Same as name", new AColor(255, 255, 255, 0), "acolor", nval -> playerColor = nval));
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    @SubscribeEvent
+    public void onDungeonInitialize(BossroomEnterEvent enterEvent) {
+        on = false;
+    }
+
+    @SubscribeEvent
+    public void onDungeonLeft(DungeonLeftEvent leftEvent) {
+        on = false;
+    }
+
+    @SubscribeEvent
+    public void onDungeonStart(DungeonStartedEvent leftEvent) {
+        on = true;
+    }
+
+    @Override
+    protected float getWidth(float scale, boolean example) {
+        return 128;
+    }
+
+    @Override
+    protected float getHeight(float scale, boolean example) {
+        return 128;
     }
 
     public static final Ordering<NetworkPlayerInfo> sorter = Ordering.from((compare1, compare2) -> {
@@ -99,23 +175,29 @@ public class FeatureDungeonMap extends GuiFeature implements DungeonEndListener,
 
     private boolean on = false;
 
-    @Override
-    public void onDungeonEnd() {
-        on = false;
+    FontRenderer getFontRenderer(){
+        return Minecraft.getMinecraft().fontRendererObj;
+    }
+
+
+    @SubscribeEvent
+    public void onRender(RenderGameOverlayEvent.Post postRender) {
+        try {
+            boolean isLocConfig = Minecraft.getMinecraft().currentScreen instanceof GuiGuiLocationConfig;
+
+            if (!(postRender.type == RenderGameOverlayEvent.ElementType.EXPERIENCE || postRender.type == RenderGameOverlayEvent.ElementType.JUMPBAR)) return;
+
+            if (!SkyblockStatus.isOnSkyblock()) return;
+
+
+//            drawHUD(postRender.partialTicks);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     @Override
-    public void onDungeonStart() {
-        on = true;
-    }
-
-    @Override
-    public void onBossroomEnter() {
-        on = false;
-    }
-
-    @Override
-    public void drawHUD(float partialTicks) {
+    protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
         if (!on) return;
         if (!DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnDungeon()) return;
 
@@ -124,50 +206,52 @@ public class FeatureDungeonMap extends GuiFeature implements DungeonEndListener,
 
         MapProcessor mapProcessor = context.getMapProcessor();
         MapData mapData = mapProcessor.getLatestMapData();
-        Rectangle featureRect = getFeatureRect().getRectangle();
-        Gui.drawRect(0, 0, featureRect.width, featureRect.height, RenderUtils.getColorAt(featureRect.x, featureRect.y, backgroudColor));
+//        Rectangle featureRect = getFeatureRect().getRectangle();
+//        Gui.drawRect(0, 0, (int) getWidth(scale, false), (int) getHeight(scale, false), RenderUtils.getColorAt(featureRect.x, featureRect.y, DgOneCongifConfig.oneconftodgcolor(backgroudColor)));
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.pushMatrix();
         if (mapData == null) {
-            Gui.drawRect(0, 0, featureRect.width, featureRect.height, 0xFFFF0000);
+//            Gui.drawRect(0, 0, featureRect.width, featureRect.height, 0xFFFF0000);
         } else {
-            renderMap(partialTicks, mapProcessor, mapData, context);
+//            renderMap(partialTicks, mapProcessor, mapData, context);
         }
         GlStateManager.popMatrix();
         GL11.glLineWidth(2);
-        RenderUtils.drawUnfilledBox(0, 0, featureRect.width, featureRect.height, this.<AColor>getParameter("border_color").getValue());
+//        RenderUtils.drawUnfilledBox(0, 0, featureRect.width, featureRect.height, DgOneCongifConfig.oneconftodgcolor(border_color));
     }
 
-    @Override
-    public void drawDemo(float partialTicks) {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnDungeon() && context != null && context.getMapProcessor().isInitialized() && on) {
-            drawHUD(partialTicks);
-            return;
-        }
-        Rectangle featureRect = getFeatureRect().getRectangle();
-        Gui.drawRect(0, 0, featureRect.width, featureRect.height, RenderUtils.getColorAt(featureRect.x, featureRect.y, backgroudColor));
-        FontRenderer fr = getFontRenderer();
 
-        GlStateManager.enableBlend();
-        GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        fr.drawString("Please join a dungeon to see preview", featureRect.width / 2 - fr.getStringWidth("Please join a dungeon to see preview") / 2, featureRect.height / 2 - fr.FONT_HEIGHT / 2, 0xFFFFFFFF);
-        GL11.glLineWidth(2);
-        RenderUtils.drawUnfilledBox(0, 0, featureRect.width, featureRect.height, this.<AColor>getParameter("border_color").getValue());
-    }
+
+//    @Override
+//    public void drawDemo(float partialTicks) {
+//        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+//        if (DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnDungeon() && context != null && context.getMapProcessor().isInitialized() && on) {
+//            drawHUD(partialTicks);
+//            return;
+//        }
+//        Rectangle featureRect = getFeatureRect().getRectangle();
+//        Gui.drawRect(0, 0, featureRect.width, featureRect.height, RenderUtils.getColorAt(featureRect.x, featureRect.y, DgOneCongifConfig.oneconftodgcolor(backgroudColor)));
+//        FontRenderer fr = getFontRenderer();
+//
+//        GlStateManager.enableBlend();
+//        GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//        fr.drawString("Please join a dungeon to see preview", featureRect.width / 2 - fr.getStringWidth("Please join a dungeon to see preview") / 2, featureRect.height / 2 - fr.FONT_HEIGHT / 2, 0xFFFFFFFF);
+//        GL11.glLineWidth(2);
+//        RenderUtils.drawUnfilledBox(0, 0, featureRect.width, featureRect.height, DgOneCongifConfig.oneconftodgcolor(border_color));
+//    }
 
     public void renderMap(float partialTicks, MapProcessor mapProcessor, MapData mapData, DungeonContext context) {
         EntityPlayer p = Minecraft.getMinecraft().thePlayer;
 
         float postScale = this.centerMapOnPlayer ? postscaleOfMap : 1;
 
-        Rectangle featureRect = getFeatureRect().getRectangle();
-        int width = featureRect.width;
+//        Rectangle featureRect = getFeatureRect().getRectangle();
+//        int width = featureRect.width;
 
-        float scale = shouldScale ? width / 128.0f : 1;
-
-        GlStateManager.translate(width / 2d, width / 2d, 0);
+//        float scale = shouldScale ? width / 128.0f : 1;
+//
+//        GlStateManager.translate(width / 2d, width / 2d, 0);
         GlStateManager.scale(scale, scale, 0);
         GlStateManager.scale(postScale, postScale, 0);
 
@@ -440,7 +524,7 @@ public class FeatureDungeonMap extends GuiFeature implements DungeonEndListener,
         // cutting out the player head out of the skin texture
         Gui.drawScaledCustomSizeModalRect(-4, -4, 8.0F, l2, 8, i3, 8, 8, 64.0F, 64.0F);
         GL11.glLineWidth(1);
-        RenderUtils.drawUnfilledBox(-4, -4, 4, 4, this.playerColor);
+        RenderUtils.drawUnfilledBox(-4, -4, 4, 4, DgOneCongifConfig.oneconftodgcolor(this.playerColor));
         GlStateManager.popMatrix();
     }
 

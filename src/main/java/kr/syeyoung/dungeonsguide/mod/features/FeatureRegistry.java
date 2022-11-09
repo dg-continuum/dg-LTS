@@ -104,10 +104,6 @@ public class FeatureRegistry {
     public static SimpleFeature SOLVER_WATERPUZZLE;
     public static SimpleFeature SOLVER_CREEPER;
 
-
-
-    public static FeatureDungeonMap DUNGEON_MAP;
-    public static FeatureTestPepole TEST_PEPOLE;
     public static FeatureDungeonRoomName DUNGEON_ROOMNAME;
     public static FeaturePressAnyKeyToCloseChest DUNGEON_CLOSECHEST;
     public static FeatureBoxSkelemaster DUNGEON_BOXSKELEMASTER;
@@ -176,7 +172,6 @@ public class FeatureRegistry {
     public static SimpleFeature DISCORD_RICHPRESENCE;
     public static PartyInviteViewer DISCORD_ASKTOJOIN;
     public static PlayingDGAlarm DISCORD_ONLINEALARM;
-    public static SimpleFeature DISCORD_DONOTUSE;
 
     public static FeatureRoomDebugInfo ADVANCED_DEBUG_ROOM;
 
@@ -220,8 +215,6 @@ public class FeatureRegistry {
             DUNGEON_BOXSKELEMASTER = register(new FeatureBoxSkelemaster());
             DUNGEON_CLOSECHEST = register(new FeaturePressAnyKeyToCloseChest());
             DUNGEON_ROOMNAME = register(new FeatureDungeonRoomName());
-//            TEST_PEPOLE = register(new FeatureTestPepole());
-            DUNGEON_MAP = register(new FeatureDungeonMap());
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
             SOLVER_WATERPUZZLE = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Waterboard (Advanced)", "Calculates solution for waterboard puzzle and displays it to user", "solver.waterboard"));
             SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Item Drop Line Settings", "Line Settings when pathfind to Item Drop, when using above feature", "secret.lineproperties.apf.itemdrop", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
@@ -232,7 +225,12 @@ public class FeatureRegistry {
             SECRET_LINE_PROPERTIES_AUTOPATHFIND = register(new PathfindLineProperties("Dungeon.Secrets.Legacy AutoPathfind", "Line Settings", "Line Settings when pathfinding using above features", "secret.lineproperties.autopathfind", true, SECRET_LINE_PROPERTIES_GLOBAL));
             SECRET_BLOOD_RUSH_LINE_PROPERTIES = register(new PathfindLineProperties("Dungeon.Secrets.Blood Rush", "Blood Rush Line Settings", "Line Settings to be used", "secret.lineproperties.bloodrush", false, SECRET_LINE_PROPERTIES_GLOBAL));
             SECRET_BLOOD_RUSH = register(new FeatureBloodRush());
-            SECRET_NEXT_KEY = register(new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind", "Auto Pathfind to new secret upon pressing a key", "Auto browse the best next secret when you press key.\nPress settings to edit the key", "secret.keyfornext", false) {{
+            SECRET_NEXT_KEY = register(
+                    new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind",
+                            "Auto Pathfind to new secret upon pressing a key",
+                            "Auto browse the best next secret when you press key.\nPress settings to edit the key",
+                            "secret.keyfornext", false)
+            {{
                 addParameter("key", new FeatureParameter<Integer>("key", "Key", "Press to navigate to next best secret", Keyboard.KEY_NONE, "keybind"));
             }});
 
@@ -279,9 +277,15 @@ public class FeatureRegistry {
             });
             DISCORD_ASKTOJOIN = register(new PartyInviteViewer());
             DISCORD_ONLINEALARM = register(new PlayingDGAlarm());
-            DISCORD_DONOTUSE = register(new SimpleFeature("Discord", "Disable Native Library", "Disables usage of jna for discord rpc support.\nBreaks any discord related feature in the mod.\nRequires mod restart to get affected.\n\nThis feature is only for those whose minecraft crashes due to discord gamesdk crash.", "discord.rpc", false));
             ADVANCED_DEBUG_ROOM = register(new FeatureRoomDebugInfo());
             ADVANCED_DEBUGGABLE_MAP = register(new FeatureDebuggableMap());
+
+
+
+            // MIGRATED
+
+
+
             ADVANCED_COORDS = register(new FeatureRoomCoordDisplay());
         } catch (Exception e) {
             System.out.println(e);

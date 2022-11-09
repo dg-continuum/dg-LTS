@@ -187,7 +187,7 @@ public class DungeonsGuide implements IDungeonGuide {
             ClientCommandHandler.instance.registerCommand(commandReparty);
         }
 
-        if (FeatureRegistry.DISCORD_DONOTUSE.isEnabled()) {
+        if (DgOneCongifConfig.disableDiscd) {
             System.setProperty("dg.safe", "true");
         }
 

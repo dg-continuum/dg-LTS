@@ -8,6 +8,7 @@ import cc.polyfrost.oneconfig.config.data.*;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.BossHealth;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.DungeonMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.Ping;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.*;
@@ -478,6 +479,44 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Update Alarm"
     )
     public static boolean updateAlarm  = false;
+
+
+    @Info(
+            text = "Disables usage of jna for discord rpc support. Breaks any discord related feature in the mod. Requires mod restart to get affected. This feature is only for those whose minecraft crashes due to discord gamesdk crash.",
+            type = InfoType.INFO,
+            category = "Discord",
+            subcategory = "Disable Native Library"
+    )
+    public static boolean useless;
+    @Switch(
+            name = "enable",
+            size = 2,
+            category = "Discord",
+            subcategory = "Disable Native Library"
+    )
+    public static boolean disableDiscd  = true;
+
+
+
+    @Switch(
+            name = "enable",
+            size = 2,
+            category = "HUD",
+            description = "Display dungeon map!",
+            subcategory = "Dungeon Map"
+    )
+    public static boolean dungeonMap = true;
+
+    @Page(
+            name = "Settings",
+            location = PageLocation.BOTTOM,
+            category = "HUD",
+            subcategory = "Dungeon Map"
+    )
+    private static DungeonMap mp = new DungeonMap();
+
+
+
 
 
 
