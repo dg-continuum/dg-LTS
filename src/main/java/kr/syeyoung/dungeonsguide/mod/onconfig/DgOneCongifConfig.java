@@ -31,7 +31,6 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean DEBUG_BLOCKCACHING = true;
 
-
     @Switch(
             description = "Display Coordinate Relative to the Dungeon Room and room's rotation",
             name = "Enabled",
@@ -47,6 +46,7 @@ public class DgOneCongifConfig extends Config {
     )
     public static OneColor DUNGEON_CORDS_COLOR = new OneColor(255, 191, 0);
 
+
     @Switch(
             name = "Enabled",
             description = "Display Coordinate Relative to the Dungeon Room and room's rotation",
@@ -60,6 +60,7 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Dungeon Room Info"
     )
     public static OneColor DUNGEON_ROOMINFO_COLOR = new OneColor(255, 255, 255);
+
 
     @Switch(
             name = "Enabled",
@@ -76,9 +77,6 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Test People"
     )
     public static float DEBUG_TEST_PEPOLE_SCALE = 2F;
-
-
-
 
 
     @Switch(
@@ -100,10 +98,42 @@ public class DgOneCongifConfig extends Config {
 
 
 
+    @Switch(
+            name = "Blaze Solver",
+            size = 2,
+            description = "Highlights the blaze that needs to be killed in an blaze room",
+            category = "Solvers",
+            subcategory = "Blaze Solver"
+    )
+    public static boolean BLAZE_SOLVER = true;
 
+    @Color(
+            name = "Normal Blaze Color",
+            category = "Solvers",
+            subcategory = "Blaze Solver"
+    )
+    public static OneColor BLAZE_SOLVER_COLOR_NORMAL = new OneColor(255,255,255, 255);
 
+    @Color(
+            name = "Next Blaze Color",
+            category = "Solvers",
+            subcategory = "Blaze Solver"
+    )
+    public static OneColor BLAZE_SOLVER_COLOR_NEXT = new OneColor(0,255,0, 255);
 
+    @Color(
+            name = "Next up Blaze Color",
+            category = "Solvers",
+            subcategory = "Blaze Solver"
+    )
+    public static OneColor BLAZE_SOLVER_COLOR_NEXT_UP = new OneColor(255,255,0, 255);
 
+    @Color(
+            name = "Blaze Border Color",
+            category = "Solvers",
+            subcategory = "Blaze Solver"
+    )
+    public static OneColor BLAZE_SOLVER_BORDER = new OneColor(255,255,255, 0);
 
 
 
@@ -137,7 +167,7 @@ public class DgOneCongifConfig extends Config {
         super(new Mod("DG-LTS", ModType.SKYBLOCK, "/gdlogox512.png"), "dgconfig.json");
         initialize();
 
-        hideMultipleIf( () -> DEBUG_MODE,  "NO");
+        hideMultipleIf(() -> !DEBUG_MODE,  "DEBUGABLE_MAP", "DEBUG_BLOCKCACHING", "DEBUG_DUNGEON_CORDS", "DUNGEON_CORDS_COLOR", "DEBUG_ROOM_INFO", "DUNGEON_ROOMINFO_COLOR", "DEBUG_TEST_PEPOLE", "DEBUG_TEST_PEPOLE_SCALE", "DEBUG_ROOMEDIT_KEYBIND", "DEBUG_ROOM_EDIT");
 
 //        addDependency("fieldname", () -> bollthatdetemins);
     }
