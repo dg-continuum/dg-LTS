@@ -137,6 +137,30 @@ public class DgOneCongifConfig extends Config {
 
 
 
+
+
+
+
+
+    @Switch(
+            name = "Bomb Defuse",
+            size = 2,
+            description = "Communicates with others dg using key 'F' for solutions and displays it",
+            category = "Solvers",
+            subcategory = "Bomb Defuse Solver"
+    )
+    public static boolean BOMB_DEFUSE_SOLVER = false;
+
+    @KeyBind(
+            category = "Solvers",
+            name = "keybind",
+            description = "Press to send solution in chat",
+            subcategory = "Bomb Defuse Solver"
+    )
+    public static OneKeyBind BOMB_DEFUSE_SOLVER_KEYBIND = new OneKeyBind(UKeyboard.KEY_NONE);
+
+
+
     @Switch(
             name = "Pathfind to all",
             category = "Secrets", // optional

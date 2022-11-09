@@ -86,7 +86,7 @@ public class RoomProcessorBombDefuseSolver extends GeneralRoomProcessor {
 
     public RoomProcessorBombDefuseSolver(DungeonRoom dungeonRoom) {
         super(dungeonRoom);
-        if (!FeatureRegistry.SOLVER_BOMBDEFUSE.isEnabled()) {
+        if (!DgOneCongifConfig.BOMB_DEFUSE_SOLVER) {
             bugged = true;
             return;
         }

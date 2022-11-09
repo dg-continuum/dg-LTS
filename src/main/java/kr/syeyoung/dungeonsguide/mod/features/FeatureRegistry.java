@@ -111,7 +111,7 @@ public class FeatureRegistry {
     public static FeatureSolverSilverfish SOLVER_SILVERFISH;
     public static FeatureSolverBox SOLVER_BOX;
     public static FeatureSolverKahoot SOLVER_KAHOOT;
-    public static FeatureSolverBombdefuse SOLVER_BOMBDEFUSE;
+
 
 
     public static FeatureDungeonMap DUNGEON_MAP;
@@ -233,7 +233,6 @@ public class FeatureRegistry {
             DUNGEON_ROOMNAME = register(new FeatureDungeonRoomName());
 //            TEST_PEPOLE = register(new FeatureTestPepole());
             DUNGEON_MAP = register(new FeatureDungeonMap());
-            SOLVER_BOMBDEFUSE = register(new FeatureSolverBombdefuse());
             SOLVER_KAHOOT = register(new FeatureSolverKahoot());
             SOLVER_BOX = register(new FeatureSolverBox());
             SOLVER_SILVERFISH = register(new FeatureSolverSilverfish());
