@@ -109,7 +109,6 @@ public class FeatureRegistry {
     public static FeatureSolverTeleport SOLVER_TELEPORT;
     public static FeatureSolverIcefill SOLVER_ICEPATH;
     public static FeatureSolverSilverfish SOLVER_SILVERFISH;
-    public static FeatureSolverBox SOLVER_BOX;
     public static FeatureSolverKahoot SOLVER_KAHOOT;
 
 
@@ -234,7 +233,6 @@ public class FeatureRegistry {
 //            TEST_PEPOLE = register(new FeatureTestPepole());
             DUNGEON_MAP = register(new FeatureDungeonMap());
             SOLVER_KAHOOT = register(new FeatureSolverKahoot());
-            SOLVER_BOX = register(new FeatureSolverBox());
             SOLVER_SILVERFISH = register(new FeatureSolverSilverfish());
             SOLVER_ICEPATH = register(new FeatureSolverIcefill());
             PINGER = register(new FeaturePing());

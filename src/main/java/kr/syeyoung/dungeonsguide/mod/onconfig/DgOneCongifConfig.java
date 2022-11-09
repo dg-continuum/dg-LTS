@@ -161,6 +161,75 @@ public class DgOneCongifConfig extends Config {
 
 
 
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Calculates solution for box puzzle room, and displays it to user",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static boolean SOLVER_BOX = true;
+
+
+    @Switch(
+            name = "disableText",
+            description = "Box Puzzle Solver Disable text\", \"Disable 'Type recalc to recalculate solution' showing up on top left.\\nYou can still type recalc to recalc solution after disabling this feature",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static boolean SOLVER_BOX_DISABLE_TEXT = false;
+
+    @Slider(
+            name = "Line Thickness",
+            min = 0,
+            max = 10,
+            description = "Thickness of the solution line",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static float SOLVER_BOX_LINEWIDTH = 1.0F;
+
+    @Color(
+            name = "Line Color",
+            description = "Color of the solution line",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static OneColor SOLVER_BOX_LINE_COLOR = new OneColor(0xFF00FF00);
+
+
+    @Color(
+            name = "Target Color",
+            description = "Color of the target button",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static OneColor SOLVER_BOX_TARGET_COLOR = new OneColor(0x5500FFFF);
+
+    @Color(
+            name = "Text Color Next Step",
+            description = "Color of the text (next step)",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static OneColor SOLVER_BOX_TEXT_COLOR_NEXT_STEP = new OneColor(0xFF00FF00);
+
+    @Color(
+            name = "Text Color Next Step",
+            description = "Color of the text (others)",
+            category = "Solvers",
+            subcategory = "Box (Advanced)"
+    )
+    public static OneColor SOLVER_BOX_TEXT_COLOR = new OneColor(0xFF000000);
+
+
+
+
+
+
+
     @Switch(
             name = "Pathfind to all",
             category = "Secrets", // optional
