@@ -23,6 +23,8 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Silverfish;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -139,9 +141,9 @@ public class RoomProcessorIcePath extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!FeatureRegistry.SOLVER_SILVERFISH.isEnabled()) return;
+        if (!DgOneCongifConfig.silverFishSolver) return;
         if (!err)
-        RenderUtils.drawLines(solution, FeatureRegistry.SOLVER_SILVERFISH.getLineColor(),FeatureRegistry.SOLVER_SILVERFISH.getLineWidth(), partialTicks, true);
+            RenderUtils.drawLines(solution, DgOneCongifConfig.oneconftodgcolor(Silverfish.color), Silverfish.width, partialTicks, true);
     }
 
     public Point getPointOfSilverFishOnMap(BlockPos blockPos) {

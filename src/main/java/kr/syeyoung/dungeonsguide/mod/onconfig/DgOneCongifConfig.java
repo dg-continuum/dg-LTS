@@ -9,8 +9,10 @@ import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.config.data.PageLocation;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.IceFillPage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.KahootPage;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Silverfish;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Weirdos;
 
 import java.util.function.Supplier;
@@ -277,6 +279,25 @@ public class DgOneCongifConfig extends Config {
     public Weirdos b = new Weirdos();
 
 
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Actively calculates solution for silverfish puzzle and displays it to user",
+            category = "Solvers",
+            subcategory = "Silverfish (Advanced)"
+    )
+    public static boolean silverFishSolver = true;
+    @Page(
+            name = "options",
+            location = PageLocation.BOTTOM,
+            category = "Solvers",
+            subcategory = "Silverfish (Advanced)"
+    )
+    public Silverfish c = new Silverfish();
+
+
+
+
 
     @Switch(
             name = "Pathfind to all",
@@ -301,6 +322,10 @@ public class DgOneCongifConfig extends Config {
         for (String dep : deps) {
             hideIf(dep, condition);
         }
+    }
+
+    public static AColor oneconftodgcolor(OneColor c){
+        return new AColor(c.getRed(), c.getBlue(), c.getGreen(), c.getAlpha());
     }
 
 

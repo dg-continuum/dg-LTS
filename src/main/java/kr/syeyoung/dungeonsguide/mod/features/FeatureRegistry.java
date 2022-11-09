@@ -106,7 +106,6 @@ public class FeatureRegistry {
     public static SimpleFeature SOLVER_WATERPUZZLE;
     public static SimpleFeature SOLVER_CREEPER;
     public static FeatureSolverTeleport SOLVER_TELEPORT;
-    public static FeatureSolverSilverfish SOLVER_SILVERFISH;
 
 
 
@@ -229,7 +228,6 @@ public class FeatureRegistry {
             DUNGEON_ROOMNAME = register(new FeatureDungeonRoomName());
 //            TEST_PEPOLE = register(new FeatureTestPepole());
             DUNGEON_MAP = register(new FeatureDungeonMap());
-            SOLVER_SILVERFISH = register(new FeatureSolverSilverfish());
             PINGER = register(new FeaturePing());
             SOLVER_TELEPORT = register(new FeatureSolverTeleport());
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
