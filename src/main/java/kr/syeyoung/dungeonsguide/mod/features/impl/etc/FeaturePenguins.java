@@ -24,6 +24,7 @@ import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.PlayerRenderListener;
 import kr.syeyoung.dungeonsguide.mod.features.listener.TextureStichListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -49,8 +50,8 @@ public class FeaturePenguins extends SimpleFeature implements PlayerRenderListen
     public FeaturePenguins() {
         super("Misc", "Penguins", "Awwww", "etc.penguin", false);
         OBJLoader.instance.addDomain("dungeonsguide");
-
     }
+
     @Override
     public void onTextureStitch(TextureStitchEvent event) {
         if (event instanceof TextureStitchEvent.Pre) {
@@ -79,8 +80,7 @@ public class FeaturePenguins extends SimpleFeature implements PlayerRenderListen
 
     @Override
     public void onEntityRenderPre(RenderPlayerEvent.Pre renderPlayerEvent) {
-
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.penguins) return;
         if (renderPlayerEvent.entityPlayer.isInvisible()) return;
         renderPlayerEvent.setCanceled(true);
         GlStateManager.pushMatrix();

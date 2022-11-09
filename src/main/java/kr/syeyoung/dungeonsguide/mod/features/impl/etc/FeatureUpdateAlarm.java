@@ -23,12 +23,18 @@ import kr.syeyoung.dungeonsguide.mod.events.impl.StompConnectedEvent;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.StompConnectedListener;
 import kr.syeyoung.dungeonsguide.mod.features.listener.TickListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 
 public class FeatureUpdateAlarm extends SimpleFeature implements StompConnectedListener, TickListener {
     public FeatureUpdateAlarm() {
-        super("Misc", "Update Alarm","Show a warning in chat when a version has been released.", "etc.updatealarm", true);
+        super("", "","", "etc.updatealarm", true);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.updateAlarm;
     }
 
     private String stompPayload;

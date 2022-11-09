@@ -20,6 +20,7 @@ package kr.syeyoung.dungeonsguide.mod.commands;
 
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import net.minecraft.client.Minecraft;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 public class CommandReparty extends CommandBase {
     private String command;
     public CommandReparty() {
-        command = FeatureRegistry.ETC_REPARTY.<String>getParameter("command").getValue();
+        command = DgOneCongifConfig.reparty;
         command = command.replace(" ", "");
     }
 

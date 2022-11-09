@@ -20,6 +20,7 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -29,9 +30,14 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 
 public class FeatureCopyMessages extends SimpleFeature implements ChatListener {
     public FeatureCopyMessages() {
-        super("Misc.Chat", "Copy Chat Messages", "Click on copy to copy", "etc.copymsg");
-        setEnabled(false);
+        super("Misc.Chat", "", "", "etc.copymsg");
     }
+
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.copyChatMesseges;
+    }
+
     @Override
     public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
         if (!isEnabled()) return;

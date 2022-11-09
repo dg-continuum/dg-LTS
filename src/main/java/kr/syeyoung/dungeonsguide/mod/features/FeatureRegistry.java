@@ -150,7 +150,6 @@ public class FeatureRegistry {
     public static FeatureTooltipPrice ETC_PRICE;
     public static FeatureAbilityCooldown ETC_ABILITY_COOLDOWN;
     public static FeatureCooldownCounter ETC_COOLDOWN;
-    public static FeatureRepartyCommand ETC_REPARTY;
     public static FeatureDecreaseExplosionSound ETC_EXPLOSION_SOUND;
     public static FeatureAutoAcceptReparty ETC_AUTO_ACCEPT_REPARTY;
     public static FeatureUpdateAlarm ETC_TEST;
@@ -263,7 +262,6 @@ public class FeatureRegistry {
             ETC_PRICE = register(new FeatureTooltipPrice());
             ETC_ABILITY_COOLDOWN = register(new FeatureAbilityCooldown());
             ETC_COOLDOWN = register(new FeatureCooldownCounter());
-            ETC_REPARTY = register(new FeatureRepartyCommand());
             ETC_EXPLOSION_SOUND = register(new FeatureDecreaseExplosionSound());
             ETC_AUTO_ACCEPT_REPARTY = register(new FeatureAutoAcceptReparty());
             ETC_TEST = register(new FeatureUpdateAlarm());

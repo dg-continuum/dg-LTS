@@ -21,6 +21,7 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.TooltipListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.AhUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.item.ItemStack;
@@ -34,16 +35,20 @@ import java.util.TreeSet;
 
 public class FeatureTooltipPrice extends SimpleFeature implements TooltipListener {
     public FeatureTooltipPrice() {
-        super("Misc.API Features", "Item Price", "Shows price of items", "tooltip.price");
-        addParameter("reqShift", new FeatureParameter<Boolean>("reqShift", "Require Shift", "If shift needs to be pressed in order for this feature to be activated", false, "boolean"));
-        setEnabled(false);
+        super("", "", "", "tooltip.price");
+    }
+
+
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.dungeonStat;
     }
 
     @Override
     public void onTooltip(ItemTooltipEvent event) {
         if (!isEnabled()) return;
 
-        boolean activated = !this.<Boolean>getParameter("reqShift").getValue() || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+        boolean activated = !DgOneCongifConfig.tooltipPrice || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
 
         ItemStack hoveredItem = event.itemStack;
         NBTTagCompound compound = hoveredItem.getTagCompound();

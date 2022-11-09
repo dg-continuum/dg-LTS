@@ -183,7 +183,7 @@ public class DungeonsGuide implements IDungeonGuide {
             e.printStackTrace();
         }
 
-        if (FeatureRegistry.ETC_REPARTY.isEnabled()) {
+        if (DgOneCongifConfig.repartyCommand) {
             ClientCommandHandler.instance.registerCommand(commandReparty);
         }
 

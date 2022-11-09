@@ -4,14 +4,12 @@ import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
-import cc.polyfrost.oneconfig.config.data.Mod;
-import cc.polyfrost.oneconfig.config.data.ModType;
-import cc.polyfrost.oneconfig.config.data.OptionSize;
-import cc.polyfrost.oneconfig.config.data.PageLocation;
+import cc.polyfrost.oneconfig.config.data.*;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.BossHealth;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.Ping;
+import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.*;
 
 import java.util.function.Supplier;
@@ -356,17 +354,131 @@ public class DgOneCongifConfig extends Config {
 
 
     @Switch(
-            name = "Pathfind to all",
-            category = "Secrets", // optional
-            subcategory = "Mode" // optional
+            name = "enabled",
+            size = 2,
+            description = "Automatically accept reparty",
+            category = "Misc",
+            subcategory = "Auto accept reparty"
     )
-    public static boolean pathfindToAll = false; // this is the default value.
+    public static boolean autoRp = true;
+
+
+
     @Switch(
-            name = "Blood Rush mode",
-            category = "Secrets", // optional
-            subcategory = "Mode" // optional
+            name = "enabled",
+            size = 2,
+            description = "Click on copy to copy",
+            category = "Misc",
+            subcategory = "Copy Chat Messages"
     )
-    public static boolean bloodRush = false; // this is the default value.
+    public static boolean copyChatMesseges = false;
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Decreases volume of explosions while on skyblock",
+            category = "Misc",
+            subcategory = "Decrease Explosion sound effect"
+    )
+    public static boolean decreseExplosionSound = true;
+    @Slider(
+            name = "Sound Multiplier %",
+            min = 1F,
+            max = 100F,
+            description = "The volume of explosion effect will be multiplied by this value. 0~100",
+            category = "Misc",
+            subcategory = "Decrease Explosion sound effect"
+    )
+    public static float explosionDecreseMultiplyer = 10F;
+
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Do not let ability messages show up in chatbox\nclick on Edit for more precise settings",
+            category = "Misc",
+            subcategory = "Disable ability messages"
+    )
+    public static boolean disableMessages = true;
+    @Page(
+            name = "Settings",
+            location = PageLocation.BOTTOM,
+            category = "Misc",
+            subcategory = "Disable ability messages"
+    )
+    public DisableMessage aaa = new DisableMessage();
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Shows a cool dungeon start instead of the chat messages",
+            category = "HUD",
+            subcategory = "Epic Dungeon Start Countdown"
+    )
+    public static boolean epicCountdown = true;
+
+    @Switch(name = "Clean Dungeon Chat", category = "HUD", subcategory = "Epic Dungeon Start Countdown")
+    public static boolean cleanChat = true;
+    @Switch(name = "Countdown SFX", category = "HUD", subcategory = "Epic Dungeon Start Countdown")
+    public static boolean sfxenabled = true;
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Awwww",
+            category = "Misc",
+            subcategory = "Penguins"
+    )
+    public static boolean penguins = false;
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            category = "Misc",
+            subcategory = "Reparty Command From DG"
+    )
+    public static boolean repartyCommand = false;
+    @Info(text = "if you disable, /dg reparty will still work, Auto reparty will still work\nRequires Restart to get applied", type = InfoType.INFO, category = "Misc", subcategory = "Reparty Command From DG")
+    public static boolean ignored2; // Useless. Java limitations with @annotation.
+    @Text(
+            name = "The Command",
+            placeholder = "reparty",
+            category = "Misc",
+            subcategory = "Reparty Command From DG"
+    )
+    public static String reparty = "reparty";
+
+
+
+    @Switch(
+            name = "enabled",
+            description = "Shows quality of dungeon items (floor, percentage)",
+            size = 2,
+            category = "Misc",
+            subcategory = "Dungeon Item Stats"
+    )
+    public static boolean dungeonStat = false;
+
+    @Switch(
+            name = "Require Shift",
+            description = "If shift needs to be pressed in order for this feature to be activated",
+            category = "Misc",
+            subcategory = "Dungeon Item Stats"
+    )
+    public static boolean tooltipPrice = false;
+
+    @Switch(
+            name = "enabled",
+            description = "Show a warning in chat when a version has been released.",
+            size = 2,
+            category = "Misc",
+            subcategory = "Update Alarm"
+    )
+    public static boolean updateAlarm  = false;
+
 
 
     void addDependences(Supplier<Boolean> condition, String... deps){

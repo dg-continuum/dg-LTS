@@ -3,8 +3,8 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessResult;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.ScoreBoardUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TitleRender;
@@ -27,24 +27,24 @@ public class FeatureEpicCountdown extends SimpleFeature {
 
     static volatile long updatedAt;
     static volatile int secondsLeft;
-    private static boolean cleanChat;
-    private boolean sfxenabled;
 
     int actualSecondsLeft;
 
     public FeatureEpicCountdown() {
-        super("Dungeon.HUDs", "Epic Dungeon Start Countdown", "Shows a cool dungeon start instead of the chat messages", "etc.dungeoncountdown", true);
-        addParameter("cleanchat", new FeatureParameter<>("cleanchat", "Clean Dungeon Chat", "^^^", true, "boolean", nval -> cleanChat = nval));
-        addParameter("sounds", new FeatureParameter<>("sounds", "Countdown SFX", "^^^", true, "boolean", nval -> sfxenabled = nval));
-
+        super("Dungeon.HUDs", "", "", "etc.dungeoncountdown", true);
         lastSec = GO_TEXT;
 
         ChatProcessor.INSTANCE.subscribe(FeatureEpicCountdown::processChat);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.epicCountdown;
+    }
+
     public static ChatProcessResult processChat(String txt, Map<String, Object> context) {
-        if(cleanChat){
+        if(DgOneCongifConfig.cleanChat){
             if(txt.startsWith("§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.§r")){
                 return REMOVE_CHAT;
             }
@@ -139,7 +139,7 @@ public class FeatureEpicCountdown extends SimpleFeature {
         String string = "§c" + actualSecondsLeft;
 
         if(!Objects.equals(string, lastSec)){
-            if(actualSecondsLeft == 3   && sfxenabled){
+            if(actualSecondsLeft == 3   && DgOneCongifConfig.sfxenabled){
                 Minecraft.getMinecraft().thePlayer.playSound("skyblock_dungeons_guide:readysetgo", 1F, 1F);
             }
             if(actualSecondsLeft > 5){

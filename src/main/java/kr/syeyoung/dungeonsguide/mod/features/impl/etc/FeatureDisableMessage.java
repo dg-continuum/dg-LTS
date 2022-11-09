@@ -22,10 +22,14 @@ import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class FeatureDisableMessage extends SimpleFeature implements ChatListener {
@@ -38,28 +42,34 @@ public class FeatureDisableMessage extends SimpleFeature implements ChatListener
         private String key;
     }
 
-    private static final MessageData[] PRE_DEFINED = new MessageData[] {
-            new MessageData(Pattern.compile("§r§cThere are blocks in the way!§r"), "Aote block message", "\"There are blocks in the way!\"", "aote"),
-            new MessageData(Pattern.compile("§r§cThis ability is currently on cooldown for .+ more seconds?\\.§r"), "Ability cooldown message", "\"This ability is currently on cooldown for 3 more seconds.\"", "cooldown"),
-            new MessageData(Pattern.compile("§r§cThis ability is on cooldown for .+s\\.§r"), "Ability cooldown message2", "\"This ability is on cooldown for 3s.\"", "cooldown2"),
-            new MessageData(Pattern.compile("§r§cWhow! Slow down there!§r"), "Grappling hook cooldown", "\"Whow! Slow down there!\"", "grappling"),
-            new MessageData(Pattern.compile("§r§cNo more charges, next one in §r§e.+§r§cs!§r"), "Zombie Sword Charging", "\"No more charges, next one in 3s!\"", "zombie"),
-            new MessageData(Pattern.compile("§r§7Your .+ hit §r§c.+ §r§7enem(?:y|ies) for §r§c.+ §r§7damage\\.§r"), "Ability Damage", "\"Your blahblah hit 42 enemy for a lots of damage\"", "ability"),
-            new MessageData(Pattern.compile("§r§cYou do not have enough mana to do this!§r"), "Not enough mana", "\"You do not have enough mana to do this!\"", "mana"),
-            new MessageData(Pattern.compile("§r§aUsed §r.+§r§a!§r"), "Dungeon Ability Usage", "\"Used Guided Sheep!\" and such", "dungeonability"),
-            new MessageData(Pattern.compile("§r.+§r§a is ready to use! Press §r.+§r§a to activate it!§r"), "Ready to use message", "\"Blah is ready to use! Press F to activate it!", "readytouse"),
-            new MessageData(Pattern.compile("§r.+ §r§ais now available!§r"), "Ability Available","\"blah is now available!\"", "available"),
-            new MessageData(Pattern.compile("§r§cThe Stone doesn't seem to do anything here\\.§r"), "Stone Message", "\"The Stone doesn't seem to do anything here\"", "stone"),
-            new MessageData(Pattern.compile("§r§cNo target found!§r"), "Voodoo Doll No Target", "\"No target found!\"", "voodotarget")
-    };
 
-    public FeatureDisableMessage() {
-        super("Misc.Chat", "Disable ability messages", "Do not let ability messages show up in chatbox\nclick on Edit for more precise settings", "fixes.messagedisable", true);
-        for (MessageData messageData : PRE_DEFINED) {
-            addParameter(messageData.key, new FeatureParameter<Boolean>(messageData.key, messageData.name, messageData.description, true, "boolean"));
-        }
+    public static final Map<String, Pattern> messeges = new HashMap<>();
+
+
+    static {
+        messeges.put("aote", Pattern.compile("§r§cThere are blocks in the way!§r"));
+        messeges.put("cooldown", Pattern.compile("§r§cThis ability is currently on cooldown for .+ more seconds?\\.§r"));
+        messeges.put("cooldown2", Pattern.compile("§r§cThis ability is on cooldown for .+s\\.§r"));
+        messeges.put("grappling", Pattern.compile("§r§cWhow! Slow down there!§r"));
+        messeges.put("zombie", Pattern.compile("§r§cNo more charges, next one in §r§e.+§r§cs!§r"));
+        messeges.put("ability",Pattern.compile("§r§7Your .+ hit §r§c.+ §r§7enem(?:y|ies) for §r§c.+ §r§7damage\\.§r"));
+        messeges.put("mana", Pattern.compile("§r§cYou do not have enough mana to do this!§r"));
+        messeges.put("dungeonability", Pattern.compile("§r§aUsed §r.+§r§a!§r"));
+        messeges.put("readytouse", Pattern.compile("§r.+§r§a is ready to use! Press §r.+§r§a to activate it!§r"));
+        messeges.put("available", Pattern.compile("§r.+ §r§ais now available!§r"));
+        messeges.put("stone", Pattern.compile("§r§cThe Stone doesn't seem to do anything here\\.§r"));
+        messeges.put( "voodotarget", Pattern.compile("§r§cNo target found!§r"));
     }
 
+
+    public FeatureDisableMessage() {
+        super("Misc.Chat", "", "", "fixes.messagedisable", true);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.disableMessages;
+    }
 
     @Override
     public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
@@ -67,11 +77,50 @@ public class FeatureDisableMessage extends SimpleFeature implements ChatListener
         if (!isEnabled()) return;
         if (!SkyblockStatus.isOnSkyblock()) return;
         String msg = clientChatReceivedEvent.message.getFormattedText();
-        for (MessageData md:PRE_DEFINED) {
-            if (this.<Boolean>getParameter(md.key).getValue() && md.pattern.matcher(msg).matches()) {
-                clientChatReceivedEvent.setCanceled(true);
-                return;
-            }
+
+        if(DisableMessage.aote && messeges.get("aote").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
         }
+        if(DisableMessage.cooldown && messeges.get("cooldown").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.cooldown2 && messeges.get("cooldown2").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.grappling && messeges.get("grappling").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.zombie && messeges.get("zombie").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.ability && messeges.get("ability").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.mana && messeges.get("mana").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.dungeonability && messeges.get("dungeonability").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.readytouse && messeges.get("readytouse").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.stone && messeges.get("stone").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+            return;
+        }
+        if(DisableMessage.voodotarget && messeges.get("voodotarget").matcher(msg).matches()){
+            clientChatReceivedEvent.setCanceled(true);
+        }
+
     }
 }

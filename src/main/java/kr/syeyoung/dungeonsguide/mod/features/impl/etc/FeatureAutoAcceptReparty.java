@@ -23,15 +23,19 @@ import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 
 public class FeatureAutoAcceptReparty extends SimpleFeature implements ChatListener {
     public FeatureAutoAcceptReparty() {
-        super("Party.Reparty", "Auto accept reparty", "Automatically accept reparty", "qol.autoacceptreparty", true);
+        super("Party.Reparty", "", "", "qol.autoacceptreparty", true);
     }
 
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.autoRp;
+    }
 
     private String lastDisband;
     @Override

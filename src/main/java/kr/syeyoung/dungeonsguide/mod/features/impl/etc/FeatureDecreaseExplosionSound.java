@@ -22,13 +22,18 @@ import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.SoundListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 
 public class FeatureDecreaseExplosionSound extends SimpleFeature implements SoundListener {
     public FeatureDecreaseExplosionSound() {
-       super("Misc", "Decrease Explosion sound effect", "Decreases volume of explosions while on skyblock", "qol.explosionsound");
-        addParameter("sound", new FeatureParameter<Float>("sound", "Sound Multiplier %", "The volume of explosion effect will be multiplied by this value. 0~100", 10.0f, "float"));
+       super("Misc", "", "", "qol.explosionsound");
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.decreseExplosionSound;
     }
 
     @Override
@@ -39,7 +44,7 @@ public class FeatureDecreaseExplosionSound extends SimpleFeature implements Soun
             PositionedSoundRecord positionedSoundRecord = (PositionedSoundRecord) soundEvent.result;
             PositionedSoundRecord neweff = new PositionedSoundRecord(
                     positionedSoundRecord.getSoundLocation(),
-                    positionedSoundRecord.getVolume() * (this.<Float>getParameter("sound").getValue() / 100),
+                    positionedSoundRecord.getVolume() * (DgOneCongifConfig.explosionDecreseMultiplyer / 100),
                     positionedSoundRecord.getPitch(),
                     positionedSoundRecord.getXPosF(),
                     positionedSoundRecord.getYPosF(),
