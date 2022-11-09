@@ -7,8 +7,9 @@ import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
+import cc.polyfrost.oneconfig.config.data.PageLocation;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
-import cc.polyfrost.oneconfig.utils.commands.annotations.Description;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.IceFillPage;
 
 import java.util.function.Supplier;
 
@@ -180,7 +181,6 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Box (Advanced)"
     )
     public static boolean SOLVER_BOX_DISABLE_TEXT = false;
-
     @Slider(
             name = "Line Thickness",
             min = 0,
@@ -190,7 +190,6 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Box (Advanced)"
     )
     public static float SOLVER_BOX_LINEWIDTH = 1.0F;
-
     @Color(
             name = "Line Color",
             description = "Color of the solution line",
@@ -198,8 +197,6 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Box (Advanced)"
     )
     public static OneColor SOLVER_BOX_LINE_COLOR = new OneColor(0xFF00FF00);
-
-
     @Color(
             name = "Target Color",
             description = "Color of the target button",
@@ -207,7 +204,6 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Box (Advanced)"
     )
     public static OneColor SOLVER_BOX_TARGET_COLOR = new OneColor(0x5500FFFF);
-
     @Color(
             name = "Text Color Next Step",
             description = "Color of the text (next step)",
@@ -215,7 +211,6 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Box (Advanced)"
     )
     public static OneColor SOLVER_BOX_TEXT_COLOR_NEXT_STEP = new OneColor(0xFF00FF00);
-
     @Color(
             name = "Text Color Next Step",
             description = "Color of the text (others)",
@@ -227,6 +222,23 @@ public class DgOneCongifConfig extends Config {
 
 
 
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Calculates solution for icepath puzzle and displays it to user",
+            category = "Solvers",
+            subcategory = "Icepath (Advanced)"
+    )
+    public static boolean ICE_FILL = true;
+
+    @Page(
+            name = "options",
+            location = PageLocation.BOTTOM,
+            category = "Solvers",
+            subcategory = "Icepath (Advanced)"
+    )
+    public IceFillPage testPage2 = new IceFillPage();
 
 
 

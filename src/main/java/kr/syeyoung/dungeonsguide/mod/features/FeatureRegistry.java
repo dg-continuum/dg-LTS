@@ -107,7 +107,6 @@ public class FeatureRegistry {
     public static SimpleFeature SOLVER_WATERPUZZLE;
     public static SimpleFeature SOLVER_CREEPER;
     public static FeatureSolverTeleport SOLVER_TELEPORT;
-    public static FeatureSolverIcefill SOLVER_ICEPATH;
     public static FeatureSolverSilverfish SOLVER_SILVERFISH;
     public static FeatureSolverKahoot SOLVER_KAHOOT;
 
@@ -234,7 +233,6 @@ public class FeatureRegistry {
             DUNGEON_MAP = register(new FeatureDungeonMap());
             SOLVER_KAHOOT = register(new FeatureSolverKahoot());
             SOLVER_SILVERFISH = register(new FeatureSolverSilverfish());
-            SOLVER_ICEPATH = register(new FeatureSolverIcefill());
             PINGER = register(new FeaturePing());
             SOLVER_TELEPORT = register(new FeatureSolverTeleport());
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));

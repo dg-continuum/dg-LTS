@@ -20,10 +20,12 @@ package kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.icefill;
 
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
+import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessorGenerator;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.IceFillPage;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -92,14 +94,13 @@ public class RoomProcessorIcePath2 extends GeneralRoomProcessor {
     @Override
     public void tick() {
         super.tick();
-        if (!FeatureRegistry.SOLVER_ICEPATH.isEnabled()) return;
     }
 
     @Override
     public void drawWorld(float partialTicks) {
-        if (!FeatureRegistry.SOLVER_ICEPATH.isEnabled()) return;
+        if (!DgOneCongifConfig.ICE_FILL) return;
         for (List<BlockPos> solution:this.solution)
-            RenderUtils.drawLines(solution, FeatureRegistry.SOLVER_ICEPATH.getLineColor(),FeatureRegistry.SOLVER_ICEPATH.getLineWidth(), partialTicks, true);
+            RenderUtils.drawLines(solution, new AColor(IceFillPage.ICE_FILL_LINECOLOR.getRed(), IceFillPage.ICE_FILL_LINECOLOR.getBlue(), IceFillPage.ICE_FILL_LINECOLOR.getGreen(), IceFillPage.ICE_FILL_LINECOLOR.getAlpha()), IceFillPage.ICE_FILL_LINEWIDTH, partialTicks, true);
     }
 
     public static class Generator implements RoomProcessorGenerator<RoomProcessorIcePath2> {
