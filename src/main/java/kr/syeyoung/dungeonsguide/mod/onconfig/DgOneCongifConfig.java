@@ -309,6 +309,23 @@ public class DgOneCongifConfig extends Config {
     )
     public Teleport d = new Teleport();
 
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Shows the best move that could be taken by player in the tictactoe room",
+            category = "Solvers",
+            subcategory = "Tictactoe"
+    )
+    public static boolean ticktaktoeSolver = true;
+    @Page(
+            name = "options",
+            location = PageLocation.BOTTOM,
+            category = "Solvers",
+            subcategory = "Tictactoe"
+    )
+    public TicktackToe e = new TicktackToe();
+
+
 
 
 

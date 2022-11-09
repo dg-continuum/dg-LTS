@@ -22,6 +22,8 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.TicktackToe;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItemFrame;
@@ -183,7 +185,7 @@ public class RoomProcessorTicTacToeSolver extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!FeatureRegistry.SOLVER_TICTACTOE.isEnabled()) return;
+        if (!DgOneCongifConfig.ticktaktoeSolver) return;
         if (chosePos != -1) {
             BlockPos block = board.getOffsetPointList().get(chosePos).getBlockPos(getDungeonRoom());
             boolean whoseturn = false; // false => hype true => me
@@ -199,8 +201,8 @@ public class RoomProcessorTicTacToeSolver extends GeneralRoomProcessor {
                 whoseturn = ones < negativeones;
             }
             RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(block.getX(), block.getY(), block.getZ(), block.getX()+1, block.getY() + 1, block.getZ() + 1),
-                    whoseturn ? FeatureRegistry.SOLVER_TICTACTOE.getTargetColor()
-                            : FeatureRegistry.SOLVER_TICTACTOE.getTargetColor2(), partialTicks, true);
+                    whoseturn ? DgOneCongifConfig.oneconftodgcolor(TicktackToe.solutionColor)
+                            : DgOneCongifConfig.oneconftodgcolor(TicktackToe.predictColor), partialTicks, true);
         }
     }
 
