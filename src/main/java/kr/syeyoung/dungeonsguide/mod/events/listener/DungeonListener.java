@@ -35,6 +35,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.events.impl.*;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.MapUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import lombok.Getter;
@@ -279,7 +280,7 @@ public class DungeonListener {
             return;
         }
 
-        if (FeatureRegistry.DEBUG.isEnabled()) {
+        if (DgOneCongifConfig.DEBUG_MODE) {
             for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
                 for (DungeonDoor door : dungeonRoom.getDoors()) {
                     RenderUtils.renderDoor(door, renderWorldLastEvent.partialTicks);
@@ -302,7 +303,7 @@ public class DungeonListener {
             }
         }
 
-        if (FeatureRegistry.DEBUG.isEnabled() && dungeonRoom != null) {
+        if (DgOneCongifConfig.DEBUG_MODE && dungeonRoom != null) {
 
             Vec3 player = Minecraft.getMinecraft().thePlayer.getPositionVector();
             BlockPos real = new BlockPos(player.xCoord * 2, player.yCoord * 2, player.zCoord * 2);
@@ -421,7 +422,7 @@ public class DungeonListener {
 
     @SubscribeEvent
     public void onKeyInput(KeyBindPressedEvent keyInputEvent) {
-        if (FeatureRegistry.DEBUG.isEnabled() && FeatureRegistry.ADVANCED_ROOMEDIT.isEnabled() && keyInputEvent.getKey() == FeatureRegistry.ADVANCED_ROOMEDIT.<Integer>getParameter("key").getValue()) {
+        if (DgOneCongifConfig.DEBUG_MODE && DgOneCongifConfig.DEBUG_ROOM_EDIT && keyInputEvent.getKey() == DgOneCongifConfig.DEBUG_ROOMEDIT_KEYBIND.getKeyBinds().get(0)) {
             EditingContext ec = EditingContext.getEditingContext();
             if (ec == null) {
                 DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();

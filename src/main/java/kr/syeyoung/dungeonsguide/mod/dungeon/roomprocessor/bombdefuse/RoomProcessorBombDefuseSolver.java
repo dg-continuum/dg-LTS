@@ -37,6 +37,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bombdefuse.chambers.c
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bombdefuse.chambers.goldenpath.GoldenPathProcessorMatcher;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bombdefuse.chambers.maze.MazeProcessorMatcher;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bombdefuse.chambers.number.NumberProcessorMatcher;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import lombok.AllArgsConstructor;
@@ -239,7 +240,7 @@ public class RoomProcessorBombDefuseSolver extends GeneralRoomProcessor {
         if (bugged) return;
         BlockPos player = Minecraft.getMinecraft().thePlayer.getPosition();
         OffsetPoint offsetPoint = new OffsetPoint(getDungeonRoom(), new BlockPos(player.getX(), 68, player.getZ()));
-        if (FeatureRegistry.DEBUG.isEnabled()) {
+        if (DgOneCongifConfig.DEBUG_MODE) {
             for (ChamberSet ch : chambers) {
                 if (ch.getChamberGen() == null) continue;
                 if (ch.getLeft() != null && ch.getLeft().getProcessor() != null) {

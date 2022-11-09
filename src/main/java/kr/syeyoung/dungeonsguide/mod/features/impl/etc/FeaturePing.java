@@ -12,6 +12,7 @@ import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TitleRender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerAddress;
@@ -90,7 +91,7 @@ public class FeaturePing extends TextHUDFeature {
             temp += i;
         }
         averagePing = temp / averagePingStore.size();
-        if(FeatureRegistry.DEBUG.isEnabled()) logger.info("Updating ping: {}", ping);
+        if(DgOneCongifConfig.DEBUG_MODE) logger.info("Updating ping: {}", ping);
     }
 
     Logger logger = LogManager.getLogger("FeaturePing");

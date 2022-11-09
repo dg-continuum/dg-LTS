@@ -41,6 +41,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.pathfinding.NodeProcessorDungeonRoo
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomedit.gui.GuiDungeonAddSet;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomedit.gui.GuiDungeonRoomEdit;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.VectorUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -173,7 +174,7 @@ public class GeneralRoomProcessor implements RoomProcessor {
             a.onRenderScreen(partialTicks);
         });
 
-        if (FeatureRegistry.ADVANCED_ROOMEDIT.isEnabled() && FeatureRegistry.DEBUG.isEnabled()) {
+        if (DgOneCongifConfig.DEBUG_ROOM_EDIT && DgOneCongifConfig.DEBUG_MODE) {
             FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
 
             if (Minecraft.getMinecraft().objectMouseOver == null) return;
@@ -192,7 +193,7 @@ public class GeneralRoomProcessor implements RoomProcessor {
 
     @Override
     public void drawWorld(float partialTicks) {
-        if (FeatureRegistry.DEBUG.isEnabled() && (EditingContext.getEditingContext() != null && EditingContext.getEditingContext().getCurrent() instanceof GuiDungeonRoomEdit)) {
+        if (DgOneCongifConfig.DEBUG_MODE && (EditingContext.getEditingContext() != null && EditingContext.getEditingContext().getCurrent() instanceof GuiDungeonRoomEdit)) {
             for (Map.Entry<String, DungeonMechanic> value : dungeonRoom.getMechanics().entrySet()) {
                 if (value.getValue() == null) continue;
                 value.getValue().highlight(new Color(0,255,255,50), value.getKey(), dungeonRoom, partialTicks);
@@ -405,8 +406,8 @@ public class GeneralRoomProcessor implements RoomProcessor {
 
         if (event.entityPlayer.getHeldItem() != null &&
             event.entityPlayer.getHeldItem().getItem() == Items.stick &&
-                FeatureRegistry.ADVANCED_ROOMEDIT.isEnabled() &&
-                FeatureRegistry.DEBUG.isEnabled()) {
+                DgOneCongifConfig.DEBUG_ROOM_EDIT &&
+                DgOneCongifConfig.DEBUG_MODE) {
             EditingContext ec = EditingContext.getEditingContext();
             if (ec == null) return;
             if (!(ec.getCurrent() instanceof GuiDungeonAddSet)) return;

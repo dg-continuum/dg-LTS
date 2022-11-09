@@ -20,6 +20,7 @@ package kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight;
 
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.boss.BossStatus;
@@ -88,7 +89,7 @@ public class BossfightProcessorThorn extends GeneralBossfightProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!FeatureRegistry.DEBUG.isEnabled()) return;
+        if (!DgOneCongifConfig.DEBUG_MODE) return;
         try {
             BlockPos pos = new BlockPos(205,77, 205);
             RenderUtils.highlightBlock(pos, new Color(0, 255, 255, 50), partialTicks, false);

@@ -19,6 +19,7 @@
 package kr.syeyoung.dungeonsguide.mod.stomp;
 
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -63,12 +64,12 @@ public class StompPayload {
         if (payload != null)
             sb.append(payload);
         sb.append((char) 0);
-        if (FeatureRegistry.DEBUG.isEnabled()) System.out.println("Sending.. "+ sb);
+        if (DgOneCongifConfig.DEBUG_MODE) System.out.println("Sending.. "+ sb);
         return sb.toString();
     }
 
     public static StompPayload parse(String payload) {
-        if (FeatureRegistry.DEBUG.isEnabled()) System.out.println("Receving.. "+payload);
+        if (DgOneCongifConfig.DEBUG_MODE) System.out.println("Receving.. "+payload);
 
         Scanner scanner = new Scanner(payload);
         StompPayload stompPayload = new StompPayload();

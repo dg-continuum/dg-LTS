@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
@@ -33,7 +34,7 @@ public class BlockCache {
 
     @SuppressWarnings("UnstableApiUsage")
     public IBlockState getBlockState(@NotNull BlockPos pos){
-        if(FeatureRegistry.DEBUG_BLOCK_CACHING.isEnabled()){
+        if(DgOneCongifConfig.DEBUG_BLOCKCACHING){
             return cache.getUnchecked(pos);
         } else {
             return Minecraft.getMinecraft().theWorld.getBlockState(pos);

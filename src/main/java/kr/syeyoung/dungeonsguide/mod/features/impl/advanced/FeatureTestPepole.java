@@ -3,10 +3,10 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.advanced;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
 import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonStartListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompPayload;
@@ -47,7 +47,6 @@ import static kr.syeyoung.dungeonsguide.mod.utils.TabListUtil.getString;
 public class FeatureTestPepole extends GuiFeature implements ChatListener, DungeonStartListener {
 
     Logger logger = LogManager.getLogger("FeatureTestPepole");
-    private Float scale;
     private Set<String> lastmebersRaw;
     private boolean broadcastLock;
 
@@ -55,7 +54,7 @@ public class FeatureTestPepole extends GuiFeature implements ChatListener, Dunge
         super("Dungeon", "Feuture test", "NOU", "", false, 200, 100);
 
 
-        addParameter("scale", new FeatureParameter<>("scale", "Scale", "Scale", 2.0f, "float", nval -> this.scale = nval));
+//        addParameter("scale", new FeatureParameter<>("scale", "Scale", "Scale", 2.0f, "float", nval -> this.scale = nval));
         MinecraftForge.EVENT_BUS.register(this);
 
 //        (new Thread(() -> {
@@ -63,6 +62,11 @@ public class FeatureTestPepole extends GuiFeature implements ChatListener, Dunge
 //                handleSelfBroadcasts();
 //            }
 //        }) ).start();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.DEBUG_TEST_PEPOLE;
     }
 
     public static void handlePartyBroadCast(String playload) {
@@ -390,7 +394,7 @@ public class FeatureTestPepole extends GuiFeature implements ChatListener, Dunge
             GlStateManager.pushMatrix();
 
 
-            GlStateManager.scale(scale, scale, 1F);
+            GlStateManager.scale(DgOneCongifConfig.DEBUG_TEST_PEPOLE_SCALE, DgOneCongifConfig.DEBUG_TEST_PEPOLE_SCALE, 1F);
 
             Gui.drawRect(15 + xOffset, 5 + y, fr.getStringWidth(partyRawMember + genPlayerText(partyRawMember)) + 20 + xOffset, 15 + y, getColorTextColor(partyRawMember));
 

@@ -190,23 +190,16 @@ public class FeatureRegistry {
     public static PlayingDGAlarm DISCORD_ONLINEALARM;
     public static SimpleFeature DISCORD_DONOTUSE;
 
-
-    public static SimpleFeature DEBUG;
-    public static SimpleFeature ADVANCED_ROOMEDIT;
-
     public static FeatureRoomDebugInfo ADVANCED_DEBUG_ROOM;
 
     public static FeatureDebuggableMap ADVANCED_DEBUGGABLE_MAP;
 
     public static FeatureRoomCoordDisplay ADVANCED_COORDS;
 
-    private static FeatureDebugTrap ADVANCED_BAT;
 
     public static SimpleFeature RENDER_BREACONS;
 
     public static SimpleFeature RENDER_DESTENATION_TEXT;
-
-    public static SimpleFeature DEBUG_BLOCK_CACHING;
 
     public void init(){
         try {
@@ -268,7 +261,6 @@ public class FeatureRegistry {
             EPIC_COUNTDOWN = register(new FeatureEpicCountdown());
 
             RENDER_BREACONS = register(new SimpleFeature("Dungeon.Secrets.Preferences", "Render beacons", "Should the mod not render beacons on secret", "secret.beacons", false));
-            DEBUG_BLOCK_CACHING = register(new SimpleFeature("Debug","Enable block getBlockCaching", "Cache all world.getBlockState callls", "debug.blockcache"));
             RENDER_DESTENATION_TEXT = register(new SimpleFeature("Dungeon.Secrets.Preferences", "Render Destination text", "Should the mod not render \"destination\" on secrets", "secret.desttext", false));
             SECRET_AUTO_START = register(new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind", "Auto pathfind to new secret", "Auto browse best secret upon entering the room.", "secret.autouponenter", false));
             SECRET_AUTO_BROWSE_NEXT = register(new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind", "Auto Pathfind to next secret", "Auto browse best next secret after current one completes.\nthe first pathfinding of first secret needs to be triggered first in order for this option to work", "secret.autobrowse", false));
@@ -312,16 +304,9 @@ public class FeatureRegistry {
             DISCORD_ASKTOJOIN = register(new PartyInviteViewer());
             DISCORD_ONLINEALARM = register(new PlayingDGAlarm());
             DISCORD_DONOTUSE = register(new SimpleFeature("Discord", "Disable Native Library", "Disables usage of jna for discord rpc support.\nBreaks any discord related feature in the mod.\nRequires mod restart to get affected.\n\nThis feature is only for those whose minecraft crashes due to discord gamesdk crash.", "discord.rpc", false));
-            DEBUG = register(new FeatureDebug());
-            ADVANCED_ROOMEDIT = register(new SimpleFeature("Debug", "Room Edit", "Allow editing dungeon rooms\n\nWarning: using this feature can break or freeze your Minecraft\nThis is only for advanced users only", "advanced.roomedit", false) {
-                {
-                    addParameter("key", new FeatureParameter<Integer>("key", "Key", "Press to edit room", Keyboard.KEY_R, "keybind"));
-                }
-            });
             ADVANCED_DEBUG_ROOM = register(new FeatureRoomDebugInfo());
             ADVANCED_DEBUGGABLE_MAP = register(new FeatureDebuggableMap());
             ADVANCED_COORDS = register(new FeatureRoomCoordDisplay());
-            ADVANCED_BAT = register(new FeatureDebugTrap());
         } catch (Exception e) {
             System.out.println(e);
             throw new RuntimeException(e);

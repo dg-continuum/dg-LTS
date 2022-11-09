@@ -1,6 +1,7 @@
 package kr.syeyoung.dungeonsguide.mod.chat;
 
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
@@ -40,8 +41,7 @@ public class ChatTransmitter {
     }
 
     public static void sendDebugChat(IChatComponent iChatComponent) {
-        if(FeatureRegistry.DEBUG == null) return;
-        if (FeatureRegistry.DEBUG.isEnabled())
+        if (DgOneCongifConfig.DEBUG_MODE)
             addToQueue((ChatComponentText) iChatComponent);
     }
 
