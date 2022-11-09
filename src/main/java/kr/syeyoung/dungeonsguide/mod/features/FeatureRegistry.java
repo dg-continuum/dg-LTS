@@ -102,7 +102,6 @@ public class FeatureRegistry {
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ESSENCE;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP;
 
-    public static FeatureSolverRiddle SOLVER_RIDDLE;
     public static FeatureSolverTictactoe SOLVER_TICTACTOE;
     public static SimpleFeature SOLVER_WATERPUZZLE;
     public static SimpleFeature SOLVER_CREEPER;
@@ -236,7 +235,6 @@ public class FeatureRegistry {
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
             SOLVER_WATERPUZZLE = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Waterboard (Advanced)", "Calculates solution for waterboard puzzle and displays it to user", "solver.waterboard"));
             SOLVER_TICTACTOE = register(new FeatureSolverTictactoe());
-            SOLVER_RIDDLE = register(new FeatureSolverRiddle());
             SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Item Drop Line Settings", "Line Settings when pathfind to Item Drop, when using above feature", "secret.lineproperties.apf.itemdrop", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
             SECRET_LINE_PROPERTIES_PATHFINDALL_ESSENCE = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Essence Line Settings", "Line Settings when pathfind to Essence, when using above feature", "secret.lineproperties.apf.essence", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
             SECRET_LINE_PROPERTIES_PATHFINDALL_CHEST = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Chest Line Settings", "Line Settings when pathfind to Chest, when using above feature", "secret.lineproperties.apf.chest", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));

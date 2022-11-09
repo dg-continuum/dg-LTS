@@ -20,8 +20,11 @@ package kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor;
 
 import com.google.common.base.Predicate;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
+import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Weirdos;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.block.Block;
@@ -56,7 +59,7 @@ public class RoomProcessorRiddle extends GeneralRoomProcessor {
     @Override
     public void chatReceived(IChatComponent chat) {
         super.chatReceived(chat);
-        if (!FeatureRegistry.SOLVER_RIDDLE.isEnabled()) return;
+        if (!DgOneCongifConfig.riddleSolver) return;
         String ch2 = chat.getUnformattedText();
         if (!ch2.startsWith("§e[NPC] ")) {
             return;
@@ -105,9 +108,9 @@ public class RoomProcessorRiddle extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!FeatureRegistry.SOLVER_RIDDLE.isEnabled()) return;
+        if (!DgOneCongifConfig.riddleSolver) return;
         if (chest != null) {
-            RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(chest.getX(), chest.getY(), chest.getZ(), chest.getX()+1, chest.getY() + 1, chest.getZ() + 1),  FeatureRegistry.SOLVER_RIDDLE.getTargetColor(), partialTicks, true);
+            RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(chest.getX(), chest.getY(), chest.getZ(), chest.getX()+1, chest.getY() + 1, chest.getZ() + 1),  new AColor(Weirdos.chestColor.getRed(), Weirdos.chestColor.getBlue(), Weirdos.chestColor.getGreen(), Weirdos.chestColor.getAlpha()), partialTicks, true);
         }
     }
 

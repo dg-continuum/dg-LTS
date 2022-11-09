@@ -11,6 +11,7 @@ import cc.polyfrost.oneconfig.config.data.PageLocation;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.IceFillPage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.KahootPage;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.Weirdos;
 
 import java.util.function.Supplier;
 
@@ -258,6 +259,22 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Quiz"
     )
     public KahootPage a = new KahootPage();
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Highlights the correct box after clicking on all 3 weirdos",
+            category = "Solvers",
+            subcategory = "3 weirdos Solver"
+    )
+    public static boolean riddleSolver = true;
+    @Page(
+            name = "options",
+            location = PageLocation.BOTTOM,
+            category = "Solvers",
+            subcategory = "3 weirdos Solver"
+    )
+    public Weirdos b = new Weirdos();
 
 
 
