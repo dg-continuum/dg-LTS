@@ -18,87 +18,73 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
+import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.HealthData;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.BossHealth;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
+import lombok.val;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class FeatureBossHealth extends TextHUDFeature {
+public class FeatureBossHealth extends TextHud {
     public FeatureBossHealth() {
-        super("Dungeon.Bossfight", "Display Boss(es) Health", "Show the health of boss and minibosses in bossfight (Guardians, Priests..)", "bossfight.health", false, getFontRenderer().getStringWidth("The Professor: 4242m"), getFontRenderer().FONT_HEIGHT * 5);
-        this.setEnabled(true);
-        addParameter("totalHealth", new FeatureParameter<Boolean>("totalHealth", "show total health", "Show total health along with current health", false, "boolean", nval -> totalHealth = nval));
-        addParameter("formatHealth", new FeatureParameter<Boolean>("formatHealth", "format health", "1234568 -> 1m", true, "boolean", nval -> formatHealth = nval));
-        addParameter("ignoreInattackable", new FeatureParameter<Boolean>("ignoreInattackable", "Don't show health of in-attackable enemy", "For example, do not show guardians health when they're not attackable", false, "boolean", nval -> ignoreInattackable = nval));
-
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("health", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator2", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("maxHealth", new AColor(0x55, 0x55,0xFF,255), new AColor(0, 0,0,0), false));
+        super(true);
     }
 
 
-    boolean totalHealth;
-    boolean formatHealth;
-    boolean ignoreInattackable;
-
-
-
     @Override
-    public boolean doesScaleWithHeight() {
-        return false;
+    public boolean isEnabled() {
+        return true;
     }
 
-    @Override
-    public boolean isHUDViewable() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() != null;
-    }
 
-    @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "health", "separator2", "maxHealth");
-    }
-
-    @Override
-    public java.util.List<StyledText> getDummyText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        addLine(new HealthData("The Professor", 3300000, 5000000, false), actualBit);
-        addLine(new HealthData("Chaos Guardian", 500000, 2000000, true), actualBit);
-        addLine(new HealthData("Healing Guardian", 1000000, 3000000, true), actualBit);
-        addLine(new HealthData("Laser Guardian", 5000000, 5000000, true), actualBit);
-        addLine(new HealthData("Giant", 10000000, 20000000, false), actualBit);
+    public List<String> getDummyText() {
+        ArrayList<String> actualBit = new ArrayList<>();
+        actualBit = (ArrayList<String>) addLine(new HealthData("The Professor", 3300000, 5000000, false), actualBit);
+        actualBit = (ArrayList<String>) addLine(new HealthData("Chaos Guardian", 500000, 2000000, true), actualBit);
+        actualBit = (ArrayList<String>) addLine(new HealthData("Healing Guardian", 1000000, 3000000, true), actualBit);
+        actualBit = (ArrayList<String>) addLine(new HealthData("Laser Guardian", 5000000, 5000000, true), actualBit);
+        actualBit = (ArrayList<String>) addLine(new HealthData("Giant", 10000000, 20000000, false), actualBit);
         return actualBit;
     }
 
-    public void addLine(HealthData data, List<StyledText> actualBit) {
-        if (ignoreInattackable && !data.isAttackable()) return;
+    public List<String> addLine(HealthData data, List<String> actualBit) {
+        if (BossHealth.ignoreInattackable && !data.isAttackable()) return Collections.emptyList();
 
-        actualBit.add(new StyledText(data.getName(),"title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText( (formatHealth ? TextUtils.format(data.getHealth()) : data.getHealth()) + (totalHealth ? "" : "\n"),"health"));
-        if (totalHealth) {
-            actualBit.add(new StyledText("/", "separator2"));
-            actualBit.add(new StyledText( (formatHealth ? TextUtils.format(data.getMaxHealth()) : data.getMaxHealth()) +"\n","maxHealth"));
+        StringBuilder line = new StringBuilder();
+
+        line.append(data.getName()).append(": ");
+        line.append(BossHealth.showTotalHealth ? TextUtils.format(data.getHealth()) : data.getHealth()).append(BossHealth.showTotalHealth ? "" : "\n");
+        if (BossHealth.showTotalHealth) {
+            line.append("/");
+            line.append(BossHealth.showTotalHealth ? TextUtils.format(data.getMaxHealth()) : data.getMaxHealth()).append("\n");
         }
+        actualBit.add(line.toString());
+
+        return actualBit;
     }
 
+
     @Override
-    public java.util.List<StyledText> getText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        List<HealthData> healths = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor().getHealths();
-        for (HealthData heal : healths) {
-            addLine(heal, actualBit);
+    protected void getLines(List<String> lines, boolean editing) {
+        if(editing) {
+            lines.addAll(getDummyText());
+        } else {
+            if (!SkyblockStatus.isOnDungeon()) return;
+            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null) return;
+            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() == null) return;
+
+            List<HealthData> healths = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor().getHealths();
+            for (HealthData heal : healths) {
+                addLine(heal, lines);
+            }
         }
-        return actualBit;
+
     }
 }

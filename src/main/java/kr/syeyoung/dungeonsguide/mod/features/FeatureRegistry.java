@@ -131,7 +131,6 @@ public class FeatureRegistry {
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
     public static SimpleFeature BOSSFIGHT_CHESTPRICE;
     public static FeatureAutoReparty BOSSFIGHT_AUTOREPARTY;
-    public static FeatureBossHealth BOSSFIGHT_HEALTH;
     public static FeatureHideAnimals BOSSFIGHT_HIDE_ANIMALS;
     public static FeatureThornBearPercentage BOSSFIGHT_BEAR_PERCENT;
     public static FeatureThornSpiritBowTimer BOSSFIGHT_BOW_TIMER;
@@ -167,7 +166,6 @@ public class FeatureRegistry {
 
     public static FeatureCollectScore ETC_COLLECT_SCORE;
 
-    public static FeaturePing PINGER;
 
 
 
@@ -225,7 +223,6 @@ public class FeatureRegistry {
             DUNGEON_ROOMNAME = register(new FeatureDungeonRoomName());
 //            TEST_PEPOLE = register(new FeatureTestPepole());
             DUNGEON_MAP = register(new FeatureDungeonMap());
-            PINGER = register(new FeaturePing());
             SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
             SOLVER_WATERPUZZLE = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Waterboard (Advanced)", "Calculates solution for waterboard puzzle and displays it to user", "solver.waterboard"));
             SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Item Drop Line Settings", "Line Settings when pathfind to Item Drop, when using above feature", "secret.lineproperties.apf.itemdrop", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
@@ -249,7 +246,6 @@ public class FeatureRegistry {
             BOSSFIGHT_WARNING_ON_PORTAL = register(new FeatureWarningOnPortal());
             BOSSFIGHT_CHESTPRICE = register(new FeatureChestPrice());
             BOSSFIGHT_AUTOREPARTY = register(new FeatureAutoReparty());
-            BOSSFIGHT_HEALTH = register(new FeatureBossHealth());
             BOSSFIGHT_HIDE_ANIMALS = register(new FeatureHideAnimals());
             BOSSFIGHT_BEAR_PERCENT = register(new FeatureThornBearPercentage());
             BOSSFIGHT_BOW_TIMER = register(new FeatureThornSpiritBowTimer());

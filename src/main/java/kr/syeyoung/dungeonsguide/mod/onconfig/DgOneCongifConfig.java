@@ -10,6 +10,8 @@ import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.config.data.PageLocation;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.BossHealth;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.Ping;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.*;
 
 import java.util.function.Supplier;
@@ -326,6 +328,29 @@ public class DgOneCongifConfig extends Config {
     public TicktackToe e = new TicktackToe();
 
 
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "See players through walls",
+            category = "Dungeon mics",
+            subcategory = "Player ESP"
+    )
+    public static boolean playerEps = true;
+
+
+    @Page(
+            name = "Ping",
+            location = PageLocation.BOTTOM,
+            category = "Hud"
+    )
+    public Ping ss = new Ping();
+
+    @Page(
+            name = "Boss Health",
+            location = PageLocation.BOTTOM,
+            category = "Hud"
+    )
+    public BossHealth aa = new BossHealth();
 
 
 

@@ -1,5 +1,6 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -41,12 +42,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class FeaturePing extends TextHUDFeature {
+public class FeaturePing extends SingleTextHud {
 
     public FeaturePing() {
-        super("Misc", "Epic ping warner", "Shows ping and displays timeout warnings", "misc.epicping", false, getFontRenderer().getStringWidth("Ping: 100") + 4, getFontRenderer().FONT_HEIGHT + 2);
-        addParameter("average", new FeatureParameter<>("average", "Show average", "Should the ping counter show the average over 5 seconds instead of current", true, "boolean", nval -> shouldShowAverage = nval));
-        addParameter("timeoutwarn", new FeatureParameter<>("timeoutwarn", "Show timeout warnings", "Tells you when the server stopped responding", true, "boolean", nval -> shouldShowAverage = nval));
+        super("Ping: ", true);
         setup();
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -61,6 +60,17 @@ public class FeaturePing extends TextHUDFeature {
     static final int TIMEOUT_THRESHOLD = 330;
 
     boolean lastTimeOutStatus;
+
+    @Override
+    public boolean isEnabled() {
+        return SkyblockStatus.isOnSkyblock();
+    }
+
+    @Override
+    public String getText(boolean example) {
+        return String.valueOf(shouldShowAverage ? averagePing : ping);
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent e){
         if(e.phase != TickEvent.Phase.START || e.side != Side.CLIENT) return;
@@ -97,7 +107,6 @@ public class FeaturePing extends TextHUDFeature {
     Logger logger = LogManager.getLogger("FeaturePing");
 
     public void setup(){
-
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg Ping pool").build();
         final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, namedThreadFactory);
 
@@ -123,37 +132,6 @@ public class FeaturePing extends TextHUDFeature {
         }, 10,1000, TimeUnit.MILLISECONDS);
     }
 
-
-    private static final List<StyledText> dummyText = new ArrayList<>();
-    static {
-        dummyText.add(new StyledText("Ping: ","base"));
-        dummyText.add(new StyledText("999", "ping"));
-    }
-
-    @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-
-
-    @Override
-    public boolean isHUDViewable() {
-        return true;
-    }
-
-    @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("ping", "base");
-    }
-
-    @Override
-    public List<StyledText> getText() {
-        return Arrays.asList(
-                new StyledText("Ping: ","base"),
-                new StyledText(String.valueOf(shouldShowAverage ? averagePing : ping),"ping")
-        );
-    }
 
 
     /**
@@ -201,75 +179,6 @@ public class FeaturePing extends TextHUDFeature {
             logger.info("Failed to ping {}", serveraddress);
             logger.info(e);
         }
-    }
-
-
-    private void legacyPing(String serverAdress) {
-        final ServerAddress serveraddress = ServerAddress.fromString(serverAdress);
-        (((new Bootstrap().group(NetworkManager.CLIENT_NIO_EVENTLOOP.getValue())).handler(new ChannelInitializer<Channel>(){
-
-            @Override
-            protected void initChannel(Channel channel) {
-                try {
-                    channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-                } catch (ChannelException e) {
-                    e.printStackTrace();
-                }
-                channel.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>(){
-
-
-                    long pingStart = 0L;
-
-                    /*
-                     * WARNING - Removed try catching itself - possible behaviour change.
-                     */
-                    @Override
-                    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                        super.channelActive(ctx);
-                        ByteBuf bytebuf = Unpooled.buffer();
-                        try {
-                            bytebuf.writeByte(254);
-                            bytebuf.writeByte(1);
-                            bytebuf.writeByte(250);
-                            char[] achar = "MC|PingHost".toCharArray();
-                            bytebuf.writeShort(achar.length);
-                            for (char c0 : achar) {
-                                bytebuf.writeChar(c0);
-                            }
-                            bytebuf.writeShort(7 + 2 * serveraddress.getIP().length());
-                            bytebuf.writeByte(127);
-                            achar = serveraddress.getIP().toCharArray();
-                            bytebuf.writeShort(achar.length);
-                            for (char c1 : achar) {
-                                bytebuf.writeChar(c1);
-                            }
-                            bytebuf.writeInt(serveraddress.getPort());
-
-                            pingStart = Minecraft.getSystemTime();
-                            logger.info("sent Ping");
-                            ctx.channel().writeAndFlush(bytebuf).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-                        } finally {
-                            bytebuf.release();
-                        }
-                    }
-
-                    @Override
-                    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-                        short short1 = msg.readUnsignedByte();
-                        if (short1 == 255) {
-                            logger.info("Recived pong");
-                            setPing(Minecraft.getSystemTime() - pingStart);
-                        }
-                        ctx.close();
-                    }
-
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext e, Throwable t) {
-                        e.close();
-                    }
-                });
-            }
-        })).channel(NioSocketChannel.class)).connect(serveraddress.getIP(), serveraddress.getPort());
     }
 
 

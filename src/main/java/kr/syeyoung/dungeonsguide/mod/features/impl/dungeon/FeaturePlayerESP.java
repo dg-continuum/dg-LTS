@@ -23,6 +23,7 @@ import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.listener.PlayerRenderListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,11 +36,12 @@ import org.lwjgl.opengl.GL11;
 public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListener {
     public FeaturePlayerESP() {
         super("Dungeon.Teammates", "See players through walls", "See players through walls", "dungeon.playeresp", false);
-        setEnabled(false);
     }
 
-
-    private final SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
+    @Override
+    public boolean isEnabled() {
+        return DgOneCongifConfig.playerEps;
+    }
 
     private boolean preCalled = false;
     @Override
@@ -47,7 +49,7 @@ public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListe
 
 
         if (preCalled) return;
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.playerEps) return;
 
 
         DungeonContext dungeonContext = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
