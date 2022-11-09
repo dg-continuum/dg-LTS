@@ -10,6 +10,7 @@ import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.config.data.PageLocation;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.IceFillPage;
+import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.KahootPage;
 
 import java.util.function.Supplier;
 
@@ -239,6 +240,24 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Icepath (Advanced)"
     )
     public IceFillPage testPage2 = new IceFillPage();
+
+
+    @Switch(
+            name = "enabled",
+            size = 2,
+            description = "Highlights the correct solution for trivia puzzle",
+            category = "Solvers",
+            subcategory = "Quiz"
+    )
+    public static boolean KAHOOT_SOLVER = true;
+
+    @Page(
+            name = "options",
+            location = PageLocation.BOTTOM,
+            category = "Solvers",
+            subcategory = "Quiz"
+    )
+    public KahootPage a = new KahootPage();
 
 
 
