@@ -7,6 +7,8 @@ import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.*;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonMap;
+import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.BossHealth;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.DungeonMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.Ping;
@@ -340,14 +342,14 @@ public class DgOneCongifConfig extends Config {
     @Page(
             name = "Ping",
             location = PageLocation.BOTTOM,
-            category = "Hud"
+            category = "HUD"
     )
     public Ping ss = new Ping();
 
     @Page(
             name = "Boss Health",
             location = PageLocation.BOTTOM,
-            category = "Hud"
+            category = "HUD"
     )
     public BossHealth aa = new BossHealth();
 
@@ -412,19 +414,14 @@ public class DgOneCongifConfig extends Config {
     public DisableMessage aaa = new DisableMessage();
 
 
-    @Switch(
-            name = "enabled",
-            size = 2,
+    @Page(
+            name = "Epic Dungeon Start Countdown",
+            location = PageLocation.BOTTOM,
             description = "Shows a cool dungeon start instead of the chat messages",
-            category = "HUD",
-            subcategory = "Epic Dungeon Start Countdown"
+            category = "HUD"
     )
-    public static boolean epicCountdown = true;
+    private static DungeonMap mp = new DungeonMap();
 
-    @Switch(name = "Clean Dungeon Chat", category = "HUD", subcategory = "Epic Dungeon Start Countdown")
-    public static boolean cleanChat = true;
-    @Switch(name = "Countdown SFX", category = "HUD", subcategory = "Epic Dungeon Start Countdown")
-    public static boolean sfxenabled = true;
     @Switch(
             name = "enabled",
             size = 2,
@@ -497,26 +494,19 @@ public class DgOneCongifConfig extends Config {
     public static boolean disableDiscd  = true;
 
 
-
-    @Switch(
-            name = "enable",
-            size = 2,
-            category = "HUD",
-            description = "Display dungeon map!",
-            subcategory = "Dungeon Map"
-    )
-    public static boolean dungeonMap = true;
-
     @Page(
-            name = "Settings",
+            name = "Dungeon Map",
             location = PageLocation.BOTTOM,
-            category = "HUD",
-            subcategory = "Dungeon Map"
+            category = "HUD"
     )
-    private static DungeonMap mp = new DungeonMap();
+    private static DungeonMap map = new DungeonMap();
 
 
-
+    @HUD(
+            name = "Debug Map",
+            category = "Debug"
+    )
+    public static TestMap f = new TestMap();
 
 
 
@@ -541,6 +531,8 @@ public class DgOneCongifConfig extends Config {
         initialize();
 
         hideMultipleIf(() -> !DEBUG_MODE,  "DEBUGABLE_MAP", "DEBUG_BLOCKCACHING", "DEBUG_DUNGEON_CORDS", "DUNGEON_CORDS_COLOR", "DEBUG_ROOM_INFO", "DUNGEON_ROOMINFO_COLOR", "DEBUG_TEST_PEPOLE", "DEBUG_TEST_PEPOLE_SCALE", "DEBUG_ROOMEDIT_KEYBIND", "DEBUG_ROOM_EDIT");
+
+        hideMultipleIf(() -> !FeatureDungeonMap.centerMapOnPlayer, "shouldRotateWithPlayer");
 
 //        addDependency("fieldname", () -> bollthatdetemins);
     }

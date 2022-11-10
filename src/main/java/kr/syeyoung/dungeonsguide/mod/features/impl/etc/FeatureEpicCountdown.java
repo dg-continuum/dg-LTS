@@ -4,7 +4,7 @@ import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessResult;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.epicCountdown;
 import kr.syeyoung.dungeonsguide.mod.utils.ScoreBoardUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TitleRender;
@@ -40,11 +40,11 @@ public class FeatureEpicCountdown extends SimpleFeature {
 
     @Override
     public boolean isEnabled() {
-        return DgOneCongifConfig.epicCountdown;
+        return epicCountdown.epicCountdown;
     }
 
     public static ChatProcessResult processChat(String txt, Map<String, Object> context) {
-        if(DgOneCongifConfig.cleanChat){
+        if(epicCountdown.cleanChat){
             if(txt.startsWith("§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.§r")){
                 return REMOVE_CHAT;
             }
@@ -139,7 +139,7 @@ public class FeatureEpicCountdown extends SimpleFeature {
         String string = "§c" + actualSecondsLeft;
 
         if(!Objects.equals(string, lastSec)){
-            if(actualSecondsLeft == 3   && DgOneCongifConfig.sfxenabled){
+            if(actualSecondsLeft == 3   && epicCountdown.sfxenabled){
                 Minecraft.getMinecraft().thePlayer.playSound("skyblock_dungeons_guide:readysetgo", 1F, 1F);
             }
             if(actualSecondsLeft > 5){

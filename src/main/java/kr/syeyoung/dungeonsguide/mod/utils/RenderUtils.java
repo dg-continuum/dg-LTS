@@ -32,16 +32,33 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.util.*;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+import org.spongepowered.asm.mixin.transformer.meta.MixinInner;
 
 import javax.vecmath.Vector3f;
 import java.awt.*;
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class RenderUtils {
     public static final ResourceLocation icons = new ResourceLocation("textures/gui/icons.png");
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
+
+    private static Timer cachedTimer;
+    public static float getPartialTicks(){
+        if (cachedTimer == null) {
+            cachedTimer = ReflectionHelper.getPrivateValue(
+                    Minecraft.class,
+                    Minecraft.getMinecraft(),
+                    "field_71428_T",
+                    "timer");
+        }
+
+        return cachedTimer != null ? cachedTimer.renderPartialTicks : 0;
+    }
+
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0

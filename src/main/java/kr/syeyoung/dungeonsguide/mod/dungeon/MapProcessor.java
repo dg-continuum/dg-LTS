@@ -105,9 +105,9 @@ public class MapProcessor {
             waitDelay++;
             return;
         }
-        if (bugged) {
-            return;
-        }
+//        if (bugged) {
+//            return;
+//        }
         ItemStack stack = Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(8);
 
         if (stack == null || !(stack.getItem() instanceof ItemMap)) {
