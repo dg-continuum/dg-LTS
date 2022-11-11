@@ -16,6 +16,7 @@ import java.util.Collection;
 
 public class DungeonUtil {
     public static int getTombsFound() {
+        if(Minecraft.getMinecraft().thePlayer == null) return 0;
         for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
             String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
             if (name.startsWith("§r Crypts: §r§6")) {
