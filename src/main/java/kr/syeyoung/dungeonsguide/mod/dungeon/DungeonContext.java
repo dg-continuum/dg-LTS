@@ -32,6 +32,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.mod.events.impl.BossroomEnterEvent;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonSecrets;
 import kr.syeyoung.dungeonsguide.mod.utils.TabListUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import lombok.Getter;
@@ -165,14 +166,14 @@ public class DungeonContext {
         players.addAll(TabListUtil.getPlayersInDungeon());
 
 
-        if (latestSecretCnt != FeatureRegistry.DUNGEON_SECRETS.getSecretsFound()) {
-            int newSecretCnt = FeatureRegistry.DUNGEON_SECRETS.getSecretsFound();
-            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, newSecretCnt, latestTotalSecret, FeatureRegistry.DUNGEON_SECRETS.sureOfTotalSecrets()));
+        if (latestSecretCnt != FeatureDungeonSecrets.getSecretsFound()) {
+            int newSecretCnt = FeatureDungeonSecrets.getSecretsFound();
+            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, newSecretCnt, latestTotalSecret, FeatureDungeonSecrets.sureOfTotalSecrets()));
             latestSecretCnt = newSecretCnt;
         }
-        if (latestTotalSecret != FeatureRegistry.DUNGEON_SECRETS.getTotalSecretsInt()) {
-            latestTotalSecret = FeatureRegistry.DUNGEON_SECRETS.getTotalSecretsInt();
-            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, latestSecretCnt, latestTotalSecret, FeatureRegistry.DUNGEON_SECRETS.sureOfTotalSecrets()));
+        if (latestTotalSecret != FeatureDungeonSecrets.getTotalSecretsInt()) {
+            latestTotalSecret = FeatureDungeonSecrets.getTotalSecretsInt();
+            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, latestSecretCnt, latestTotalSecret, FeatureDungeonSecrets.sureOfTotalSecrets()));
         }
         if (latestCrypts != FeatureRegistry.DUNGEON_TOMBS.getTombsFound()) {
             int newlatestCrypts = FeatureRegistry.DUNGEON_TOMBS.getTombsFound();

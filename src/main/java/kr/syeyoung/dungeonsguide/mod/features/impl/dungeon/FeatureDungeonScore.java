@@ -259,12 +259,12 @@ public class FeatureDungeonScore extends TextHUDFeature {
                 total += dungeonRoom.getUnitPoints().size();
             }
 
-            totalSecrets =  FeatureRegistry.DUNGEON_SECRETS.getTotalSecretsInt() ;
-            totalSecretsKnown = FeatureRegistry.DUNGEON_SECRETS.sureOfTotalSecrets();
+            totalSecrets =  FeatureDungeonSecrets.getTotalSecretsInt() ;
+            totalSecretsKnown = FeatureDungeonSecrets.sureOfTotalSecrets();
 
             fullyCleared = completed >= getTotalRooms() && context.getMapProcessor().getUndiscoveredRoom() == 0;
             explorer += MathHelper.clamp_int((int) Math.floor(6.0 / 10.0 * (context.getMapProcessor().getUndiscoveredRoom() != 0 ? DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() : completed / total * 100)), 0, 60);
-            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = FeatureRegistry.DUNGEON_SECRETS.getSecretsFound()) / Math.ceil(totalSecrets * context.getSecretPercentage())),0,40);
+            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = FeatureDungeonSecrets.getSecretsFound()) / Math.ceil(totalSecrets * context.getSecretPercentage())),0,40);
         }
         int time = 0;
         {

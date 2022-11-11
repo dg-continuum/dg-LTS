@@ -13,6 +13,7 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.dungeon.HideAnimal;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DeathDisplay;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DungeonSecrets;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.HighlightMobs;
 import kr.syeyoung.dungeonsguide.mod.onconfig.secrets.AutoPathfindPage;
@@ -425,6 +426,14 @@ public class DgOneCongifConfig extends Config {
             category = "HUD"
     )
     public DeathDisplay dd = new DeathDisplay();
+
+    @Page(
+            name = "Display Total # of Secrets",
+            description = "Display how much total secrets have been found in a dungeon run.\\n+ sign means DG does not know the correct number, but it's somewhere above that number.",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public DungeonSecrets ds = new DungeonSecrets();
 
 
 

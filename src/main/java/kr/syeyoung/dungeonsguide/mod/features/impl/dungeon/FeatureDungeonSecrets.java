@@ -18,38 +18,25 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
+import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
+import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+public class FeatureDungeonSecrets extends SingleTextHud {
 
-public class FeatureDungeonSecrets extends TextHUDFeature {
     public FeatureDungeonSecrets() {
-        super("Dungeon.HUDs", "Display Total # of Secrets", "Display how much total secrets have been found in a dungeon run.\n+ sign means DG does not know the correct number, but it's somewhere above that number.", "dungeon.stats.secrets", true, getFontRenderer().getStringWidth("Secrets: 999/999+ of 999+"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(false);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("currentSecrets", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator2", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("totalSecrets", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("unknown", new AColor(0xFF, 0xFF,0x55,255), new AColor(0, 0,0,0), false));
+        super("Secrets", true);
     }
 
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-    public int getSecretsFound() {
-        for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
+    public static int getSecretsFound() {
+        for (val networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
             String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
             if (name.startsWith("§r Secrets Found: §r§b") && !name.contains("%")) {
                 String noColor = TextUtils.stripColor(name);
@@ -58,7 +45,36 @@ public class FeatureDungeonSecrets extends TextHUDFeature {
         }
         return 0;
     }
-    public double getSecretPercentage() {
+
+    public static int getTotalSecretsInt() {
+        if (getSecretsFound() != 0) {
+            return (int) Math.ceil(getSecretsFound() / getSecretPercentage() * 100);
+        }
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        int totalSecrets = 0;
+        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+            if (dungeonRoom.getTotalSecrets() != -1) {
+                totalSecrets += dungeonRoom.getTotalSecrets();
+            }
+        }
+        return totalSecrets;
+    }
+
+    public static boolean sureOfTotalSecrets() {
+        if (getSecretsFound() != 0) return true;
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if (context.getMapProcessor().getUndiscoveredRoom() > 0) return false;
+        boolean allknown = true;
+        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+            if (dungeonRoom.getTotalSecrets() == -1) {
+                allknown = false;
+                break;
+            }
+        }
+        return allknown;
+    }
+
+    public static double getSecretPercentage() {
         for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
             String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
             if (name.startsWith("§r Secrets Found: §r") && name.contains("%")) {
@@ -67,27 +83,6 @@ public class FeatureDungeonSecrets extends TextHUDFeature {
             }
         }
         return 0;
-    }
-
-    public int getTotalSecretsInt() {
-        if (getSecretsFound() != 0) return (int) Math.ceil (getSecretsFound() / getSecretPercentage() * 100);
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        int totalSecrets = 0;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-            if (dungeonRoom.getTotalSecrets() != -1)
-                totalSecrets += dungeonRoom.getTotalSecrets();
-        }
-        return totalSecrets;
-    }
-    public boolean sureOfTotalSecrets() {
-        if (getSecretsFound() != 0) return true;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (context.getMapProcessor().getUndiscoveredRoom() > 0) return false;
-        boolean allknown = true;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-            if (dungeonRoom.getTotalSecrets() == -1) allknown = false;
-        }
-        return allknown;
     }
 
     public String getTotalSecrets() {
@@ -100,46 +95,28 @@ public class FeatureDungeonSecrets extends TextHUDFeature {
                 totalSecrets += dungeonRoom.getTotalSecrets();
             else allknown = false;
         }
-        return totalSecrets + (allknown ? "":"+");
+        return totalSecrets + (allknown ? "" : "+");
     }
 
-
-    private static final java.util.List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Secrets","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("999","currentSecrets"));
-        dummyText.add(new StyledText("/","separator2"));
-        dummyText.add(new StyledText("2","totalSecrets"));
-        dummyText.add(new StyledText("+","unknown"));
-    }
-
-    @Override
     public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon();
+        return SkyblockStatus.isOnDungeon();
     }
+
 
     @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "currentSecrets", "separator2", "totalSecrets", "unknown");
+    protected String getText(boolean example) {
+        if (example) {
+            return "999/2+";
+        }
+
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if(context == null) return "";
+
+        return getSecretsFound() +
+                "/" +
+                (int) Math.ceil(getTotalSecretsInt() * context.getSecretPercentage()) +
+                " of " +
+                getTotalSecretsInt() +
+                (getTotalSecrets().contains("+") ? "+" : "");
     }
-
-    @Override
-    public java.util.List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public java.util.List<StyledText> getText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Secrets","title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(getSecretsFound() +"","currentSecrets"));
-        actualBit.add(new StyledText("/","separator2"));
-
-        actualBit.add(new StyledText((int)Math.ceil(getTotalSecretsInt() * DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getSecretPercentage())+" of "+getTotalSecretsInt(),"totalSecrets"));
-        actualBit.add(new StyledText(getTotalSecrets().contains("+") ? "+" : "","unknown"));
-        return actualBit;
-    }
-
 }

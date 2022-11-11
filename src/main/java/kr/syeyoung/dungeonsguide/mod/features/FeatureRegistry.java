@@ -66,7 +66,6 @@ public class FeatureRegistry {
     public static FeatureDungeonMilestone DUNGEON_MILESTONE;
     public static FeatureDungeonRealTime DUNGEON_REALTIME;
     public static FeatureDungeonSBTime DUNGEON_SBTIME;
-    public static FeatureDungeonSecrets DUNGEON_SECRETS;
     public static FeatureDungeonCurrentRoomSecrets DUNGEON_SECRETS_ROOM;
     public static FeatureDungeonTombs DUNGEON_TOMBS;
     public static FeatureDungeonScore DUNGEON_SCORE;
@@ -115,7 +114,6 @@ public class FeatureRegistry {
             DUNGEON_SCORE = register(new FeatureDungeonScore());
             DUNGEON_TOMBS = register(new FeatureDungeonTombs());
             DUNGEON_SECRETS_ROOM = register(new FeatureDungeonCurrentRoomSecrets());
-            DUNGEON_SECRETS = register(new FeatureDungeonSecrets());
             DUNGEON_SBTIME = register(new FeatureDungeonSBTime());
             DUNGEON_REALTIME = register(new FeatureDungeonRealTime());
             DUNGEON_MILESTONE = register(new FeatureDungeonMilestone());
