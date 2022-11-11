@@ -20,7 +20,9 @@ package kr.syeyoung.dungeonsguide.mod.events.listener;
 
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.config.guiconfig.location.GuiGuiLocationConfig;
-import kr.syeyoung.dungeonsguide.mod.events.impl.*;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonEndedEvent;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonLeftEvent;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.mod.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.GuiFeature;
@@ -28,7 +30,6 @@ import kr.syeyoung.dungeonsguide.mod.features.listener.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -56,170 +57,9 @@ public class FeatureListener {
         }
     }
 
-    @SubscribeEvent
-    public void onKeybindPress(KeyBindPressedEvent keyBindPressedEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof KeybindPressedListener) {
-                    ((KeybindPressedListener) abstractFeature).onKeybindPress(keyBindPressedEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 
-    @SubscribeEvent
-    public void onStomp(StompConnectedEvent stompConnectedEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof StompConnectedListener) {
-                    ((StompConnectedListener) abstractFeature).onStompConnected(stompConnectedEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onStomp(TextureStitchEvent.Pre textureStitchEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof TextureStichListener) {
-                    ((TextureStichListener) abstractFeature).onTextureStitch(textureStitchEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onStomp(TextureStitchEvent.Post textureStitchEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof TextureStichListener) {
-                    ((TextureStichListener) abstractFeature).onTextureStitch(textureStitchEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onDiscordUserUpdate(DiscordUserUpdateEvent discordUserUpdateEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof DiscordUserUpdateListener) {
-                    ((DiscordUserUpdateListener) abstractFeature).onDiscordUserUpdate(discordUserUpdateEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onDiscordUserUpdate(DiscordUserJoinRequestEvent discordUserUpdateEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof DiscordUserJoinRequestListener) {
-                    ((DiscordUserJoinRequestListener) abstractFeature).onDiscordUserJoinRequest(discordUserUpdateEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onWindowUpdate(WindowUpdateEvent windowUpdateEvent) {
-        try {
 
-            if (!SkyblockStatus.isOnSkyblock()) return;
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof GuiUpdateListener) {
-                    ((GuiUpdateListener) abstractFeature).onGuiUpdate(windowUpdateEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onRender(RenderLivingEvent.Pre preRender) {
-        try {
 
-            if (!SkyblockStatus.isOnSkyblock()) return;
-
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof EntityLivingRenderListener) {
-                    ((EntityLivingRenderListener) abstractFeature).onEntityRenderPre(preRender);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    @SubscribeEvent
-    public void onSound(PlaySoundEvent soundEvent) {
-        try {
-
-            if (!SkyblockStatus.isOnSkyblock()) return;
-
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof SoundListener) {
-                    ((SoundListener) abstractFeature).onSound(soundEvent);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    @SubscribeEvent
-    public void onRender(RenderLivingEvent.Post preRender) {
-        try {
-
-            if (!SkyblockStatus.isOnSkyblock()) return;
-
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof EntityLivingRenderListener) {
-                    ((EntityLivingRenderListener) abstractFeature).onEntityRenderPost(preRender);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onRender(RenderPlayerEvent.Pre preRender) {
-        try {
-
-            if (!SkyblockStatus.isOnSkyblock()) return;
-
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof PlayerRenderListener) {
-                    ((PlayerRenderListener) abstractFeature).onEntityRenderPre(preRender);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onRender(RenderPlayerEvent.Post preRender) {
-        try {
-
-            if (!SkyblockStatus.isOnSkyblock()) return;
-
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof PlayerRenderListener) {
-                    ((PlayerRenderListener) abstractFeature).onEntityRenderPost(preRender);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 
 
     @SubscribeEvent
@@ -270,18 +110,6 @@ public class FeatureListener {
         }
     }
 
-    @SubscribeEvent
-    public void onChatGlobal(ClientChatReceivedEvent postRender) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof ChatListenerGlobal) {
-                    ((ChatListenerGlobal) abstractFeature).onChat(postRender);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 
     @SubscribeEvent
     public void dungeonTooltip(ItemTooltipEvent event) {
@@ -396,30 +224,6 @@ public class FeatureListener {
         }
     }
     @SubscribeEvent
-    public void onSkyblockJoin(SkyblockJoinedEvent joinedEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof SkyblockJoinListener) {
-                    ((SkyblockJoinListener) abstractFeature).onSkyblockJoin();
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onSkyblockQuit(SkyblockLeftEvent leftEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof SkyblockLeaveListener) {
-                    ((SkyblockLeaveListener) abstractFeature).onSkyblockQuit();
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
     public void onKey(GuiScreenEvent.KeyboardInputEvent event) {
         try {
             for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
@@ -452,18 +256,6 @@ public class FeatureListener {
                 }
                 if (abstractFeature instanceof DungeonEndListener) {
                     ((DungeonEndListener) abstractFeature).onDungeonEnd();
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
-    public void onDungeonInitialize(DungeonContextInitializationEvent leftEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof DungeonContextInitializationListener) {
-                    ((DungeonContextInitializationListener) abstractFeature).onDungeonInitialize();
                 }
             }
         } catch (Throwable t) {
