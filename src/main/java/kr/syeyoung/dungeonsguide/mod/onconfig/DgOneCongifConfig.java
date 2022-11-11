@@ -474,6 +474,14 @@ public class DgOneCongifConfig extends Config {
     )
     public WarnLowHealth wlh = new WarnLowHealth();
 
+    @Page(
+            name = "Display Ingame Dungeon Time",
+            description = "Display how much time skyblock thinks has passed since dungeon run started",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public DungeonSBTime dsbt = new DungeonSBTime();
+
 
     @Switch(
             name = "enabled",

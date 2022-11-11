@@ -18,12 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
@@ -31,66 +27,36 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
-public class FeatureDungeonSBTime extends TextHUDFeature {
-
-    private final SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
+public class FeatureDungeonSBTime extends SingleTextHud {
     public FeatureDungeonSBTime() {
-        super("Dungeon.HUDs", "Display Ingame Dungeon Time", "Display how much time skyblock thinks has passed since dungeon run started", "dungeon.stats.igtime", true, getFontRenderer().getStringWidth("Time(IG): 1h 59m 59s"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(false);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("discriminator", new AColor(0xAA,0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("number", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-    }
-
-    private static final java.util.List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Time","title"));
-        dummyText.add(new StyledText("(Ig)","discriminator"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("-42h","number"));
+        super("Time(IG)", true);
     }
 
     @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon();
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon();
     }
 
     @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "discriminator", "separator", "number");
-    }
-
-    @Override
-    public java.util.List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public java.util.List<StyledText> getText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Time","title"));
-        actualBit.add(new StyledText("(Ig)","discriminator"));
-        actualBit.add(new StyledText(": ","separator"));
+    protected String getText(boolean example) {
+        if (example) {
+            return "1h 59m 59s";
+        }
+        if(Minecraft.getMinecraft().theWorld == null) return "";
         Scoreboard scoreboard = Minecraft.getMinecraft().theWorld.getScoreboard();
+        if(scoreboard == null) return "";
         ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
         Collection<Score> scores = scoreboard.getSortedScores(objective);
         String time = "unknown";
-        for (Score sc:scores) {
+        for (Score sc : scores) {
             ScorePlayerTeam scorePlayerTeam = scoreboard.getPlayersTeam(sc.getPlayerName());
             String strippedLine = TextUtils.keepScoreboardCharacters(TextUtils.stripColor(ScorePlayerTeam.formatPlayerName(scorePlayerTeam, sc.getPlayerName()))).trim();
             if (strippedLine.startsWith("Time Elapsed: ")) {
                 time = strippedLine.substring(14);
             }
         }
-        actualBit.add(new StyledText(time,"number"));
-        return actualBit;
+        return time;
     }
-
 }

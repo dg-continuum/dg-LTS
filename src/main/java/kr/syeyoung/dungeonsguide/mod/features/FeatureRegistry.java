@@ -63,7 +63,6 @@ public class FeatureRegistry {
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP;
     public static FeaturePressAnyKeyToCloseChest DUNGEON_CLOSECHEST;
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
-    public static FeatureDungeonSBTime DUNGEON_SBTIME;
     public static FeatureDungeonScore DUNGEON_SCORE;
     public static SimpleFeature DUNGEON_INTERMODCOMM;
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
@@ -106,7 +105,6 @@ public class FeatureRegistry {
             SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Parent Line Settings", "Line Settings to be used by default", "secret.lineproperties.apf.parent", false, SECRET_LINE_PROPERTIES_GLOBAL));
             DUNGEON_INTERMODCOMM = register(new SimpleFeature("Dungeon.Teammates", "Communicate With Other's Dungeons Guide", "Sends total secret in the room to others\nSo that they can use the data to calculate total secret in dungeon run\n\nThis automates player chatting action, (chatting data) Thus it might be against hypixel's rules.\nBut mods like auto-gg which also automate player action and is kinda allowed mod exist so I'm leaving this feature.\nThis option is use-at-your-risk and you'll be responsible for ban if you somehow get banned because of this feature\n(Although it is not likely to happen)\nDefaults to off", "dungeon.intermodcomm", false));
             DUNGEON_SCORE = register(new FeatureDungeonScore());
-            DUNGEON_SBTIME = register(new FeatureDungeonSBTime());
             DUNGEON_WATCHERWARNING = register(new FeatureWatcherWarning());
             DUNGEON_CLOSECHEST = register(new FeaturePressAnyKeyToCloseChest());
             SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Item Drop Line Settings", "Line Settings when pathfind to Item Drop, when using above feature", "secret.lineproperties.apf.itemdrop", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
