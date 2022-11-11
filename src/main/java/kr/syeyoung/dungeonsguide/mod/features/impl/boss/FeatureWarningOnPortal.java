@@ -34,6 +34,7 @@ import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonScore;
 import kr.syeyoung.dungeonsguide.mod.features.text.*;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 
 import java.util.*;
@@ -154,7 +155,7 @@ public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextP
         texts.add(new StyledText("Time","field_name"));
         texts.add(new StyledText(": ","field_separator"));
         texts.add(new StyledText(scoreCalculation.getTime()+" ","field_value"));
-        texts.add(new StyledText("("+ TextUtils.formatTime(FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed())+")\n","field_etc"));
+        texts.add(new StyledText("("+ TextUtils.formatTime(DungeonUtil.getTimeElapsed())+")\n","field_etc"));
 
         texts.add(new StyledText("Bonus","field_name"));
         texts.add(new StyledText(": ","field_separator"));

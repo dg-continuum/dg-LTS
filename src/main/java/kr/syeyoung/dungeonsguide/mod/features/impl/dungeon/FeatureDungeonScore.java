@@ -24,7 +24,6 @@ import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
@@ -211,8 +210,8 @@ public class FeatureDungeonScore extends TextHUDFeature {
         int skill = 100;
         int deaths = 0;
         {
-            deaths = FeatureDungeonDeaths.getTotalDeaths();
-            skill -= FeatureDungeonDeaths.getTotalDeaths() * 2;
+            deaths = DungeonUtil.getTotalDeaths();
+            skill -= DungeonUtil.getTotalDeaths() * 2;
             int totalCompRooms= 0;
             int roomCnt = 0;
             int roomSkillPenalty = 0;
@@ -260,12 +259,12 @@ public class FeatureDungeonScore extends TextHUDFeature {
                 total += dungeonRoom.getUnitPoints().size();
             }
 
-            totalSecrets =  FeatureDungeonSecrets.getTotalSecretsInt() ;
-            totalSecretsKnown = FeatureDungeonSecrets.sureOfTotalSecrets();
+            totalSecrets =  DungeonUtil.getTotalSecretsInt() ;
+            totalSecretsKnown = DungeonUtil.sureOfTotalSecrets();
 
             fullyCleared = completed >= getTotalRooms() && context.getMapProcessor().getUndiscoveredRoom() == 0;
             explorer += MathHelper.clamp_int((int) Math.floor(6.0 / 10.0 * (context.getMapProcessor().getUndiscoveredRoom() != 0 ? DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() : completed / total * 100)), 0, 60);
-            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = FeatureDungeonSecrets.getSecretsFound()) / Math.ceil(totalSecrets * context.getSecretPercentage())),0,40);
+            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = DungeonUtil.getSecretsFound()) / Math.ceil(totalSecrets * context.getSecretPercentage())),0,40);
         }
         int time = 0;
         {
@@ -277,7 +276,7 @@ public class FeatureDungeonScore extends TextHUDFeature {
 //            else if (timeSec <= 980) time = (int) Math.ceil(119 - 0.05 * timeSec);
 //            else if (timeSec < 3060) time = (int) Math.ceil(3102 - (1/30.0) * timeSec);
 //            time = MathHelper.clamp_int(time, 0, 100); // just in case.
-            time = TimeScoreUtil.estimate(FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed(), maxTime);
+            time = TimeScoreUtil.estimate(DungeonUtil.getTimeElapsed(), maxTime);
         }
         int bonus = 0;
         int tombs;

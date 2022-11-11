@@ -28,6 +28,7 @@ import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
 import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -102,9 +103,9 @@ public class FeatureDungeonMilestone extends TextHUDFeature implements ChatListe
         if (milestone_pattern.matcher(txt).matches()) {
             context.getMilestoneReached().add(new String[] {
                     TextUtils.formatTime(FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed()),
-                    TextUtils.formatTime(FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed())
+                    TextUtils.formatTime(DungeonUtil.getTimeElapsed())
             });
-            ChatTransmitter.sendDebugChat(new ChatComponentText("Reached Milestone At " +  TextUtils.formatTime(FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed()) + " / "+TextUtils.formatTime(FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed())));
+            ChatTransmitter.sendDebugChat(new ChatComponentText("Reached Milestone At " +  TextUtils.formatTime(FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed()) + " / "+TextUtils.formatTime(DungeonUtil.getTimeElapsed())));
         }
     }
 }

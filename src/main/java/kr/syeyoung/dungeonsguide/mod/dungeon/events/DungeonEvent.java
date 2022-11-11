@@ -19,6 +19,7 @@
 package kr.syeyoung.dungeonsguide.mod.dungeon.events;
 
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -35,7 +36,7 @@ public class DungeonEvent implements Serializable {
     public DungeonEvent(DungeonEventData eventData){
         this.data = eventData;
         this.realTimeElapsed = FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed();
-        this.skyblockTimeElapsed = FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed();
+        this.skyblockTimeElapsed = DungeonUtil.getTimeElapsed();
         this.eventName = eventData.getEventName();
     }
 }

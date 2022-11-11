@@ -26,6 +26,7 @@ import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompPayload;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.MapUtils;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
 import net.minecraft.util.ChatComponentText;
@@ -47,7 +48,7 @@ public class FeatureCollectScore extends SimpleFeatureV2 {
         int time = MapUtils.readNumber(mapData, 51, 73, 9);
         int bonus = MapUtils.readNumber(mapData, 51, 92, 9);
         ChatTransmitter.sendDebugChat(new ChatComponentText(("skill: " + skill + " / exp: " + exp + " / time: " + time + " / bonus : " + bonus)));
-        JSONObject payload = new JSONObject().put("timeSB", FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed())
+        JSONObject payload = new JSONObject().put("timeSB", DungeonUtil.getTimeElapsed())
                 .put("timeR", FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed())
                 .put("timeScore", time)
                 .put("completionStage", context.getBossRoomEnterSeconds() == -1 ? 0 :

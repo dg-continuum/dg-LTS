@@ -24,11 +24,10 @@ import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.events.impl.DungeonDeathEvent;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import lombok.val;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,25 +44,6 @@ public class FeatureDungeonDeaths extends TextHud {
     public FeatureDungeonDeaths() {
         super(true);
         MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    public static int getTotalDeaths() {
-        if (!SkyblockStatus.isOnDungeon()) return 0;
-        for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
-            String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-            if (name.contains("Deaths")) {
-                String whatever = TextUtils.keepIntegerCharactersOnly(TextUtils.keepScoreboardCharacters(TextUtils.stripColor(name)));
-                if (whatever.isEmpty()) break;
-                return Integer.parseInt(whatever);
-            }
-        }
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (context == null) return 0;
-        int d = 0;
-        for (Integer value : context.getDeaths().values()) {
-            d += value;
-        }
-        return d;
     }
 
     @SubscribeEvent
@@ -119,7 +99,7 @@ public class FeatureDungeonDeaths extends TextHud {
         for (val death : context.getDeaths().entrySet()) {
             lines.add(death.getKey() + ": " + death.getValue());
         }
-        lines.add("Total Deaths: " + getTotalDeaths());
+        lines.add("Total Deaths: " + DungeonUtil.getTotalDeaths());
     }
 
 

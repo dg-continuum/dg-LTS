@@ -31,8 +31,6 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.mod.events.impl.BossroomEnterEvent;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
-import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonSecrets;
 import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TabListUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
@@ -151,7 +149,7 @@ public class DungeonContext {
 
 
         if (mapProcessor.isInitialized() && BossRoomEnterSeconds == -1 && !roomBoundary.contains(mapProcessor.worldPointToMapPoint(Minecraft.getMinecraft().thePlayer.getPositionVector()))) {
-            BossRoomEnterSeconds = FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed() / 1000;
+            BossRoomEnterSeconds = DungeonUtil.getTimeElapsed() / 1000;
             bossroomSpawnPos = Minecraft.getMinecraft().thePlayer.getPosition();
             MinecraftForge.EVENT_BUS.post(new BossroomEnterEvent());
             createEvent(new DungeonNodataEvent("BOSSROOM_ENTER"));
@@ -167,14 +165,14 @@ public class DungeonContext {
         players.addAll(TabListUtil.getPlayersInDungeon());
 
 
-        if (latestSecretCnt != FeatureDungeonSecrets.getSecretsFound()) {
-            int newSecretCnt = FeatureDungeonSecrets.getSecretsFound();
-            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, newSecretCnt, latestTotalSecret, FeatureDungeonSecrets.sureOfTotalSecrets()));
+        if (latestSecretCnt != DungeonUtil.getSecretsFound()) {
+            int newSecretCnt = DungeonUtil.getSecretsFound();
+            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, newSecretCnt, latestTotalSecret, DungeonUtil.sureOfTotalSecrets()));
             latestSecretCnt = newSecretCnt;
         }
-        if (latestTotalSecret != FeatureDungeonSecrets.getTotalSecretsInt()) {
-            latestTotalSecret = FeatureDungeonSecrets.getTotalSecretsInt();
-            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, latestSecretCnt, latestTotalSecret, FeatureDungeonSecrets.sureOfTotalSecrets()));
+        if (latestTotalSecret != DungeonUtil.getTotalSecretsInt()) {
+            latestTotalSecret = DungeonUtil.getTotalSecretsInt();
+            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, latestSecretCnt, latestTotalSecret, DungeonUtil.sureOfTotalSecrets()));
         }
         if (latestCrypts != DungeonUtil.getTombsFound()) {
             int newlatestCrypts = DungeonUtil.getTombsFound();

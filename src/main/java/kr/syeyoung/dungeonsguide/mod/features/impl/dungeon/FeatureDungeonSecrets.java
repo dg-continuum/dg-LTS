@@ -23,66 +23,12 @@ import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
-import lombok.val;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.scoreboard.ScorePlayerTeam;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 
 public class FeatureDungeonSecrets extends SingleTextHud {
 
     public FeatureDungeonSecrets() {
         super("Secrets", true);
-    }
-
-    public static int getSecretsFound() {
-        for (val networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
-            String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-            if (name.startsWith("§r Secrets Found: §r§b") && !name.contains("%")) {
-                String noColor = TextUtils.stripColor(name);
-                return Integer.parseInt(noColor.substring(16));
-            }
-        }
-        return 0;
-    }
-
-    public static int getTotalSecretsInt() {
-        if (getSecretsFound() != 0) {
-            return (int) Math.ceil(getSecretsFound() / getSecretPercentage() * 100);
-        }
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        int totalSecrets = 0;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-            if (dungeonRoom.getTotalSecrets() != -1) {
-                totalSecrets += dungeonRoom.getTotalSecrets();
-            }
-        }
-        return totalSecrets;
-    }
-
-    public static boolean sureOfTotalSecrets() {
-        if (getSecretsFound() != 0) return true;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (context.getMapProcessor().getUndiscoveredRoom() > 0) return false;
-        boolean allknown = true;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-            if (dungeonRoom.getTotalSecrets() == -1) {
-                allknown = false;
-                break;
-            }
-        }
-        return allknown;
-    }
-
-    public static double getSecretPercentage() {
-        for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
-            String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-            if (name.startsWith("§r Secrets Found: §r") && name.contains("%")) {
-                String noColor = TextUtils.stripColor(name);
-                return Double.parseDouble(noColor.substring(16).replace("%", ""));
-            }
-        }
-        return 0;
     }
 
     public String getTotalSecrets() {
@@ -112,11 +58,11 @@ public class FeatureDungeonSecrets extends SingleTextHud {
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
         if(context == null) return "";
 
-        return getSecretsFound() +
+        return DungeonUtil.getSecretsFound() +
                 "/" +
-                (int) Math.ceil(getTotalSecretsInt() * context.getSecretPercentage()) +
+                (int) Math.ceil(DungeonUtil.getTotalSecretsInt() * context.getSecretPercentage()) +
                 " of " +
-                getTotalSecretsInt() +
+                DungeonUtil.getTotalSecretsInt() +
                 (getTotalSecrets().contains("+") ? "+" : "");
     }
 }
