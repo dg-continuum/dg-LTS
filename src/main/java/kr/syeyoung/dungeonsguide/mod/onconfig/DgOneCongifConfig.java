@@ -612,6 +612,14 @@ public class DgOneCongifConfig extends Config {
     )
     private static FairySoulWarning fsrw = new FairySoulWarning();
 
+    @Page(
+            name = "Display Current Phase",
+            description = "Displays the current phase of bossfight",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static CurrentBossPhase cbp = new CurrentBossPhase();
+
     @HUD(
             name = "Debug Map",
             category = "Debug"

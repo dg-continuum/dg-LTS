@@ -112,7 +112,6 @@ public class FeatureRegistry {
     public static FeatureHideAnimals BOSSFIGHT_HIDE_ANIMALS;
     public static FeatureThornSpiritBowTimer BOSSFIGHT_BOW_TIMER;
     public static FeatureBoxRealLivid BOSSFIGHT_BOX_REALLIVID;
-    public static FeatureCurrentPhase BOSSFIGHT_CURRENT_PHASE;
     public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureSimonSaysSolver BOSSFIGHT_SIMONSAYS_SOLVER;
 
@@ -176,7 +175,6 @@ public class FeatureRegistry {
             BOSSFIGHT_HIDE_ANIMALS = register(new FeatureHideAnimals());
             BOSSFIGHT_BOW_TIMER = register(new FeatureThornSpiritBowTimer());
             BOSSFIGHT_BOX_REALLIVID = register(new FeatureBoxRealLivid());
-            BOSSFIGHT_CURRENT_PHASE = register(new FeatureCurrentPhase());
             BOSSFIGHT_TERMINAL_SOLVERS = register(new FeatureTerminalSolvers());
             BOSSFIGHT_SIMONSAYS_SOLVER = register(new FeatureSimonSaysSolver());
             PARTYKICKER_VIEWPLAYER = register(new FeatureViewPlayerStatsOnJoin());

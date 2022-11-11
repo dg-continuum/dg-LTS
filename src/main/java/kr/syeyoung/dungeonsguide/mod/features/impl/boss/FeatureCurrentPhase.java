@@ -18,57 +18,31 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
-import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FeatureCurrentPhase extends TextHUDFeature {
+public class FeatureCurrentPhase extends SingleTextHud {
     public FeatureCurrentPhase() {
-        super("Dungeon.Bossfight", "Display Current Phase", "Displays the current phase of bossfight", "bossfight.phasedisplay", false, getFontRenderer().getStringWidth("Current Phase: fight-2-idk-howlng"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(true);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("phase", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-    }
+        super("Current Phase", true);
 
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
-    private static final List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Current Phase","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("fight-2","phase"));
-    }
-    @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() != null;
     }
 
     @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "phase");
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() != null;
     }
 
     @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
+    protected String getText(boolean example) {
+        if(example){
+            return "fight-2";
+        }
 
-    @Override
-    public List<StyledText> getText() {
-        String currentPhsae = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor().getCurrentPhase();
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Current Phase","title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(currentPhsae,"phase"));
-        return actualBit;
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if(context == null) return "";
+        if(context.getBossfightProcessor() == null) return "";
+        return context.getBossfightProcessor().getCurrentPhase();
     }
-
 }
