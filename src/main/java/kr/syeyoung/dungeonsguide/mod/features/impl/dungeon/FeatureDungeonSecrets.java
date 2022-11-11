@@ -44,7 +44,8 @@ public class FeatureDungeonSecrets extends SingleTextHud {
         return totalSecrets + (allknown ? "" : "+");
     }
 
-    public boolean isHUDViewable() {
+    @Override
+    protected boolean shouldShow() {
         return SkyblockStatus.isOnDungeon();
     }
 
