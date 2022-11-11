@@ -106,7 +106,20 @@ public class DgOneCongifConfig extends Config {
 
 
 
+    @Switch(
+            name = "enabled",
+            description = "Box Real Livid in bossfight",
+            category = "Solvers",
+            subcategory = "Box Real Livid"
+    )
+    public static boolean boxRealLivid = true;
 
+    @Color(
+            name = "Box color",
+            category = "Solvers",
+            subcategory = "Box Real Livid"
+    )
+    public static OneColor realLividColor = new OneColor(0, 255, 0, 150);
 
 
     @Switch(
