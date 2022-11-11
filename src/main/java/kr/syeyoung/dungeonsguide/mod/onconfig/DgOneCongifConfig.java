@@ -458,6 +458,14 @@ public class DgOneCongifConfig extends Config {
     )
     public CurrentRoomDungeonSecrets crds = new CurrentRoomDungeonSecrets();
 
+    @Page(
+            name = "Display Current Class Milestone",
+            description = "Display current class milestone of yourself",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public DungeonMilestone dm = new DungeonMilestone();
+
 
     @Switch(
             name = "enabled",
