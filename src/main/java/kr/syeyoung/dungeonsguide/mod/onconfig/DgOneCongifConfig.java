@@ -12,6 +12,7 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonMap;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.dungeon.HideAnimal;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DeathDisplay;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.HighlightMobs;
 import kr.syeyoung.dungeonsguide.mod.onconfig.secrets.AutoPathfindPage;
@@ -417,6 +418,13 @@ public class DgOneCongifConfig extends Config {
     )
     public BossHealth aa = new BossHealth();
 
+    @Page(
+            name = "Dungeon Deaths Display",
+            description = "Display names of player and death count in dungeon run",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public DeathDisplay dd = new DeathDisplay();
 
 
 

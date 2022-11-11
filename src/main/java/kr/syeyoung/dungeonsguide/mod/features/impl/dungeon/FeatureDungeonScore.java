@@ -210,8 +210,8 @@ public class FeatureDungeonScore extends TextHUDFeature {
         int skill = 100;
         int deaths = 0;
         {
-            deaths = FeatureRegistry.DUNGEON_DEATHS.getTotalDeaths();
-            skill -= FeatureRegistry.DUNGEON_DEATHS.getTotalDeaths() * 2;
+            deaths = FeatureDungeonDeaths.getTotalDeaths();
+            skill -= FeatureDungeonDeaths.getTotalDeaths() * 2;
             int totalCompRooms= 0;
             int roomCnt = 0;
             int roomSkillPenalty = 0;

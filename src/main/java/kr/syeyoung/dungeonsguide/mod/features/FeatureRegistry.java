@@ -63,7 +63,6 @@ public class FeatureRegistry {
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP;
     public static FeaturePressAnyKeyToCloseChest DUNGEON_CLOSECHEST;
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
-    public static FeatureDungeonDeaths DUNGEON_DEATHS;
     public static FeatureDungeonMilestone DUNGEON_MILESTONE;
     public static FeatureDungeonRealTime DUNGEON_REALTIME;
     public static FeatureDungeonSBTime DUNGEON_SBTIME;
@@ -120,7 +119,6 @@ public class FeatureRegistry {
             DUNGEON_SBTIME = register(new FeatureDungeonSBTime());
             DUNGEON_REALTIME = register(new FeatureDungeonRealTime());
             DUNGEON_MILESTONE = register(new FeatureDungeonMilestone());
-            DUNGEON_DEATHS = register(new FeatureDungeonDeaths());
             DUNGEON_WATCHERWARNING = register(new FeatureWatcherWarning());
             DUNGEON_CLOSECHEST = register(new FeaturePressAnyKeyToCloseChest());
             SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Item Drop Line Settings", "Line Settings when pathfind to Item Drop, when using above feature", "secret.lineproperties.apf.itemdrop", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
