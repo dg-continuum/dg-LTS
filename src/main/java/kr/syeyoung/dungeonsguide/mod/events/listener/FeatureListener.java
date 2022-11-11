@@ -191,21 +191,6 @@ public class FeatureListener {
         }
     }
     @SubscribeEvent
-    public void onRender(TitleEvent titleEvent) {
-        try {
-
-            if (!SkyblockStatus.isOnSkyblock()) return;
-
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof TitleListener) {
-                    ((TitleListener) abstractFeature).onTitle(titleEvent.getPacketTitle());
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
     public void onRender(RenderPlayerEvent.Pre preRender) {
         try {
 

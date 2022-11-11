@@ -613,6 +613,14 @@ public class DgOneCongifConfig extends Config {
     private static FairySoulWarning fsrw = new FairySoulWarning();
 
     @Page(
+            name = "Display Spirit bow timer",
+            description = "Displays how long until spirit bow gets destroyed",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static SpiritBowTimer sbt = new SpiritBowTimer();
+
+    @Page(
             name = "Display Current Phase",
             description = "Displays the current phase of bossfight",
             location = PageLocation.BOTTOM,
