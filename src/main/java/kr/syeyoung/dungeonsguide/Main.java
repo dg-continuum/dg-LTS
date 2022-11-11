@@ -22,7 +22,6 @@ import cc.polyfrost.oneconfig.events.EventManager;
 import kr.syeyoung.dungeonsguide.auth.AuthManager;
 import kr.syeyoung.dungeonsguide.auth.InvalidDungeonsGuideCredentialsException;
 import kr.syeyoung.dungeonsguide.auth.ResourceManager;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.url.DGStreamHandlerFactory;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiMainMenu;

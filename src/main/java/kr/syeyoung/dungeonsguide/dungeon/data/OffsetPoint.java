@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.data;
 
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.utils.VectorUtils;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.block.Block;
