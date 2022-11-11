@@ -21,51 +21,58 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.InteractListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.TickListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.WorldRenderListener;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.BossfightProcessorNecron;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FeatureSimonSaysSolver extends SimpleFeature implements WorldRenderListener, TickListener, InteractListener {
-    public FeatureSimonSaysSolver() {
-        super("Dungeon.Bossfight.Floor 7+","Simon Says Solver","Solver for Simon says puzzle", "Dungeon.Bossfight.simonsays2");
-    }
-
-    private final SkyblockStatus ss = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
+public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
     private final List<BlockPos> orderbuild = new ArrayList<BlockPos>();
     private final LinkedList<BlockPos> orderclick = new LinkedList<BlockPos>();
+    private boolean wasButton = false;
 
-    @Override
-    public void drawWorld(float partialTicks) {
-        if (!isEnabled()) return;
+    public FeatureSimonSaysSolver() {
+        super("Dungeon.Bossfight.simonsays2");
+    }
+
+    @SubscribeEvent
+    public void onInteract(PlayerInteractEvent event) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.simonySaysSolver) return;
+
         DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (dc == null) {
+        if (dc == null) return;
+        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
+        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
+
+        BlockPos pos = event.pos.add(1, 0, 0);
+        if (120 <= pos.getY() && pos.getY() <= 123 && pos.getX() == 310 && 291 <= pos.getZ() && pos.getZ() <= 294) {
+            if (DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(event.pos).getBlock() != Blocks.stone_button)
+                return;
+            if (pos.equals(orderclick.peek())) {
+                orderclick.poll();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent e) {
+        if (e.phase != TickEvent.Phase.END || e.type != TickEvent.Type.CLIENT) {
             return;
         }
-        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
-        if (Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(309,123,291) > 400) return;
-
-
-        if (orderclick.size() >= 1)
-            RenderUtils.highlightBlock(orderclick.get(0), new Color(0, 255 ,255, 100), partialTicks, false);
-        if (orderclick.size() >= 2)
-            RenderUtils.highlightBlock(orderclick.get(1), new Color(255, 170, 0, 100), partialTicks, false);
-    }
-    private boolean wasButton = false;
-    @Override
-    public void onTick() {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
         if (dc == null) {
             wasButton = false;
@@ -77,7 +84,7 @@ public class FeatureSimonSaysSolver extends SimpleFeature implements WorldRender
             orderclick.clear();
             orderbuild.clear();
             wasButton = false;
-        } else if (!wasButton && DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.stone_button){
+        } else if (!wasButton && DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.stone_button) {
             orderclick.addAll(orderbuild);
             wasButton = true;
         }
@@ -92,22 +99,22 @@ public class FeatureSimonSaysSolver extends SimpleFeature implements WorldRender
         }
     }
 
-    @Override
-    public void onInteract(PlayerInteractEvent event) {
-        if (!isEnabled()) return;
-
+    @SubscribeEvent
+    public void onRenderWorld(RenderWorldLastEvent e) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.simonySaysSolver) return;
         DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (dc == null) return;
-        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
-        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
-        World w = dc.getWorld();
-
-        BlockPos pos = event.pos.add(1,0,0);
-        if (120 <= pos.getY() && pos.getY() <= 123 && pos.getX() == 310 && 291 <= pos.getZ() && pos.getZ() <= 294) {
-            if (DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(event.pos).getBlock() != Blocks.stone_button) return;
-            if (pos.equals(orderclick.peek())) {
-                orderclick.poll();
-            }
+        if (dc == null) {
+            return;
         }
+        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
+        if (Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(309, 123, 291) > 400) return;
+
+
+        if (orderclick.size() >= 1)
+            RenderUtils.highlightBlock(orderclick.get(0), new Color(0, 255, 255, 100), e.partialTicks, false);
+        if (orderclick.size() >= 2)
+            RenderUtils.highlightBlock(orderclick.get(1), new Color(255, 170, 0, 100), e.partialTicks, false);
     }
+
 }

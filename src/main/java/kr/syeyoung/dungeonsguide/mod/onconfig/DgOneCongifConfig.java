@@ -121,6 +121,12 @@ public class DgOneCongifConfig extends Config {
     )
     public static OneColor realLividColor = new OneColor(0, 255, 0, 150);
 
+    @Switch(
+            name = "Simon Says Solver",
+            description = "Solver for Simon says puzzle",
+            category = "Solvers"
+    )
+    public static boolean simonySaysSolver = true;
 
     @Switch(
             name = "Creeper",
