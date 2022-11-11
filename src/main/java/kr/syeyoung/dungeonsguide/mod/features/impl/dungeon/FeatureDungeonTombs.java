@@ -18,71 +18,26 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
-import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.scoreboard.ScorePlayerTeam;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FeatureDungeonTombs extends TextHUDFeature {
+public class FeatureDungeonTombs extends SingleTextHud {
     public FeatureDungeonTombs() {
-        super("Dungeon.HUDs", "Display # of Crypts", "Display how much total crypts have been blown up in a dungeon run", "dungeon.stats.tombs", true, getFontRenderer().getStringWidth("Crypts: 42"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(false);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("number", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
+        super("Crypts", true);
     }
 
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
+    @Override
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon();
+    }
 
-    public int getTombsFound() {
-        for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
-            String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-            if (name.startsWith("§r Crypts: §r§6")) {
-                return Integer.parseInt(TextUtils.stripColor(name).substring(9));
-            }
+    @Override
+    protected String getText(boolean example) {
+        if(example){
+            return "42";
         }
-        return 0;
-    }
 
-    private static final java.util.List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Crypts","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("42","number"));
+        return String.valueOf(DungeonUtil.getTombsFound());
     }
-
-    @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon();
-    }
-
-    @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "number");
-    }
-
-    @Override
-    public java.util.List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public java.util.List<StyledText> getText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Crypts","title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(getTombsFound()+"","number"));
-        return actualBit;
-    }
-
 }

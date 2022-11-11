@@ -33,6 +33,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.BossfightPr
 import kr.syeyoung.dungeonsguide.mod.events.impl.BossroomEnterEvent;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonSecrets;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TabListUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import lombok.Getter;
@@ -175,8 +176,8 @@ public class DungeonContext {
             latestTotalSecret = FeatureDungeonSecrets.getTotalSecretsInt();
             createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, latestSecretCnt, latestTotalSecret, FeatureDungeonSecrets.sureOfTotalSecrets()));
         }
-        if (latestCrypts != FeatureRegistry.DUNGEON_TOMBS.getTombsFound()) {
-            int newlatestCrypts = FeatureRegistry.DUNGEON_TOMBS.getTombsFound();
+        if (latestCrypts != DungeonUtil.getTombsFound()) {
+            int newlatestCrypts = DungeonUtil.getTombsFound();
             createEvent(new DungeonCryptBrokenEvent(latestCrypts, newlatestCrypts));
             this.latestCrypts = newlatestCrypts;
         }

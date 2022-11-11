@@ -12,6 +12,7 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonMap;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.dungeon.HideAnimal;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.CryptsDisplay;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DeathDisplay;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DungeonSecrets;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
@@ -435,6 +436,13 @@ public class DgOneCongifConfig extends Config {
     )
     public DungeonSecrets ds = new DungeonSecrets();
 
+    @Page(
+            name = "Display # of Crypts",
+            description = "Display how much total crypts have been blown up in a dungeon run",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public CryptsDisplay fdt = new CryptsDisplay();
 
 
     @Switch(

@@ -28,6 +28,7 @@ import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TimeScoreUtil;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResource;
@@ -281,7 +282,7 @@ public class FeatureDungeonScore extends TextHUDFeature {
         int bonus = 0;
         int tombs;
         {
-            bonus += tombs = MathHelper.clamp_int(FeatureRegistry.DUNGEON_TOMBS.getTombsFound(), 0, 5);
+            bonus += tombs = MathHelper.clamp_int(DungeonUtil.getTombsFound(), 0, 5);
             if (context.isGotMimic()) bonus += 2;
             CompletableFuture<StaticResource> staticResourceCompletableFuture = StaticResourceCache.INSTANCE.getResource(StaticResourceCache.BONUS_SCORE);
             if (staticResourceCompletableFuture.isDone()) {
