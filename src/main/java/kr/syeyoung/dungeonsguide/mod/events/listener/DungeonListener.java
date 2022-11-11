@@ -159,6 +159,7 @@ public class DungeonListener {
                 if (SkyblockStatus.isOnDungeon()) {
                     DungeonsGuide.getDungeonsGuide().getDungeonFacade().setContext(new DungeonContext(Minecraft.getMinecraft().thePlayer.worldObj));
                     MinecraftForge.EVENT_BUS.post(new DungeonStartedEvent());
+                    DungeonContext.started = System.currentTimeMillis();
                 }
             }
         }

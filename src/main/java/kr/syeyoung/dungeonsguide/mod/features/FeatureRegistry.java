@@ -64,7 +64,6 @@ public class FeatureRegistry {
     public static FeaturePressAnyKeyToCloseChest DUNGEON_CLOSECHEST;
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
     public static FeatureDungeonMilestone DUNGEON_MILESTONE;
-    public static FeatureDungeonRealTime DUNGEON_REALTIME;
     public static FeatureDungeonSBTime DUNGEON_SBTIME;
     public static FeatureDungeonCurrentRoomSecrets DUNGEON_SECRETS_ROOM;
     public static FeatureDungeonScore DUNGEON_SCORE;
@@ -113,7 +112,6 @@ public class FeatureRegistry {
             DUNGEON_SCORE = register(new FeatureDungeonScore());
             DUNGEON_SECRETS_ROOM = register(new FeatureDungeonCurrentRoomSecrets());
             DUNGEON_SBTIME = register(new FeatureDungeonSBTime());
-            DUNGEON_REALTIME = register(new FeatureDungeonRealTime());
             DUNGEON_MILESTONE = register(new FeatureDungeonMilestone());
             DUNGEON_WATCHERWARNING = register(new FeatureWatcherWarning());
             DUNGEON_CLOSECHEST = register(new FeaturePressAnyKeyToCloseChest());

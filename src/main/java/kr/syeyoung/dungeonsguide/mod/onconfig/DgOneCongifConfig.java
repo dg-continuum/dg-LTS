@@ -14,6 +14,7 @@ import kr.syeyoung.dungeonsguide.mod.onconfig.dungeon.HideAnimal;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.CryptsDisplay;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DeathDisplay;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DungeonRealTime;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DungeonSecrets;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.HighlightMobs;
@@ -443,6 +444,15 @@ public class DgOneCongifConfig extends Config {
             category = "HUD"
     )
     public CryptsDisplay fdt = new CryptsDisplay();
+
+    @Page(
+            name = "Display Real Time-Dungeon Time",
+            description = "Display how much real time has passed since dungeon run started",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public DungeonRealTime drt = new DungeonRealTime();
+
 
 
     @Switch(

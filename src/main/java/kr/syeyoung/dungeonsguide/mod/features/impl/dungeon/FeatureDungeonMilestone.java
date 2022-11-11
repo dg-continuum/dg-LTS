@@ -18,12 +18,11 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
 import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
 import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
@@ -102,10 +101,10 @@ public class FeatureDungeonMilestone extends TextHUDFeature implements ChatListe
         String txt = clientChatReceivedEvent.message.getFormattedText();
         if (milestone_pattern.matcher(txt).matches()) {
             context.getMilestoneReached().add(new String[] {
-                    TextUtils.formatTime(FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed()),
+                    TextUtils.formatTime(DungeonContext.getTimeElapsed()),
                     TextUtils.formatTime(DungeonUtil.getTimeElapsed())
             });
-            ChatTransmitter.sendDebugChat(new ChatComponentText("Reached Milestone At " +  TextUtils.formatTime(FeatureRegistry.DUNGEON_REALTIME.getTimeElapsed()) + " / "+TextUtils.formatTime(DungeonUtil.getTimeElapsed())));
+            ChatTransmitter.sendDebugChat(new ChatComponentText("Reached Milestone At " +  TextUtils.formatTime(DungeonContext.getTimeElapsed()) + " / "+TextUtils.formatTime(DungeonUtil.getTimeElapsed())));
         }
     }
 }

@@ -57,6 +57,7 @@ public class DungeonContext {
      */
     @Getter @Setter
     private static String dungeonName;
+    public static long started = -1;
     @Getter
     @Setter
     public int percentage;
@@ -106,6 +107,10 @@ public class DungeonContext {
     private int maxSpeed = 600;
     @Getter
     private double secretPercentage = 1.0;
+
+    public static long getTimeElapsed() {
+        return System.currentTimeMillis() - started;
+    }
 
     public void setGotMimic(boolean gotMimic) {
         this.gotMimic = gotMimic;

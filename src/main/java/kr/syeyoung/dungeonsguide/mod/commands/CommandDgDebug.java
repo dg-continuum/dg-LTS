@@ -255,6 +255,7 @@ public class CommandDgDebug extends CommandBase {
         } else if ("reloaddungeon".equals(arg)) {
             try {
                 MinecraftForge.EVENT_BUS.post(new DungeonLeftEvent());
+                DungeonContext.started = -1;
 
                 DungeonsGuide.getDungeonsGuide().getDungeonFacade().setContext(null);
                 MapUtils.clearMap();
