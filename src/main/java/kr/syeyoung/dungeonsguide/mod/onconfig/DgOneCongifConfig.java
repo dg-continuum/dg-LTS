@@ -466,6 +466,14 @@ public class DgOneCongifConfig extends Config {
     )
     public DungeonMilestone dm = new DungeonMilestone();
 
+    @Page(
+            name = "Low Health Warning",
+            description = "Warn if someone is on low health",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public WarnLowHealth wlh = new WarnLowHealth();
+
 
     @Switch(
             name = "enabled",

@@ -65,7 +65,6 @@ public class FeatureRegistry {
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
     public static FeatureDungeonSBTime DUNGEON_SBTIME;
     public static FeatureDungeonScore DUNGEON_SCORE;
-    public static FeatureWarnLowHealth DUNGEON_LOWHEALTH_WARN;
     public static SimpleFeature DUNGEON_INTERMODCOMM;
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
     public static SimpleFeature BOSSFIGHT_CHESTPRICE;
@@ -106,7 +105,6 @@ public class FeatureRegistry {
             categoryDescription.put("ROOT.Secrets.Keybinds", "Useful keybinds / Toggle Pathfind lines, Freeze Pathfind lines, Refresh pathfind line or Trigger pathfind (you would want to use it, if you're using Pathfind to All)");
             SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Parent Line Settings", "Line Settings to be used by default", "secret.lineproperties.apf.parent", false, SECRET_LINE_PROPERTIES_GLOBAL));
             DUNGEON_INTERMODCOMM = register(new SimpleFeature("Dungeon.Teammates", "Communicate With Other's Dungeons Guide", "Sends total secret in the room to others\nSo that they can use the data to calculate total secret in dungeon run\n\nThis automates player chatting action, (chatting data) Thus it might be against hypixel's rules.\nBut mods like auto-gg which also automate player action and is kinda allowed mod exist so I'm leaving this feature.\nThis option is use-at-your-risk and you'll be responsible for ban if you somehow get banned because of this feature\n(Although it is not likely to happen)\nDefaults to off", "dungeon.intermodcomm", false));
-            DUNGEON_LOWHEALTH_WARN = register(new FeatureWarnLowHealth());
             DUNGEON_SCORE = register(new FeatureDungeonScore());
             DUNGEON_SBTIME = register(new FeatureDungeonSBTime());
             DUNGEON_WATCHERWARNING = register(new FeatureWatcherWarning());

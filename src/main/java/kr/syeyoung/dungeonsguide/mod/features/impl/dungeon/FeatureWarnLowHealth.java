@@ -18,13 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.config.annotations.Slider;
+import cc.polyfrost.oneconfig.config.annotations.Text;
+import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
@@ -32,53 +29,48 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
-public class FeatureWarnLowHealth extends TextHUDFeature {
+public class FeatureWarnLowHealth extends TextHud {
+
+
+    @Slider(
+            name = "Health Threshold",
+            description = "Health Threshold for this feature to be toggled. default to 500",
+            min = 100,
+            max = 2000
+    )
+    public static float threashhold = 500;
+
+
+    @Text(
+            name = "low health text",
+            placeholder = "is low"
+    )
+    public static String lowmessage = "is low";
+
+
     public FeatureWarnLowHealth() {
-        super("Dungeon.Teammates", "Low Health Warning", "Warn if someone is on low health", "dungeon.lowhealthwarn", false, 500, 20);
-        addParameter("threshold", new FeatureParameter<Integer>("threshold", "Health Threshold", "Health Threshold for this feature to be toggled. default to 500", 500, "integer"));
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("number", new AColor(0xFF, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("unit", new AColor(0xFF, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        setEnabled(false);
+        super(true);
+
     }
-
-
-    private final SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
 
 
     @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon();
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon();
     }
 
     @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "number", "unit");
-    }
+    protected void getLines(List<String> lines, boolean example) {
+        if(example){
+            lines.add("Steve is low: 500hp");
+            return;
+        }
 
-    private static final java.util.List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("DungeonsGuide","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("500","number"));
-        dummyText.add(new StyledText("hp","unit"));
-    }
-
-    @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public List<StyledText> getText() {
         String lowestHealthName = "";
-        int lowestHealth = 999999999;
+        int lowestHealth = Integer.MAX_VALUE;
         Scoreboard scoreboard = Minecraft.getMinecraft().thePlayer.getWorldScoreboard();
         ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
         for (Score sc : scoreboard.getSortedScores(objective)) {
@@ -94,13 +86,10 @@ public class FeatureWarnLowHealth extends TextHUDFeature {
                 }
             }
         }
-        if (lowestHealth > this.<Integer>getParameter("threshold").getValue()) return new ArrayList<StyledText>();
+        if (lowestHealth > threashhold) {
+            return;
+        }
+        lines.add(lowestHealthName + " " + lowmessage + " " + lowestHealth + "hp");
 
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText(lowestHealthName,"title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(lowestHealth+"","number"));
-        actualBit.add(new StyledText("hp","unit"));
-        return actualBit;
     }
 }
