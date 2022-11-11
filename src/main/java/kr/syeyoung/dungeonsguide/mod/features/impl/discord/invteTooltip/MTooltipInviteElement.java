@@ -18,11 +18,11 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.discord.invteTooltip;
 
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.discord.rpc.JDiscordRelation;
 import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.ImageTexture;
+import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.PartyInviteViewer;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.MButton;
-import kr.syeyoung.dungeonsguide.mod.discord.rpc.JDiscordRelation;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -79,7 +79,7 @@ public class MTooltipInviteElement extends MPanel {
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         if (!relation.getDiscordUser().getAvatar().isEmpty()){
             String avatar = "https://cdn.discordapp.com/avatars/"+Long.toUnsignedString(relation.getDiscordUser().getId())+"/"+relation.getDiscordUser().getAvatar()+"."+(relation.getDiscordUser().getAvatar().startsWith("a_") ? "gif":"png");
-            Future<ImageTexture> loadedImageFuture = FeatureRegistry.DISCORD_ASKTOJOIN.loadImage(avatar);
+            Future<ImageTexture> loadedImageFuture = PartyInviteViewer.loadImage(avatar);
             ImageTexture loadedImage = null;
             if (loadedImageFuture.isDone()) {
                 try {

@@ -26,8 +26,6 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureSimonSay
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureTerminalSolvers;
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknameColor;
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknamePrefix;
-import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.PartyInviteViewer;
-import kr.syeyoung.dungeonsguide.mod.features.impl.discord.onlinealarm.PlayingDGAlarm;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.*;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyList;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyReady;
@@ -51,47 +49,18 @@ public class FeatureRegistry {
     private static final Map<String, List<AbstractFeature>> featuresByCategory = new HashMap<String, List<AbstractFeature>>();
     @Getter
     private static final Map<String, String> categoryDescription = new HashMap<>();
-
-    public static AbstractFeature getFeatureByKey(String key) {
-        return featureByKey.get(key);
-    }
-
-    public static <T extends AbstractFeature> T register(T abstractFeature) {
-        if (featureByKey.containsKey(abstractFeature.getKey())) throw new IllegalArgumentException("DUPLICATE FEATURE DEFINITION");
-        featureList.add(abstractFeature);
-        featureByKey.put(abstractFeature.getKey(), abstractFeature);
-        List<AbstractFeature> features = featuresByCategory.get(abstractFeature.getCategory());
-        if (features == null)
-            features = new ArrayList<AbstractFeature>();
-        features.add(abstractFeature);
-        featuresByCategory.put(abstractFeature.getCategory(), features);
-
-        return abstractFeature;
-    }
-
-
-
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_GLOBAL;
-
     public static FeatureMechanicBrowse SECRET_BROWSE;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_SECRET_BROWSER;
     public static FeatureActions SECRET_ACTIONS;
-
     public static FeatureCreateRefreshLine SECRET_CREATE_REFRESH_LINE;
-
     public static PathfindLineProperties SECRET_BLOOD_RUSH_LINE_PROPERTIES;
-
-
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_AUTOPATHFIND;
-
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT;
-
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_BAT;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_CHEST;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ESSENCE;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP;
-
-
     public static FeaturePressAnyKeyToCloseChest DUNGEON_CLOSECHEST;
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
     public static FeatureDungeonDeaths DUNGEON_DEATHS;
@@ -104,7 +73,6 @@ public class FeatureRegistry {
     public static FeatureDungeonScore DUNGEON_SCORE;
     public static FeatureWarnLowHealth DUNGEON_LOWHEALTH_WARN;
     public static SimpleFeature DUNGEON_INTERMODCOMM;
-
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
     public static SimpleFeature BOSSFIGHT_CHESTPRICE;
     public static FeatureAutoReparty BOSSFIGHT_AUTOREPARTY;
@@ -112,32 +80,30 @@ public class FeatureRegistry {
     public static FeatureBoxRealLivid BOSSFIGHT_BOX_REALLIVID;
     public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureSimonSaysSolver BOSSFIGHT_SIMONSAYS_SOLVER;
-
     public static FeatureViewPlayerStatsOnJoin PARTYKICKER_VIEWPLAYER;
     public static FeaturePartyList PARTY_LIST;
     public static FeaturePartyReady PARTY_READY;
-
-
-
-
     public static FeatureNicknamePrefix COSMETIC_PREFIX;
     public static FeatureNicknameColor COSMETIC_NICKNAMECOLOR;
-
-
-
-    public static SimpleFeature DISCORD_RICHPRESENCE;
-    public static PartyInviteViewer DISCORD_ASKTOJOIN;
-    public static PlayingDGAlarm DISCORD_ONLINEALARM;
-
     public static FeatureRoomDebugInfo ADVANCED_DEBUG_ROOM;
-
     public static FeatureDebuggableMap ADVANCED_DEBUGGABLE_MAP;
-
     public static FeatureRoomCoordDisplay ADVANCED_COORDS;
 
+    public static <T extends AbstractFeature> T register(T abstractFeature) {
+        if (featureByKey.containsKey(abstractFeature.getKey()))
+            throw new IllegalArgumentException("DUPLICATE FEATURE DEFINITION");
+        featureList.add(abstractFeature);
+        featureByKey.put(abstractFeature.getKey(), abstractFeature);
+        List<AbstractFeature> features = featuresByCategory.get(abstractFeature.getCategory());
+        if (features == null)
+            features = new ArrayList<AbstractFeature>();
+        features.add(abstractFeature);
+        featuresByCategory.put(abstractFeature.getCategory(), features);
 
+        return abstractFeature;
+    }
 
-    public void init(){
+    public void init() {
         try {
             SECRET_LINE_PROPERTIES_GLOBAL = register(new PathfindLineProperties("Dungeon.Secrets.Preferences", "Global Line Settings", "Global Line Settings", "secret.lineproperties.global", true, null));
             SECRET_CREATE_REFRESH_LINE = register(new FeatureCreateRefreshLine());
@@ -179,13 +145,7 @@ public class FeatureRegistry {
 
             COSMETIC_NICKNAMECOLOR = register(new FeatureNicknameColor());
             COSMETIC_PREFIX = register(new FeatureNicknamePrefix());
-            DISCORD_RICHPRESENCE = register(new SimpleFeature("Discord", "Discord RPC", "Enable Discord rich presence", "advanced.richpresence", true) {
-                {
-                    addParameter("disablenotskyblock", new FeatureParameter<Boolean>("disablenotskyblock", "Disable When not on Skyblock", "Disable When not on skyblock", false, "boolean"));
-                }
-            });
-            DISCORD_ASKTOJOIN = register(new PartyInviteViewer());
-            DISCORD_ONLINEALARM = register(new PlayingDGAlarm());
+
             ADVANCED_DEBUG_ROOM = register(new FeatureRoomDebugInfo());
             ADVANCED_DEBUGGABLE_MAP = register(new FeatureDebuggableMap());
 
@@ -197,7 +157,7 @@ public class FeatureRegistry {
 
 
         for (AbstractFeature abstractFeature : featureList) {
-            if(abstractFeature == null){
+            if (abstractFeature == null) {
                 throw new IllegalStateException("Feature " + abstractFeature.getKey() + " is null, this cannot happen!!!");
             }
         }

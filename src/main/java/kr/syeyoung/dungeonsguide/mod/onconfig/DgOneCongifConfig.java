@@ -566,6 +566,41 @@ public class DgOneCongifConfig extends Config {
     public static boolean disableDiscd  = true;
 
 
+    @Switch(
+            name = "Use rich presence",
+            size = 2,
+            category = "Discord",
+            subcategory = "Rich Presence"
+    )
+    public static boolean useDiscordRP = false;
+
+
+    @Switch(
+            name = "Party Invite Viewer",
+            description = "Simply type /dg asktojoin or /dg atj to toggle whether ask-to-join would be presented as option on discord! Requires Discord RPC to be enabled",
+            size = 2,
+            category = "Discord",
+            subcategory = "Rich Presence"
+    )
+    public static boolean disocrdPartyInvite = false;
+
+    @Switch(
+            name = "Friend Online Notification",
+            description = "Notifies you in bottom when your discord friend has launched a Minecraft with DG! Requires the Friend's Discord RPC to be enabled",
+            size = 2,
+            category = "Discord",
+            subcategory = "Rich Presence"
+    )
+    public static boolean discordFriendOnlineAcidifications = false;
+
+    @Switch(
+            name = "Disable rich presence When not on Skyblock",
+            category = "Discord",
+            subcategory = "Rich Presence"
+    )
+    public static boolean disableDiscordRpNotOnSkyblock = false;
+
+
     @Page(
             name = "Dungeon Map",
             location = PageLocation.BOTTOM,

@@ -19,16 +19,15 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.discord.onlinealarm;
 
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.events.impl.DiscordUserUpdateEvent;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.ImageTexture;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DiscordUserUpdateListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ScreenRenderListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.TickListener;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.discord.gamesdk.jna.enumuration.EDiscordRelationshipType;
 import kr.syeyoung.dungeonsguide.mod.discord.rpc.JDiscordActivity;
 import kr.syeyoung.dungeonsguide.mod.discord.rpc.JDiscordRelation;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DiscordUserUpdateEvent;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.ImageTexture;
+import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.PartyInviteViewer;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +36,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -46,33 +48,38 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class PlayingDGAlarm extends SimpleFeature implements DiscordUserUpdateListener, ScreenRenderListener, TickListener {
+public class PlayingDGAlarm extends SimpleFeatureV2 {
     public PlayingDGAlarm() {
-        super("Discord", "Friend Online Notification","Notifies you in bottom when your discord friend has launched a Minecraft with DG!\n\nRequires the Friend's Discord RPC to be enabled", "discord.playingalarm");
+        super("discord.playingalarm");
     }
-    private List<PlayerOnline> notif = new CopyOnWriteArrayList<>();
+    private final List<PlayerOnline> notif = new CopyOnWriteArrayList<>();
 
-    @Override
-    public void onTick() {
-        try {
-            List<PlayerOnline> partyJoinRequestList = new ArrayList<>();
-            boolean isOnHypixel = DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnHypixel();
-            for (PlayerOnline joinRequest:notif) {
-                if (!isOnHypixel){
-                    partyJoinRequestList.add(joinRequest);
-                } else if (joinRequest.getEnd() < System.currentTimeMillis()) {
-                    partyJoinRequestList.add(joinRequest);
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent tick) {
+        if (tick.phase == TickEvent.Phase.END && tick.type == TickEvent.Type.CLIENT ) {
+            if (!SkyblockStatus.isOnSkyblock()) return;
+
+            try {
+                List<PlayerOnline> partyJoinRequestList = new ArrayList<>();
+                boolean isOnHypixel = DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnHypixel();
+                for (PlayerOnline joinRequest:notif) {
+                    if (!isOnHypixel || joinRequest.getEnd() < System.currentTimeMillis()){
+                        partyJoinRequestList.add(joinRequest);
+                    }
                 }
-            }
-            notif.removeAll(partyJoinRequestList);
-        } catch (Throwable e) {e.printStackTrace();}
+                notif.removeAll(partyJoinRequestList);
+            } catch (Throwable e) {e.printStackTrace();}
+        }
     }
 
+    @SubscribeEvent
+    public void onRender(RenderGameOverlayEvent.Post postRender) {
+        if (!(postRender.type == RenderGameOverlayEvent.ElementType.EXPERIENCE || postRender.type == RenderGameOverlayEvent.ElementType.JUMPBAR)) return;
 
+        if (!SkyblockStatus.isOnSkyblock()) return;
 
-    @Override
-    public void drawScreen(float partialTicks) {
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.discordFriendOnlineAcidifications) return;
+
         try {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0,0,100);
@@ -93,28 +100,37 @@ public class PlayingDGAlarm extends SimpleFeature implements DiscordUserUpdateLi
         }
     }
 
+    @SubscribeEvent
+    public void onDiscordUserUpdate(DiscordUserUpdateEvent discordUserUpdateEvent) {
+        JDiscordRelation prev = discordUserUpdateEvent.getPrev();
+        JDiscordRelation current = discordUserUpdateEvent.getCurrent();
+        if (!isDisplayable(prev) && isDisplayable(current)) {
+            notif.add(new PlayerOnline(current, System.currentTimeMillis()+3000));
+        }
+    }
+
+
     public void renderRequest(PlayerOnline online, int x, int y, int width, int height) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(x,y,0);
 
         Gui.drawRect(0, 0,width,height, 0xFF23272a);
         Gui.drawRect(2, 2, width-2, height-2, 0XFF2c2f33);
-        {
-            String avatar = "https://cdn.discordapp.com/avatars/"+Long.toUnsignedString(online.getJDiscordRelation().getDiscordUser().getId())+"/"+online.getJDiscordRelation().getDiscordUser().getAvatar()+"."+(online.getJDiscordRelation().getDiscordUser().getAvatar().startsWith("a_") ? "gif":"png");
-            Future<ImageTexture> loadedImageFuture = FeatureRegistry.DISCORD_ASKTOJOIN.loadImage(avatar);
-            ImageTexture loadedImage = null;
-            if (loadedImageFuture.isDone()) {
-                try {
-                    loadedImage = loadedImageFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
+
+        String avatar = "https://cdn.discordapp.com/avatars/"+Long.toUnsignedString(online.getJDiscordRelation().getDiscordUser().getId())+"/"+online.getJDiscordRelation().getDiscordUser().getAvatar()+"."+(online.getJDiscordRelation().getDiscordUser().getAvatar().startsWith("a_") ? "gif":"png");
+        Future<ImageTexture> loadedImageFuture = PartyInviteViewer.loadImage(avatar);
+        ImageTexture loadedImage = null;
+        if (loadedImageFuture.isDone()) {
+            try {
+                loadedImage = loadedImageFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
-            if (loadedImage != null) {
-                loadedImage.drawFrameAndIncrement( 7,7,height-14,height-14);
-            } else {
-                Gui.drawRect(7, 7, height - 7, height-7, 0xFF4E4E4E);
-            }
+        }
+        if (loadedImage != null) {
+            loadedImage.drawFrameAndIncrement( 7,7,height-14,height-14);
+        } else {
+            Gui.drawRect(7, 7, height - 7, height-7, 0xFF4E4E4E);
         }
 
         GlStateManager.enableBlend();
@@ -149,13 +165,6 @@ public class PlayingDGAlarm extends SimpleFeature implements DiscordUserUpdateLi
         private long end;
     }
 
-    @Override
-    public void onDiscordUserUpdate(DiscordUserUpdateEvent event) {
-        JDiscordRelation prev = event.getPrev(), current = event.getCurrent();
-        if (!isDisplayable(prev) && isDisplayable(current)) {
-            notif.add(new PlayerOnline(current, System.currentTimeMillis()+3000));
-        }
-    }
 
     public boolean isDisplayable(JDiscordRelation jDiscordRelation) {
         EDiscordRelationshipType relationshipType = jDiscordRelation.getDiscordRelationshipType();
