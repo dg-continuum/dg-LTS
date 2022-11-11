@@ -1,6 +1,5 @@
 package kr.syeyoung.dungeonsguide.mod.chat;
 
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
@@ -16,7 +15,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ChatTransmitter {
 
     public static final String PREFIX = "§eDungeons Guide §7:: ";
-    public static String prefix = "§eDungeons Guide §7:: ";
 
     public ChatTransmitter() {
         MinecraftForge.EVENT_BUS.register(this);

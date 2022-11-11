@@ -19,21 +19,20 @@
 package kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder;
 
 import com.google.common.collect.Sets;
+import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.MapProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
 import kr.syeyoung.dungeonsguide.mod.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.mod.dungeon.events.impl.DungeonStateChangeEvent;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.pathfinding.*;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessorGenerator;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
-import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeaturePathfindStrategy;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -105,8 +104,9 @@ public class DungeonRoom {
     private final Map<BlockPos, ThetaStar> activeThetaStar = new HashMap<>();
 
     public ScheduledFuture<List<Vec3>> createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, BlockPos targetPos, float dist, int timeout) {
-        FeaturePathfindStrategy.PathfindStrategy pathfindStrategy = FeatureRegistry.SECRET_PATHFIND_STRATEGY.getPathfindStrat();
-        if (pathfindStrategy == FeaturePathfindStrategy.PathfindStrategy.JPS_LEGACY) {
+
+
+        if (DgOneCongifConfig.secretPathfindStrategy == 3) {
             return asyncPathFinder.schedule(() -> {
                 BlockPos min = new BlockPos(getMin().getX(), 0, getMin().getZ());
                 BlockPos max=  new BlockPos(getMax().getX(), 255, getMax().getZ());
@@ -114,21 +114,21 @@ public class DungeonRoom {
                 pathFinder.pathfind(entityIn.getPositionVector(), new Vec3(targetPos).addVector(0.5, 0.5, 0.5), 1.5f,timeout);
                 return pathFinder.getRoute();
             }, 0, TimeUnit.MILLISECONDS);
-        } else if (pathfindStrategy == FeaturePathfindStrategy.PathfindStrategy.A_STAR_FINE_GRID) {
+        } else if (DgOneCongifConfig.secretPathfindStrategy == 2) {
             return asyncPathFinder.schedule(() -> {
                 AStarFineGrid pathFinder =
                         activeBetterAStar.computeIfAbsent(targetPos, (pos) -> new AStarFineGrid(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
                 pathFinder.pathfind(entityIn.getPositionVector(),timeout);
                 return pathFinder.getRoute();
             }, 0, TimeUnit.MILLISECONDS);
-        }else if (pathfindStrategy == FeaturePathfindStrategy.PathfindStrategy.A_STAR_DIAGONAL) {
+        }else if (DgOneCongifConfig.secretPathfindStrategy == 1) {
             return asyncPathFinder.schedule(() -> {
                 AStarCornerCut pathFinder =
                         activeBetterAStarCornerCut.computeIfAbsent(targetPos, (pos) -> new AStarCornerCut(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
                 pathFinder.pathfind(entityIn.getPositionVector(),timeout);
                 return pathFinder.getRoute();
             }, 0, TimeUnit.MILLISECONDS);
-        } else if (pathfindStrategy == FeaturePathfindStrategy.PathfindStrategy.THETA_STAR) {
+        } else if (DgOneCongifConfig.secretPathfindStrategy == 0) {
             return asyncPathFinder.schedule(() -> {
                 ThetaStar pathFinder =
                         activeThetaStar.computeIfAbsent(targetPos, (pos) -> new ThetaStar(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));

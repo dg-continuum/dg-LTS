@@ -19,30 +19,27 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FeatureAutoAcceptReparty extends SimpleFeature implements ChatListener {
+public class FeatureAutoAcceptReparty extends SimpleFeatureV2 {
     public FeatureAutoAcceptReparty() {
-        super("Party.Reparty", "", "", "qol.autoacceptreparty", true);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.autoRp;
+        super("qol.autoacceptreparty");
     }
 
     private String lastDisband;
-    @Override
-    public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
-        if (clientChatReceivedEvent.message.getFormattedText().endsWith("§ehas disbanded the party!§r")) {
+
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent ev) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+
+        if (ev.message.getFormattedText().endsWith("§ehas disbanded the party!§r")) {
             lastDisband = null;
-            String[] texts = TextUtils.stripColor(clientChatReceivedEvent.message.getFormattedText()).split(" ");
+            String[] texts = TextUtils.stripColor(ev.message.getFormattedText()).split(" ");
             for (String s : texts) {
                 if (s.isEmpty()) continue;
                 if (s.startsWith("[")) continue;
@@ -50,8 +47,8 @@ public class FeatureAutoAcceptReparty extends SimpleFeature implements ChatListe
                 lastDisband = s;
                 break;
             }
-        } else if (clientChatReceivedEvent.message.getFormattedText().contains("§ehas invited you to join their party!")) {
-            String[] texts = TextUtils.stripColor(clientChatReceivedEvent.message.getFormattedText()).split(" ");
+        } else if (ev.message.getFormattedText().contains("§ehas invited you to join their party!")) {
+            String[] texts = TextUtils.stripColor(ev.message.getFormattedText()).split(" ");
             boolean equals = false;
             for (String s : texts) {
                 if (s.isEmpty()) continue;
@@ -63,10 +60,11 @@ public class FeatureAutoAcceptReparty extends SimpleFeature implements ChatListe
                 }
             }
 
-            if (equals && isEnabled()) {
+            if (equals && DgOneCongifConfig.autoRp) {
                 ChatProcessor.INSTANCE.addToChatQueue("/p accept " + lastDisband, () -> {}, true);
                 lastDisband = null;
             }
         }
     }
+
 }

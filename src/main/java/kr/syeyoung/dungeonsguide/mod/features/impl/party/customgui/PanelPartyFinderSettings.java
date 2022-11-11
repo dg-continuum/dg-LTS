@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.party.customgui;
 
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.*;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
@@ -44,9 +43,19 @@ import java.util.Set;
 public class PanelPartyFinderSettings extends MPanelScaledGUI {
     private PanelPartyFinder panelPartyFinder;
 
-    private MButton refresh = new MButton(), createNew = new MButton(), settings = new MButton();
-    private MPassiveLabelAndElement filterCantjoin, filterWhitelistNote, filterBlacklistNote, plaeHighlightNote, cataLv,blacklistClass; private MToggleButton filterCantjoinButton;
-    private MTextField filterWhitelist, filterBlacklist, highlightNote, blacklistClassTxt;
+    private MButton refresh = new MButton();
+    private MButton createNew = new MButton();
+    private MButton settings = new MButton();
+    private MPassiveLabelAndElement filterCantjoin;
+    private MPassiveLabelAndElement filterWhitelistNote;
+    private MPassiveLabelAndElement filterBlacklistNote;
+    private MPassiveLabelAndElement plaeHighlightNote;
+    private MPassiveLabelAndElement cataLv;
+    private MPassiveLabelAndElement blacklistClass; private MToggleButton filterCantjoinButton;
+    private MTextField filterWhitelist;
+    private MTextField filterBlacklist;
+    private MTextField highlightNote;
+    private MTextField blacklistClassTxt;
     private MIntegerSelectionButton integerSelection;
 
     @Getter
@@ -90,13 +99,13 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
                 @Override
                 public void edit(String str) {
                     panelPartyFinder.onChestUpdate(null);
-                    FeatureRegistry.PARTYKICKER_CUSTOM.setWhitelist(str);
+                    FeatureCustomPartyFinder.setWhitelist(str);
                 }
             };
             filterBlacklist = new MTextField() {
                 @Override
                 public void edit(String str) {
-                    FeatureRegistry.PARTYKICKER_CUSTOM.setBlacklist(str);
+                    FeatureCustomPartyFinder.setBlacklist(str);
                     panelPartyFinder.onChestUpdate(null);
                 }
             };
@@ -104,22 +113,22 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
                 @Override
                 public void edit(String str) {
                     super.edit(str);
-                    FeatureRegistry.PARTYKICKER_CUSTOM.setHighlight(str);
+                    FeatureCustomPartyFinder.setHighlight(str);
                 }
             };
             blacklistClassTxt = new MTextField() {
                 @Override
                 public void edit(String str) {
                     super.edit(str);
-                    FeatureRegistry.PARTYKICKER_CUSTOM.setBlacklistClass(str);
+                    FeatureCustomPartyFinder.setBlacklistClass(str);
                     panelPartyFinder.onChestUpdate(null);
                 }
             };
 
-            filterWhitelist.setText(FeatureRegistry.PARTYKICKER_CUSTOM.getWhitelist());
-            filterBlacklist.setText(FeatureRegistry.PARTYKICKER_CUSTOM.getBlacklist());
-            highlightNote.setText(FeatureRegistry.PARTYKICKER_CUSTOM.getHighlight());
-            blacklistClassTxt.setText(FeatureRegistry.PARTYKICKER_CUSTOM.getBlacklistClass());
+            filterWhitelist.setText(FeatureCustomPartyFinder.getWhitelist());
+            filterBlacklist.setText(FeatureCustomPartyFinder.getBlacklist());
+            highlightNote.setText(FeatureCustomPartyFinder.getHighlight());
+            blacklistClassTxt.setText(FeatureCustomPartyFinder.getBlacklistClass());
 
             filterWhitelistNote = new MPassiveLabelAndElement("Whitelist Note", filterWhitelist);
             filterBlacklistNote = new MPassiveLabelAndElement("Blacklist Note", filterBlacklist);
@@ -136,9 +145,9 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
             add(blacklistClass);
         }
         {
-            integerSelection = new MIntegerSelectionButton(FeatureRegistry.PARTYKICKER_CUSTOM.getMinimumCata());
+            integerSelection = new MIntegerSelectionButton(FeatureCustomPartyFinder.getMinimumCata());
             integerSelection.setOnUpdate(() -> {
-                FeatureRegistry.PARTYKICKER_CUSTOM.setMinimumCata(integerSelection.getData());
+                FeatureCustomPartyFinder.setMinimumCata(integerSelection.getData());
                 panelPartyFinder.onChestUpdate(null);
             });
             cataLv = new MPassiveLabelAndElement("Minimum Cata Lv", integerSelection);

@@ -19,38 +19,25 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.party;
 
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListenerGlobal;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
-import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class APIKey extends SimpleFeature implements ChatListenerGlobal {
-
+public class APIKey extends SimpleFeatureV2 {
     public APIKey() {
-        super("Misc.API Features", "API KEY", "Sets api key","partykicker.apikey");
-        addParameter("apikey", new FeatureParameter<String>("apikey", "API Key", "API key", "","string"));
+        super("partykicker.apikey");
     }
 
-    public String getAPIKey() {
-        return this.<String>getParameter("apikey").getValue();
-    }
-
-
-    @Override
-    public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
-        if (clientChatReceivedEvent.type == 2) return;
-        String str = clientChatReceivedEvent.message.getFormattedText();
+    @SubscribeEvent
+    public void onChatGlobal(ClientChatReceivedEvent postRender) {
+        if (postRender.type == 2) return;
+        String str = postRender.message.getFormattedText();
         if (str.startsWith("§aYour new API key is §r§b")) {
             String apiKeys = TextUtils.stripColor(str.split(" ")[5]);
-            ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §fAutomatically Configured Hypixel API Key"));
-            this.<String>getParameter("apikey").setValue(apiKeys);
+            ChatTransmitter.addToQueue(ChatTransmitter.PREFIX + "§fAutomatically Configured Hypixel API Key");
+            DgOneCongifConfig.apikey = apiKeys;
         }
-    }
-
-    @Override
-    public boolean isDisyllable() {
-        return false;
     }
 }

@@ -1,9 +1,9 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessResult;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.epicCountdown;
 import kr.syeyoung.dungeonsguide.mod.utils.ScoreBoardUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
@@ -23,7 +23,7 @@ import static kr.syeyoung.dungeonsguide.mod.chat.ChatProcessResult.REMOVE_CHAT;
 /**
  * CREDITS FOR THE COUNTDOWN SOUNDTRACK: <a href="https://www.youtube.com/watch?v=acCqrA-JxAw">...</a>
  */
-public class FeatureEpicCountdown extends SimpleFeature {
+public class FeatureEpicCountdown extends SimpleFeatureV2 {
 
     static volatile long updatedAt;
     static volatile int secondsLeft;
@@ -31,16 +31,11 @@ public class FeatureEpicCountdown extends SimpleFeature {
     int actualSecondsLeft;
 
     public FeatureEpicCountdown() {
-        super("Dungeon.HUDs", "", "", "etc.dungeoncountdown", true);
+        super("etc.dungeoncountdown");
         lastSec = GO_TEXT;
 
         ChatProcessor.INSTANCE.subscribe(FeatureEpicCountdown::processChat);
         MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return epicCountdown.epicCountdown;
     }
 
     public static ChatProcessResult processChat(String txt, Map<String, Object> context) {
@@ -88,7 +83,7 @@ public class FeatureEpicCountdown extends SimpleFeature {
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent e){
-        if(e.phase != TickEvent.Phase.START || !isEnabled() || !DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnDungeon()) return;
+        if(e.phase != TickEvent.Phase.START || !epicCountdown.epicCountdown || !SkyblockStatus.isOnDungeon()) return;
 
 
         ScoreBoardUtils.forEachLineClean(line -> {
@@ -118,7 +113,7 @@ public class FeatureEpicCountdown extends SimpleFeature {
 
     @SubscribeEvent
     public void onRender(RenderGameOverlayEvent.Post postRender) {
-        if (!isEnabled()) return;
+        if (!epicCountdown.epicCountdown) return;
         if (!(postRender.type == RenderGameOverlayEvent.ElementType.EXPERIENCE || postRender.type == RenderGameOverlayEvent.ElementType.JUMPBAR))
             return;
 

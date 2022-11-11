@@ -18,36 +18,31 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.EntityLivingRenderListener;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
-public class FeatureHideNameTags extends SimpleFeature implements EntityLivingRenderListener {
+public class FeatureHideNameTags extends SimpleFeatureV2 {
     public FeatureHideNameTags() {
-        super("Dungeon.Mobs", "Hide mob nametags", "Hide mob nametags in dungeon", "dungeon.hidenametag", false);
+        super("dungeon.hidenametag");
     }
 
+    @SubscribeEvent
+    public void onRender(RenderLivingEvent.Pre preRender) {
+        if (!DgOneCongifConfig.hideMobNametags) return;
+        if (!SkyblockStatus.isOnDungeon()) return;
 
-    private final SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
-    @Override
-    public void onEntityRenderPre(RenderLivingEvent.Pre renderPlayerEvent) {
-        if (!isEnabled()) return;
-        if (!skyblockStatus.isOnDungeon()) return;
-
-        if (renderPlayerEvent.entity instanceof EntityArmorStand) {
-            EntityArmorStand armorStand = (EntityArmorStand) renderPlayerEvent.entity;
-            if (armorStand.getAlwaysRenderNameTag())
-                renderPlayerEvent.setCanceled(true);
+        if (preRender.entity instanceof EntityArmorStand) {
+            EntityArmorStand armorStand = (EntityArmorStand) preRender.entity;
+            if (armorStand.getAlwaysRenderNameTag()) {
+                preRender.setCanceled(true);
+            }
         }
     }
 
-    @Override
-    public void onEntityRenderPost(RenderLivingEvent.Post renderPlayerEvent) {
 
-    }
 }

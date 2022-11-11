@@ -20,6 +20,7 @@ package kr.syeyoung.dungeonsguide.mod.commands;
 
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
+import kr.syeyoung.dungeonsguide.mod.config.guiconfig.GuiConfigV2;
 import kr.syeyoung.dungeonsguide.mod.cosmetics.CosmeticsManager;
 import kr.syeyoung.dungeonsguide.mod.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
@@ -28,7 +29,9 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.api.ApiFe
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompPayload;
+import kr.syeyoung.dungeonsguide.mod.utils.SimpleLock;
 import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -39,6 +42,13 @@ import org.json.JSONObject;
 
 public class CommandDungeonsGuide extends CommandBase {
     private boolean openConfig = false;
+
+
+    private SimpleLock openOldLock = new SimpleLock();
+
+    {
+        openOldLock.lock();
+    }
 
     @Override
     public String getCommandName() {
@@ -60,6 +70,9 @@ public class CommandDungeonsGuide extends CommandBase {
             }
         } else if (args[0].equalsIgnoreCase("gui")) {
             openConfig = true;
+
+        } else if (args[0].equalsIgnoreCase("old")) {
+            openOldLock.unLock();
         } else if (args[0].equalsIgnoreCase("pvall")) {
             PartyManager.INSTANCE.requestPartyList((context) -> {
                 if (context == null) {
@@ -154,9 +167,13 @@ public class CommandDungeonsGuide extends CommandBase {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent e) {
         try {
+            if(!openOldLock.isLocked()) {
+                openOldLock.lock();
+                Minecraft.getMinecraft().displayGuiScreen(new GuiConfigV2());
+            }
             if (openConfig && e.phase == TickEvent.Phase.START) {
                 openConfig = false;
-//                Minecraft.getMinecraft().displayGuiScreen(new GuiConfigV2());
+
                 DungeonsGuide.config.openGui();
             }
         } catch (Throwable t) {

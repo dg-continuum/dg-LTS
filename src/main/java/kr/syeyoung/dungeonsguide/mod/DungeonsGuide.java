@@ -36,6 +36,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.mod.events.listener.FeatureListener;
 import kr.syeyoung.dungeonsguide.mod.events.listener.PacketListener;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistryV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.resources.DGTexturePack;
@@ -120,11 +121,11 @@ public class DungeonsGuide implements IDungeonGuide {
 
         MinecraftForge.EVENT_BUS.register(skyblockStatus);
 
-
+        (new FeatureRegistryV2()).runFeateureDiscovery();
         (new FeatureRegistry()).init();
 
-//        this.whosOnlineManager = new WhosOnlineManager("virginity.kokoniara.software");
-        this.whosOnlineManager = new WhosOnlineManager("localhost:3000");
+        this.whosOnlineManager = new WhosOnlineManager("virginity.kokoniara.software");
+//        this.whosOnlineManager = new WhosOnlineManager("localhost:3000");
 
         this.whosOnlineManager.init();
 

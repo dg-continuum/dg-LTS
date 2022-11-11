@@ -18,9 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.party.customgui;
 
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.events.impl.WindowUpdateEvent;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.*;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -31,44 +32,35 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FeatureCustomPartyFinder extends SimpleFeature implements GuiOpenListener, GuiUpdateListener {
+public class FeatureCustomPartyFinder extends SimpleFeatureV2 {
+    static GuiCustomPartyFinder guiCustomPartyFinder;
+    @Getter
+    @Setter
+    private static String whitelist = "";
+    @Getter
+    @Setter
+    private static String blacklist = "";
+    @Getter
+    @Setter
+    private static String highlight = "";
+    @Getter
+    @Setter
+    private static String blacklistClass = "";
+    @Getter
+    @Setter
+    private static int minimumCata;
+    @Getter
+    @Setter
+    private static String lastClass = "";
     public FeatureCustomPartyFinder() {
-        super("Party","Custom Party Finder","Custom Party Finder", "party.customfinder", true);
+        super("party.customfinder");
     }
 
-    @Getter
-    @Setter
-    private String whitelist = "", blacklist = "", highlight ="", blacklistClass = "";
-    @Getter
-    @Setter
-    private int minimumCata;
-
-    @Getter @Setter
-    private String lastClass = "";
-
-    GuiCustomPartyFinder guiCustomPartyFinder;
-    @Override
-    public void onGuiOpen(GuiOpenEvent event) {
-        if (event.gui == null) guiCustomPartyFinder = null;
-        if (!isEnabled()) return;
-        if (!(event.gui instanceof GuiChest)) return;
-        GuiChest chest = (GuiChest) event.gui;
-        if (!(chest.inventorySlots instanceof ContainerChest)) return;
-        ContainerChest containerChest = (ContainerChest) chest.inventorySlots;
-        IInventory lower = containerChest.getLowerChestInventory();
-        if (lower == null || !lower.getName().equals("Party Finder")) return;
-
-        if (guiCustomPartyFinder == null) {
-            guiCustomPartyFinder = new GuiCustomPartyFinder();
-        }
-        guiCustomPartyFinder.setGuiChest(chest);
-
-        event.gui = guiCustomPartyFinder;
-    }
-
-    @Override
-    public void onGuiUpdate(WindowUpdateEvent windowUpdateEvent) {
+    @SubscribeEvent
+    public void onWindowUpdate(WindowUpdateEvent windowUpdateEvent) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         if (guiCustomPartyFinder != null) {
             guiCustomPartyFinder.onChestUpdate(windowUpdateEvent);
         }
@@ -107,4 +99,25 @@ public class FeatureCustomPartyFinder extends SimpleFeature implements GuiOpenLi
             }
         }
     }
+
+    @SubscribeEvent
+    public void onGuiOpenn(GuiOpenEvent tick) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (tick.gui == null) guiCustomPartyFinder = null;
+        if (!DgOneCongifConfig.customPartyfinder) return;
+        if (!(tick.gui instanceof GuiChest)) return;
+        GuiChest chest = (GuiChest) tick.gui;
+        if (!(chest.inventorySlots instanceof ContainerChest)) return;
+        ContainerChest containerChest = (ContainerChest) chest.inventorySlots;
+        IInventory lower = containerChest.getLowerChestInventory();
+        if (lower == null || !lower.getName().equals("Party Finder")) return;
+
+        if (guiCustomPartyFinder == null) {
+            guiCustomPartyFinder = new GuiCustomPartyFinder();
+        }
+        guiCustomPartyFinder.setGuiChest(chest);
+
+        tick.gui = guiCustomPartyFinder;
+    }
+
 }

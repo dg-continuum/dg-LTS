@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.event.ClickEvent;
@@ -27,22 +27,20 @@ import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FeatureCopyMessages extends SimpleFeature implements ChatListener {
+public class FeatureCopyMessages extends SimpleFeatureV2 {
     public FeatureCopyMessages() {
-        super("Misc.Chat", "", "", "etc.copymsg");
+        super("etc.copymsg");
     }
 
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.copyChatMesseges;
+    @SubscribeEvent
+    public void onRenderWorld(ClientChatReceivedEvent postRender) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.copyChatMesseges) return;
+        if (postRender.type == 2) return;
+
+        postRender.message.appendSibling(new ChatComponentText("   §7[Copy]").setChatStyle(new ChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtils.stripColor(postRender.message.getFormattedText()))).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("§eCopy Message")))));
     }
 
-    @Override
-    public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
-        if (!isEnabled()) return;
-        if (clientChatReceivedEvent.type == 2) return;
-
-        clientChatReceivedEvent.message.appendSibling(new ChatComponentText("   §7[Copy]").setChatStyle(new ChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, TextUtils.stripColor(clientChatReceivedEvent.message.getFormattedText()))).setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("§eCopy Message")))));
-    }
 }

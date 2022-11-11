@@ -21,9 +21,9 @@ package kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.waterpuzzle;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.RoomProcessorGenerator;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.util.BlockPos;
 
@@ -65,7 +65,7 @@ public class RoomProcessorWaterPuzzle extends GeneralRoomProcessor {
     @Override
     public void tick() {
         super.tick();
-        if (!FeatureRegistry.SOLVER_WATERPUZZLE.isEnabled()) return;
+        if (!DgOneCongifConfig.waterboardSolver) return;
         if (!argumentsFulfilled) return;
         try {
             waterBoard.tick();
@@ -82,7 +82,7 @@ public class RoomProcessorWaterPuzzle extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!FeatureRegistry.SOLVER_WATERPUZZLE.isEnabled()) return;
+        if (!DgOneCongifConfig.waterboardSolver) return;
         if (!argumentsFulfilled) return;
         if (waterBoard == null) return;
 

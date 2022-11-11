@@ -30,7 +30,7 @@ import kr.syeyoung.dungeonsguide.mod.dungeon.events.impl.DungeonMapUpdateEvent;
 import kr.syeyoung.dungeonsguide.mod.dungeon.events.impl.DungeonRoomDiscoverEvent;
 import kr.syeyoung.dungeonsguide.mod.dungeon.map.DungeonMapData;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureCollectScore;
 import kr.syeyoung.dungeonsguide.mod.utils.MapUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -91,7 +91,7 @@ public class MapProcessor {
     }
 
     private static void error(String prefix) {
-        ChatTransmitter.addToQueue(new ChatComponentText(ChatTransmitter.prefix + prefix));
+        ChatTransmitter.addToQueue(new ChatComponentText(ChatTransmitter.PREFIX + prefix));
     }
 
 
@@ -441,7 +441,7 @@ public class MapProcessor {
         MapUtils.record(mapData, 0, 0, Color.GREEN);
 
 
-        FeatureRegistry.ETC_COLLECT_SCORE.collectDungeonRunData(mapData, context);
+        FeatureCollectScore.collectDungeonRunData(mapData, context);
 
     }
 

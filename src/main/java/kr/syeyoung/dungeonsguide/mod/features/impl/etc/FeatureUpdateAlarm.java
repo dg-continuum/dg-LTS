@@ -18,45 +18,44 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.mod.events.impl.StompConnectedEvent;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.StompConnectedListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.TickListener;
-import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-public class FeatureUpdateAlarm extends SimpleFeature implements StompConnectedListener, TickListener {
+public class FeatureUpdateAlarm extends SimpleFeatureV2 {
     public FeatureUpdateAlarm() {
-        super("", "","", "etc.updatealarm", true);
+        super("etc.updatealarm");
     }
 
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.updateAlarm;
+    @SubscribeEvent
+    public void onStomp(StompConnectedEvent stompConnectedEvent) {
+
+        stompConnectedEvent.getStompInterface().subscribe("/topic/updates", (stompClient, payload) -> {
+            this.stompPayload = payload;
+        });
+
+        stompConnectedEvent.getStompInterface().subscribe("/user/queue/messages", (stompClient, payload) -> {
+            this.stompPayload = payload;
+        });
+
     }
 
     private String stompPayload;
-    @Override
-    public void onTick() {
-        if (stompPayload != null) {
-            ChatTransmitter.addToQueue(new ChatComponentText(stompPayload));
-            stompPayload = null;
-            Minecraft.getMinecraft().thePlayer.playSound("random.successful_hit", 1f,1f);
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent tick) {
+        if (tick.phase == TickEvent.Phase.END && tick.type == TickEvent.Type.CLIENT) {
+            if (!SkyblockStatus.isOnSkyblock()) return;
+            if (stompPayload != null) {
+                ChatTransmitter.addToQueue(stompPayload);
+                stompPayload = null;
+                Minecraft.getMinecraft().thePlayer.playSound("random.successful_hit", 1f, 1f);
+            }
         }
     }
 
-    @Override
-    public void onStompConnected(StompConnectedEvent event) {
-
-        event.getStompInterface().subscribe("/topic/updates", (stompClient ,payload) -> {
-            this.stompPayload = payload;
-        });
-
-        event.getStompInterface().subscribe("/user/queue/messages", (stompClient ,payload) -> {
-            this.stompPayload = payload;
-        });
-
-    }
 }

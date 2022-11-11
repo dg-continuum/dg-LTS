@@ -29,7 +29,7 @@ import kr.syeyoung.dungeonsguide.mod.events.impl.BlockUpdateEvent;
 import kr.syeyoung.dungeonsguide.mod.events.impl.PlayerInteractEntityEvent;
 import kr.syeyoung.dungeonsguide.mod.events.impl.TitleEvent;
 import kr.syeyoung.dungeonsguide.mod.events.impl.WindowUpdateEvent;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
@@ -55,7 +55,7 @@ public class PacketListener extends ChannelDuplexHandler {
         lastPacketReceived = System.currentTimeMillis();
         if (skyblockStatus.isOnSkyblock()
                 && msg instanceof S04PacketEntityEquipment
-                && FeatureRegistry.FIX_SPIRIT_BOOTS.isEnabled()) { // Inventory packet name
+                && DgOneCongifConfig.spiritBootsFix) { // Inventory packet name
             S04PacketEntityEquipment packet2 = (S04PacketEntityEquipment) msg;
             if (packet2.getEntityID() == Minecraft.getMinecraft().thePlayer.getEntityId()) {
                 packet2 = new S04PacketEntityEquipment(packet2.getEntityID(), packet2.getEquipmentSlot() + 1, packet2.getItemStack());

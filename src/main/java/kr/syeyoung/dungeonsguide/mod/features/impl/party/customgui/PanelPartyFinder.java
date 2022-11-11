@@ -18,14 +18,12 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.party.customgui;
 
-import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
-import kr.syeyoung.dungeonsguide.mod.config.guiconfig.GuiConfigV2;
+import kr.syeyoung.dungeonsguide.mod.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.mod.events.impl.WindowUpdateEvent;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.impl.discord.invteTooltip.MTooltipInvite;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.*;
-import kr.syeyoung.dungeonsguide.mod.discord.rpc.RichPresenceManager;
+import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -61,7 +59,7 @@ public class PanelPartyFinder extends MPanel {
 
     private MButton previous;
     private MButton next;
-    private MButton settings, discordInvite;
+    private MButton discordInvite;
     private int page = 1;
 
     private Map<Integer, PanelPartyListElement> panelPartyListElementMap = new HashMap<>();
@@ -106,14 +104,6 @@ public class PanelPartyFinder extends MPanel {
             Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+3, 0, 0, Minecraft.getMinecraft().thePlayer);
         });
         add(goBack);
-        settings = new MButton();
-        settings.setBackground(RenderUtils.blendAlpha(0xFF141414, 0.05f));
-        settings.setText("Settings");
-        settings.setOnActionPerformed(() -> {
-            GuiConfigV2 guiConfigV2 = new GuiConfigV2();
-            guiConfigV2.getRootConfigPanel().setCurrentPageAndPushHistory("ROOT."+ FeatureRegistry.PARTYKICKER_CUSTOM.getCategory());
-            Minecraft.getMinecraft().displayGuiScreen(guiConfigV2);
-        });
         discordInvite = new MButton();
         discordInvite.setText("Invite Discord Friends");
         discordInvite.setOnActionPerformed(() -> {
@@ -133,7 +123,6 @@ public class PanelPartyFinder extends MPanel {
         });
         discordInvite.setBackground(RenderUtils.blendAlpha(0xFF141414, 0.05f));
         add(discordInvite);
-        add(settings);
         navigation = new MPanelScaledGUI() {
             @Override
             public void onBoundsUpdate() {
@@ -171,7 +160,6 @@ public class PanelPartyFinder extends MPanel {
         navigation.setScale(scaledResolution.getScaleFactor());
         scrollablePanel.setBounds(new Rectangle(0, navigation.getBounds().y+navigation.getBounds().height, 3*bounds.width/5, bounds.height - (navigation.getBounds().y+navigation.getBounds().height)));
         goBack.setBounds(new Rectangle(0,0, fr.FONT_HEIGHT*2+20, fr.FONT_HEIGHT*2+20));
-        settings.setBounds(new Rectangle(bounds.width - 75, 0, 75, fr.FONT_HEIGHT*2+20));
         discordInvite.setBounds(new Rectangle(bounds.width-275, 0, 200, fr.FONT_HEIGHT*2+20));
     }
 

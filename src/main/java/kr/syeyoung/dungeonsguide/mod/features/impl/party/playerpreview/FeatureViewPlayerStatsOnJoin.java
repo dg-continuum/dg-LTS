@@ -33,7 +33,6 @@ import kr.syeyoung.dungeonsguide.mod.config.guiconfig.RootConfigPanel;
 import kr.syeyoung.dungeonsguide.mod.cosmetics.data.ActiveCosmetic;
 import kr.syeyoung.dungeonsguide.mod.cosmetics.data.CosmeticData;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.api.ApiFetcher;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.api.PlayerSkyblockData;
@@ -44,6 +43,7 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.datarende
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.datarenders.IDataRenderer;
 import kr.syeyoung.dungeonsguide.mod.features.listener.GuiClickListener;
 import kr.syeyoung.dungeonsguide.mod.features.listener.GuiPostRenderListener;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.party.PartyContext;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
@@ -57,7 +57,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
@@ -146,7 +145,7 @@ public class FeatureViewPlayerStatsOnJoin extends SimpleFeature implements GuiPo
                     }
 
 
-                    ApiFetcher.fetchMostRecentProfileAsync(a.get(), FeatureRegistry.PARTYKICKER_APIKEY.getAPIKey());
+                    ApiFetcher.fetchMostRecentProfileAsync(a.get(), DgOneCongifConfig.apikey);
 
                     IChatComponent comp = new ChatComponentText("§eDungeons Guide §7:: §e" + username + "§f's Profile ")
                             .appendSibling(new ChatComponentText("§7view").setChatStyle(new ChatStyle().setChatHoverEvent(new HoverEventRenderPlayer(a.orElse(null)))));
@@ -190,7 +189,7 @@ public class FeatureViewPlayerStatsOnJoin extends SimpleFeature implements GuiPo
         }
 
         if (profileFuture == null) {
-            profileFuture = ApiFetcher.fetchMostRecentProfileAsync(lastuid, FeatureRegistry.PARTYKICKER_APIKEY.getAPIKey());
+            profileFuture = ApiFetcher.fetchMostRecentProfileAsync(lastuid, DgOneCongifConfig.apikey);
         }
 
         if (gameProfileFuture == null) {

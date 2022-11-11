@@ -18,60 +18,31 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
-import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.BossfightProcessorSadan;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.entity.boss.BossStatus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FeatureTerracotaTimer extends TextHUDFeature {
+public class FeatureTerracotaTimer extends SingleTextHud {
     public FeatureTerracotaTimer() {
-        super("Dungeon.Bossfight.Floor 6", "Display Terracotta phase timer", "Displays Terracotta phase timer", "bossfight.terracota", true, getFontRenderer().getStringWidth("Terracottas: 1m 99s"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(true);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("time", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-    }
-
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
-    private static final List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Terracottas","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("1m 99s","time"));
-    }
-    @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() instanceof BossfightProcessorSadan &&
-                "fight-1".equalsIgnoreCase(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor().getCurrentPhase());
+//        super("Dungeon.Bossfight.Floor 6", "Display Terracotta phase timer", "Displays Terracotta phase timer", "bossfight.terracota", true, getFontRenderer().getStringWidth("Terracottas: 1m 99s"), getFontRenderer().FONT_HEIGHT);
+        super("Terracottas", true);
     }
 
     @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "number", "unit");
+    protected boolean shouldShow() {
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        return SkyblockStatus.isOnDungeon() && context != null
+                && context.getBossfightProcessor() instanceof BossfightProcessorSadan
+                && "fight-1".equalsIgnoreCase(context.getBossfightProcessor().getCurrentPhase());
     }
+
 
     @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
+    protected String getText(boolean example) {
+        return example ? "1m 99s" : TextUtils.formatTime((long) (BossStatus.healthScale * 1000 * 60 * 1.5));
     }
-
-    @Override
-    public List<StyledText> getText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Terracottas","title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(TextUtils.formatTime((long) (BossStatus.healthScale * 1000 * 60 * 1.5)),"time"));
-        return actualBit;
-    }
-
 }

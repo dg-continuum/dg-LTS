@@ -18,7 +18,9 @@
 
 package kr.syeyoung.dungeonsguide.mod.features;
 
-import kr.syeyoung.dungeonsguide.mod.features.impl.advanced.*;
+import kr.syeyoung.dungeonsguide.mod.features.impl.advanced.FeatureDebuggableMap;
+import kr.syeyoung.dungeonsguide.mod.features.impl.advanced.FeatureRoomCoordDisplay;
+import kr.syeyoung.dungeonsguide.mod.features.impl.advanced.FeatureRoomDebugInfo;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.*;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureSimonSaysSolver;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureTerminalSolvers;
@@ -27,17 +29,15 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknamePref
 import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.PartyInviteViewer;
 import kr.syeyoung.dungeonsguide.mod.features.impl.discord.onlinealarm.PlayingDGAlarm;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.*;
-import kr.syeyoung.dungeonsguide.mod.features.impl.etc.*;
 import kr.syeyoung.dungeonsguide.mod.features.impl.etc.ability.FeatureAbilityCooldown;
-import kr.syeyoung.dungeonsguide.mod.features.impl.party.APIKey;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyList;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyReady;
-import kr.syeyoung.dungeonsguide.mod.features.impl.party.customgui.FeatureCustomPartyFinder;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.FeatureViewPlayerStatsOnJoin;
-import kr.syeyoung.dungeonsguide.mod.features.impl.secret.*;
+import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeatureActions;
+import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeatureCreateRefreshLine;
+import kr.syeyoung.dungeonsguide.mod.features.impl.secret.PathfindLineProperties;
 import kr.syeyoung.dungeonsguide.mod.features.impl.secret.mechanicbrowser.FeatureMechanicBrowse;
 import lombok.Getter;
-import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,22 +78,13 @@ public class FeatureRegistry {
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_SECRET_BROWSER;
     public static FeatureActions SECRET_ACTIONS;
 
-    public static FeaturePathfindStrategy SECRET_PATHFIND_STRATEGY;
-    public static FeatureTogglePathfind SECRET_TOGGLE_KEY;
-    public static FeatureFreezePathfind SECRET_FREEZE_LINES;
     public static FeatureCreateRefreshLine SECRET_CREATE_REFRESH_LINE;
 
-    public static SimpleFeature SECRET_AUTO_BROWSE_NEXT;
-    public static SimpleFeature SECRET_AUTO_START;
-    public static SimpleFeature SECRET_NEXT_KEY;
-
-    public static SimpleFeature SECRET_BLOOD_RUSH;
     public static PathfindLineProperties SECRET_BLOOD_RUSH_LINE_PROPERTIES;
 
 
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_AUTOPATHFIND;
 
-    public static FeaturePathfindToAll SECRET_PATHFIND_ALL;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT;
 
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_BAT;
@@ -101,14 +92,8 @@ public class FeatureRegistry {
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ESSENCE;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP;
 
-    public static SimpleFeature SOLVER_WATERPUZZLE;
-    public static SimpleFeature SOLVER_CREEPER;
 
-    public static FeatureDungeonRoomName DUNGEON_ROOMNAME;
     public static FeaturePressAnyKeyToCloseChest DUNGEON_CLOSECHEST;
-    public static FeatureBoxSkelemaster DUNGEON_BOXSKELEMASTER;
-    public static FeatureBoxBats DUNGEON_BOXBAT;
-    public static FeatureBoxStarMobs DUNGEON_BOXSTARMOBS;
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
     public static FeatureDungeonDeaths DUNGEON_DEATHS;
     public static FeatureDungeonMilestone DUNGEON_MILESTONE;
@@ -120,46 +105,21 @@ public class FeatureRegistry {
     public static FeatureDungeonScore DUNGEON_SCORE;
     public static FeatureWarnLowHealth DUNGEON_LOWHEALTH_WARN;
     public static SimpleFeature DUNGEON_INTERMODCOMM;
-    public static FeaturePlayerESP DUNGEON_PLAYERESP;
-    public static FeatureHideNameTags DUNGEON_HIDENAMETAGS;
-    public static FeatureSoulRoomWarning DUNGEON_FAIRYSOUL;
 
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
     public static SimpleFeature BOSSFIGHT_CHESTPRICE;
     public static FeatureAutoReparty BOSSFIGHT_AUTOREPARTY;
     public static FeatureHideAnimals BOSSFIGHT_HIDE_ANIMALS;
-    public static FeatureThornBearPercentage BOSSFIGHT_BEAR_PERCENT;
     public static FeatureThornSpiritBowTimer BOSSFIGHT_BOW_TIMER;
     public static FeatureBoxRealLivid BOSSFIGHT_BOX_REALLIVID;
-    public static FeatureTerracotaTimer BOSSFIGHT_TERRACOTTA_TIMER;
     public static FeatureCurrentPhase BOSSFIGHT_CURRENT_PHASE;
     public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureSimonSaysSolver BOSSFIGHT_SIMONSAYS_SOLVER;
 
-    public static APIKey PARTYKICKER_APIKEY;
     public static FeatureViewPlayerStatsOnJoin PARTYKICKER_VIEWPLAYER;
-    public static FeatureCustomPartyFinder PARTYKICKER_CUSTOM;
     public static FeaturePartyList PARTY_LIST;
     public static FeaturePartyReady PARTY_READY;
-
-    public static FeatureTooltipDungeonStat ETC_DUNGEONSTAT;
-    public static FeatureTooltipPrice ETC_PRICE;
     public static FeatureAbilityCooldown ETC_ABILITY_COOLDOWN;
-    public static FeatureCooldownCounter ETC_COOLDOWN;
-    public static FeatureDecreaseExplosionSound ETC_EXPLOSION_SOUND;
-    public static FeatureAutoAcceptReparty ETC_AUTO_ACCEPT_REPARTY;
-    public static FeatureUpdateAlarm ETC_TEST;
-
-    public static SimpleFeature FIX_SPIRIT_BOOTS;
-    public static FeatureDisableMessage FIX_MESSAGES;
-
-    public static FeatureCopyMessages ETC_COPY_MSG;
-
-    public static FeatureEpicCountdown EPIC_COUNTDOWN;
-
-    public static FeaturePenguins ETC_PENGUIN;
-
-    public static FeatureCollectScore ETC_COLLECT_SCORE;
 
 
 
@@ -180,25 +140,16 @@ public class FeatureRegistry {
     public static FeatureRoomCoordDisplay ADVANCED_COORDS;
 
 
-    public static SimpleFeature RENDER_BREACONS;
-
-    public static SimpleFeature RENDER_DESTENATION_TEXT;
 
     public void init(){
         try {
             SECRET_LINE_PROPERTIES_GLOBAL = register(new PathfindLineProperties("Dungeon.Secrets.Preferences", "Global Line Settings", "Global Line Settings", "secret.lineproperties.global", true, null));
             SECRET_CREATE_REFRESH_LINE = register(new FeatureCreateRefreshLine());
-            SECRET_FREEZE_LINES = register(new FeatureFreezePathfind());
-            SECRET_TOGGLE_KEY = register(new FeatureTogglePathfind());
-            SECRET_PATHFIND_STRATEGY = register(new FeaturePathfindStrategy());
             SECRET_ACTIONS = register(new FeatureActions());
             SECRET_LINE_PROPERTIES_SECRET_BROWSER = register(new PathfindLineProperties("Dungeon.Secrets.Secret Browser", "Line Settings", "Line Settings when pathfinding using Secret Browser", "secret.lineproperties.secretbrowser", true, SECRET_LINE_PROPERTIES_GLOBAL));
             SECRET_BROWSE = register(new FeatureMechanicBrowse());
             categoryDescription.put("ROOT.Secrets.Keybinds", "Useful keybinds / Toggle Pathfind lines, Freeze Pathfind lines, Refresh pathfind line or Trigger pathfind (you would want to use it, if you're using Pathfind to All)");
             SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Parent Line Settings", "Line Settings to be used by default", "secret.lineproperties.apf.parent", false, SECRET_LINE_PROPERTIES_GLOBAL));
-            DUNGEON_FAIRYSOUL = register(new FeatureSoulRoomWarning());
-            DUNGEON_HIDENAMETAGS = register(new FeatureHideNameTags());
-            DUNGEON_PLAYERESP = register(new FeaturePlayerESP());
             DUNGEON_INTERMODCOMM = register(new SimpleFeature("Dungeon.Teammates", "Communicate With Other's Dungeons Guide", "Sends total secret in the room to others\nSo that they can use the data to calculate total secret in dungeon run\n\nThis automates player chatting action, (chatting data) Thus it might be against hypixel's rules.\nBut mods like auto-gg which also automate player action and is kinda allowed mod exist so I'm leaving this feature.\nThis option is use-at-your-risk and you'll be responsible for ban if you somehow get banned because of this feature\n(Although it is not likely to happen)\nDefaults to off", "dungeon.intermodcomm", false));
             DUNGEON_LOWHEALTH_WARN = register(new FeatureWarnLowHealth());
             DUNGEON_SCORE = register(new FeatureDungeonScore());
@@ -210,64 +161,29 @@ public class FeatureRegistry {
             DUNGEON_MILESTONE = register(new FeatureDungeonMilestone());
             DUNGEON_DEATHS = register(new FeatureDungeonDeaths());
             DUNGEON_WATCHERWARNING = register(new FeatureWatcherWarning());
-            DUNGEON_BOXSTARMOBS = register(new FeatureBoxStarMobs());
-            DUNGEON_BOXBAT = register(new FeatureBoxBats());
-            DUNGEON_BOXSKELEMASTER = register(new FeatureBoxSkelemaster());
             DUNGEON_CLOSECHEST = register(new FeaturePressAnyKeyToCloseChest());
-            DUNGEON_ROOMNAME = register(new FeatureDungeonRoomName());
-            SOLVER_CREEPER = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Creeper", "Draws line between prismarine lamps in creeper room", "solver.creeper"));
-            SOLVER_WATERPUZZLE = register(new SimpleFeature("Dungeon.Solvers.Any Floor", "Waterboard (Advanced)", "Calculates solution for waterboard puzzle and displays it to user", "solver.waterboard"));
             SECRET_LINE_PROPERTIES_PATHFINDALL_ITEM_DROP = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Item Drop Line Settings", "Line Settings when pathfind to Item Drop, when using above feature", "secret.lineproperties.apf.itemdrop", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
             SECRET_LINE_PROPERTIES_PATHFINDALL_ESSENCE = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Essence Line Settings", "Line Settings when pathfind to Essence, when using above feature", "secret.lineproperties.apf.essence", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
             SECRET_LINE_PROPERTIES_PATHFINDALL_CHEST = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Chest Line Settings", "Line Settings when pathfind to Chest, when using above feature", "secret.lineproperties.apf.chest", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
             SECRET_LINE_PROPERTIES_PATHFINDALL_BAT = register(new PathfindLineProperties("Dungeon.Secrets.Pathfind To All", "Bat Line Settings", "Line Settings when pathfind to Bat, when using above feature", "secret.lineproperties.apf.bat", true, SECRET_LINE_PROPERTIES_PATHFINDALL_PARENT));
-            SECRET_PATHFIND_ALL = register(new FeaturePathfindToAll());
             SECRET_LINE_PROPERTIES_AUTOPATHFIND = register(new PathfindLineProperties("Dungeon.Secrets.Legacy AutoPathfind", "Line Settings", "Line Settings when pathfinding using above features", "secret.lineproperties.autopathfind", true, SECRET_LINE_PROPERTIES_GLOBAL));
             SECRET_BLOOD_RUSH_LINE_PROPERTIES = register(new PathfindLineProperties("Dungeon.Secrets.Blood Rush", "Blood Rush Line Settings", "Line Settings to be used", "secret.lineproperties.bloodrush", false, SECRET_LINE_PROPERTIES_GLOBAL));
-            SECRET_BLOOD_RUSH = register(new FeatureBloodRush());
-            SECRET_NEXT_KEY = register(
-                    new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind",
-                            "Auto Pathfind to new secret upon pressing a key",
-                            "Auto browse the best next secret when you press key.\nPress settings to edit the key",
-                            "secret.keyfornext", false)
-            {{
-                addParameter("key", new FeatureParameter<Integer>("key", "Key", "Press to navigate to next best secret", Keyboard.KEY_NONE, "keybind"));
-            }});
 
-            EPIC_COUNTDOWN = register(new FeatureEpicCountdown());
 
-            RENDER_BREACONS = register(new SimpleFeature("Dungeon.Secrets.Preferences", "Render beacons", "Should the mod not render beacons on secret", "secret.beacons", false));
-            RENDER_DESTENATION_TEXT = register(new SimpleFeature("Dungeon.Secrets.Preferences", "Render Destination text", "Should the mod not render \"destination\" on secrets", "secret.desttext", false));
-            SECRET_AUTO_START = register(new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind", "Auto pathfind to new secret", "Auto browse best secret upon entering the room.", "secret.autouponenter", false));
-            SECRET_AUTO_BROWSE_NEXT = register(new SimpleFeature("Dungeon.Secrets.Legacy AutoPathfind", "Auto Pathfind to next secret", "Auto browse best next secret after current one completes.\nthe first pathfinding of first secret needs to be triggered first in order for this option to work", "secret.autobrowse", false));
             BOSSFIGHT_WARNING_ON_PORTAL = register(new FeatureWarningOnPortal());
             BOSSFIGHT_CHESTPRICE = register(new FeatureChestPrice());
             BOSSFIGHT_AUTOREPARTY = register(new FeatureAutoReparty());
             BOSSFIGHT_HIDE_ANIMALS = register(new FeatureHideAnimals());
-            BOSSFIGHT_BEAR_PERCENT = register(new FeatureThornBearPercentage());
             BOSSFIGHT_BOW_TIMER = register(new FeatureThornSpiritBowTimer());
             BOSSFIGHT_BOX_REALLIVID = register(new FeatureBoxRealLivid());
-            BOSSFIGHT_TERRACOTTA_TIMER = register(new FeatureTerracotaTimer());
             BOSSFIGHT_CURRENT_PHASE = register(new FeatureCurrentPhase());
             BOSSFIGHT_TERMINAL_SOLVERS = register(new FeatureTerminalSolvers());
             BOSSFIGHT_SIMONSAYS_SOLVER = register(new FeatureSimonSaysSolver());
-            PARTYKICKER_APIKEY = register(new APIKey());
             PARTYKICKER_VIEWPLAYER = register(new FeatureViewPlayerStatsOnJoin());
-            PARTYKICKER_CUSTOM = register(new FeatureCustomPartyFinder());
             PARTY_LIST = register(new FeaturePartyList());
             PARTY_READY = register(new FeaturePartyReady());
-            ETC_DUNGEONSTAT = register(new FeatureTooltipDungeonStat());
-            ETC_PRICE = register(new FeatureTooltipPrice());
             ETC_ABILITY_COOLDOWN = register(new FeatureAbilityCooldown());
-            ETC_COOLDOWN = register(new FeatureCooldownCounter());
-            ETC_EXPLOSION_SOUND = register(new FeatureDecreaseExplosionSound());
-            ETC_AUTO_ACCEPT_REPARTY = register(new FeatureAutoAcceptReparty());
-            ETC_TEST = register(new FeatureUpdateAlarm());
-            FIX_SPIRIT_BOOTS = register(new SimpleFeature("Misc", "Spirit Boots Fixer", "Fix Spirit boots messing up with inventory", "fixes.spirit", true));
-            FIX_MESSAGES = register(new FeatureDisableMessage());
-            ETC_COPY_MSG = register(new FeatureCopyMessages());
-            ETC_PENGUIN = register(new FeaturePenguins());
-            ETC_COLLECT_SCORE = register(new FeatureCollectScore());
+
             COSMETIC_NICKNAMECOLOR = register(new FeatureNicknameColor());
             COSMETIC_PREFIX = register(new FeatureNicknamePrefix());
             DISCORD_RICHPRESENCE = register(new SimpleFeature("Discord", "Discord RPC", "Enable Discord rich presence", "advanced.richpresence", true) {
@@ -281,15 +197,9 @@ public class FeatureRegistry {
             ADVANCED_DEBUGGABLE_MAP = register(new FeatureDebuggableMap());
 
 
-
-            // MIGRATED
-
-
-
             ADVANCED_COORDS = register(new FeatureRoomCoordDisplay());
         } catch (Exception e) {
             System.out.println(e);
-            throw new RuntimeException(e);
         }
 
 

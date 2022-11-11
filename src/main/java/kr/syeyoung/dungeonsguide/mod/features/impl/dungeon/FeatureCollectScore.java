@@ -22,7 +22,8 @@ import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompPayload;
 import kr.syeyoung.dungeonsguide.mod.utils.MapUtils;
@@ -34,13 +35,13 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
-public class FeatureCollectScore extends SimpleFeature {
-    Logger logger = LogManager.getLogger("FeatureCollectScore");
+public class FeatureCollectScore extends SimpleFeatureV2 {
     public FeatureCollectScore() {
-        super("Misc", "Collect Speed Score", "Collect Speed score, run time, and floor and send that to developer's server for speed formula. This data is completely anonymous, opt out of the feature by disabling this feature", "misc.gatherscoredata", true);
+        super("misc.gatherscoredata");
     }
+    static final Logger logger = LogManager.getLogger("FeatureCollectScore");
 
-    public void collectDungeonRunData(byte[] mapData, DungeonContext context) {
+    public static void collectDungeonRunData(byte[] mapData, DungeonContext context) {
         int skill = MapUtils.readNumber(mapData, 51, 35, 9);
         int exp = MapUtils.readNumber(mapData, 51, 54, 9);
         int time = MapUtils.readNumber(mapData, 51, 73, 9);
@@ -68,7 +69,7 @@ public class FeatureCollectScore extends SimpleFeature {
             throw new RuntimeException(e);
         }
 
-        if (FeatureRegistry.ETC_COLLECT_SCORE.isEnabled() && !target.contains("falsefalsefalsefalse")) {
+        if (DgOneCongifConfig.collectSpeedScore && !target.contains("falsefalsefalsefalse")) {
             StompManager.getInstance().send(new StompPayload().payload(payload.toString()).destination(target.replace("false", "").trim()));
         }
     }

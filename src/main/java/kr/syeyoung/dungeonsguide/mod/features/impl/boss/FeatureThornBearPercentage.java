@@ -18,61 +18,33 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
-import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.bossfight.BossfightProcessorThorn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FeatureThornBearPercentage extends TextHUDFeature {
+public class FeatureThornBearPercentage extends SingleTextHud {
     public FeatureThornBearPercentage() {
-        super("Dungeon.Bossfight.Floor 4", "Display Spirit Bear Summon Percentage", "Displays spirit bear summon percentage in hud", "bossfight.spiritbear", true, getFontRenderer().getStringWidth("Spirit Bear: 100%"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(true);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("number", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("unit", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-    }
-
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
-    private static final java.util.List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Spirit Bear","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("50","number"));
-        dummyText.add(new StyledText("%","unit"));
-    }
-    @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() instanceof BossfightProcessorThorn;
+        super("Spirit Bear", true);
     }
 
     @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "number", "unit");
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() instanceof BossfightProcessorThorn;
     }
 
     @Override
-    public java.util.List<StyledText> getDummyText() {
-        return dummyText;
+    protected String getText(boolean example) {
+        if(example) {
+            return "50%";
+        } else {
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            if(context == null) return "";
+            if(context.getBossfightProcessor() == null) return "";
+            if(!(context.getBossfightProcessor() instanceof BossfightProcessorThorn)) return "";
+            int percentage = (int) (((BossfightProcessorThorn) context.getBossfightProcessor()).calculatePercentage() * 100);
+            return percentage+"%";
+        }
     }
-
-    @Override
-    public java.util.List<StyledText> getText() {
-        int percentage = (int) (((BossfightProcessorThorn) DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor()).calculatePercentage() * 100);
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Spirit Bear","title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(percentage+"","number"));
-        actualBit.add(new StyledText("%","unit"));
-        return actualBit;
-    }
-
 }

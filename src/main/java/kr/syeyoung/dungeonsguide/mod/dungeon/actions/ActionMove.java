@@ -18,10 +18,11 @@
 
 package kr.syeyoung.dungeonsguide.mod.dungeon.actions;
 
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.tree.ActionRouteProperties;
+import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
+import kr.syeyoung.dungeonsguide.mod.dungeon.actions.tree.ActionRouteProperties;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -70,17 +71,17 @@ public class ActionMove extends AbstractAction {
         float scale = 0.45f * multiplier;
         scale *= 25.0 / 6.0;
         if (actionRouteProperties.isBeacon()) {
-            if(!FeatureRegistry.RENDER_BREACONS.isEnabled()){
+            if(DgOneCongifConfig.renderSecretBeacons){
                 RenderUtils.renderBeaconBeam(pos.getX(), pos.getY(), pos.getZ(), actionRouteProperties.getBeaconBeamColor(), partialTicks);
             }
             RenderUtils.highlightBlock(pos, actionRouteProperties.getBeaconColor(), partialTicks);
         }
-        if(!FeatureRegistry.RENDER_DESTENATION_TEXT.isEnabled()){
+        if(DgOneCongifConfig.renderSecretDestText){
             RenderUtils.drawTextAtWorld("Destination", pos.getX() + 0.5f, pos.getY() + 0.5f + scale, pos.getZ() + 0.5f, 0xFF00FF00, flag ? 2f : 1f, true, false, partialTicks);
         }
         RenderUtils.drawTextAtWorld(String.format("%.2f",MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition())))+"m", pos.getX() + 0.5f, pos.getY() + 0.5f - scale, pos.getZ() + 0.5f, 0xFFFFFF00, flag ? 2f : 1f, true, false, partialTicks);
 
-        if (!FeatureRegistry.SECRET_TOGGLE_KEY.isEnabled() || !FeatureRegistry.SECRET_TOGGLE_KEY.togglePathfindStatus) {
+        if ((DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().get(0) != UKeyboard.KEY_NONE) || !DgOneCongifConfig.togglePathfindStatus) {
             if (poses != null){
                 RenderUtils.drawLinesVec3(poses, actionRouteProperties.getLineColor(), actionRouteProperties.getLineWidth(), partialTicks,  true);
             }
@@ -104,7 +105,7 @@ public class ActionMove extends AbstractAction {
         }
 
         if (tick == 0 && actionRouteProperties.isPathfind() && latestFuture == null) {
-            if (!FeatureRegistry.SECRET_FREEZE_LINES.isEnabled() || poses == null) {
+            if (!DgOneCongifConfig.freezePathfindingStatus || poses == null) {
                 latestFuture = dungeonRoom.createEntityPathTo(dungeonRoom.getContext().getWorld(), Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom), Integer.MAX_VALUE, 10000);
             }
         }

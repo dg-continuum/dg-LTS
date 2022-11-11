@@ -18,10 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.mod.dungeon.actions;
 
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.tree.ActionRouteProperties;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
+import kr.syeyoung.dungeonsguide.mod.dungeon.actions.tree.ActionRouteProperties;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.minecraft.client.Minecraft;
@@ -73,7 +73,7 @@ public class ActionMoveNearestAir extends AbstractAction {
         }
 
         if (tick == 0 && actionRouteProperties.isPathfind() && latestFuture == null) {
-            if (!FeatureRegistry.SECRET_FREEZE_LINES.isEnabled() || poses == null) {
+            if (!DgOneCongifConfig.freezePathfindingStatus || poses == null) {
                 latestFuture = dungeonRoom.createEntityPathTo(dungeonRoom.getContext().getWorld(), Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom), Integer.MAX_VALUE, 10000);
             }
         }

@@ -6,13 +6,16 @@ import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.*;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonMap;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.BossHealth;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.DungeonMap;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.Ping;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
+import kr.syeyoung.dungeonsguide.mod.onconfig.misc.HighlightMobs;
+import kr.syeyoung.dungeonsguide.mod.onconfig.secrets.AutoPathfindPage;
+import kr.syeyoung.dungeonsguide.mod.onconfig.secrets.BloodRushPage;
+import kr.syeyoung.dungeonsguide.mod.onconfig.secrets.PathfindToALlPage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.solvers.*;
 
 import java.util.function.Supplier;
@@ -103,6 +106,20 @@ public class DgOneCongifConfig extends Config {
 
 
 
+
+    @Switch(
+            name = "Creeper",
+            description = "Draws line between prismarine lamps in creeper room",
+            category = "Solvers"
+    )
+    public static boolean creeperSolver = true;
+
+    @Switch(
+            name = "Waterboard (Advanced)",
+            description = "Calculates solution for waterboard puzzle and displays it to user",
+            category = "Solvers"
+    )
+    public static boolean waterboardSolver = true;
     @Switch(
             name = "Blaze Solver",
             size = 2,
@@ -333,10 +350,48 @@ public class DgOneCongifConfig extends Config {
             name = "enabled",
             size = 2,
             description = "See players through walls",
-            category = "Dungeon mics",
+            category = "dungeon",
             subcategory = "Player ESP"
     )
     public static boolean playerEps = true;
+
+    @Checkbox(
+            name = "Hide Mob nametags",
+            size = 2,
+            description = "Hide mob nametags in dungeon",
+            category = "dungeon",
+            subcategory = "Mobs"
+    )
+    public static boolean hideMobNametags = true;
+
+    @Checkbox(
+            name = "Highlight bats",
+            category = "dungeon",
+            subcategory = "Mobs"
+    )
+    public static boolean highlightBats = true;
+
+    @Checkbox(
+            name = "Highlight Starred mobs",
+            category = "dungeon",
+            subcategory = "Mobs"
+    )
+    public static boolean highlightStaredMobs = true;
+
+    @Checkbox(
+            name = "Highlight Skeleton Masters",
+            category = "dungeon",
+            subcategory = "Mobs"
+    )
+    public static boolean highlightSkeletonMasters = true;
+
+    @Page(
+            name = "prefrences",
+            location = PageLocation.BOTTOM,
+            category = "dungeon",
+            subcategory = "Mobs"
+    )
+    static HighlightMobs hb = new HighlightMobs();
 
 
     @Page(
@@ -365,16 +420,42 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean autoRp = true;
 
-
+    @Switch(
+            name = "Spirit Boots Fixer",
+            description = "Fix Spirit boots messing up with inventory",
+            category = "Misc"
+    )
+    public static boolean spiritBootsFix = true;
 
     @Switch(
-            name = "enabled",
-            size = 2,
+            name = "Collect Speed Score",
+            description = "Collect Speed score, run time, and floor and send that to developer's server for speed formula. This data is completely anonymous, opt out of the feature by disabling this feature",
+            category = "Misc"
+    )
+    public static boolean collectSpeedScore = true;
+
+    @Switch(
+            name = "Custom Party Finder",
+            description = "Custom Party Finder",
+            category = "Misc"
+    )
+    public static boolean customPartyfinder = true;
+    @Switch(
+            name = "Copy Chat Messages",
             description = "Click on copy to copy",
-            category = "Misc",
-            subcategory = "Copy Chat Messages"
+            category = "Misc"
     )
     public static boolean copyChatMesseges = false;
+
+    @Text(
+            name = "Hypixel API key",
+            secure = true,
+            category = "Misc"
+    )
+    public static String apikey = "";
+
+
+
 
 
     @Switch(
@@ -434,7 +515,6 @@ public class DgOneCongifConfig extends Config {
 
     @Switch(
             name = "enabled",
-            size = 2,
             category = "Misc",
             subcategory = "Reparty Command From DG"
     )
@@ -468,14 +548,6 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean tooltipPrice = false;
 
-    @Switch(
-            name = "enabled",
-            description = "Show a warning in chat when a version has been released.",
-            size = 2,
-            category = "Misc",
-            subcategory = "Update Alarm"
-    )
-    public static boolean updateAlarm  = false;
 
 
     @Info(
@@ -501,12 +573,140 @@ public class DgOneCongifConfig extends Config {
     )
     private static DungeonMap map = new DungeonMap();
 
+    @Page(
+            name = "CooldownCounter",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static CooldownCounter cc = new CooldownCounter();
+
+    @Page(
+            name = "Terracota timer",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static TerracotaTimer tt = new TerracotaTimer();
+
+    @Page(
+            name = "Display Spirit Bear Summon Percentage",
+            description = "Displays spirit bear summon percentage in hud",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static SpiritBearPrct sbp = new SpiritBearPrct();
+
+    @Page(
+            name = "Display name of the room you are in",
+            description = "Display name of the room you are in",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static CurrentRoomName crn = new CurrentRoomName();
+
+
+    @Page(
+            name = "Secret Soul Alert",
+            description = "Alert if there is an fairy soul in the room",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static FairySoulWarning fsrw = new FairySoulWarning();
 
     @HUD(
             name = "Debug Map",
             category = "Debug"
     )
     public static TestMap f = new TestMap();
+
+
+
+    @Checkbox(
+            name = "Render beacons",
+            category = "secrets",
+            subcategory = "Preferences"
+    )
+    public static boolean renderSecretBeacons = true;
+
+    @Checkbox(
+            name = "Render Destination text",
+            category = "secrets",
+            subcategory = "Preferences"
+    )
+    public static boolean renderSecretDestText = true;
+
+
+//    THETA_STAR("The default pathfinding algorithm. It will generate sub-optimal path quickly."),
+//    A_STAR_DIAGONAL("New pathfinding algorithm. It will generate path that looks like the one JPS generates"),
+//    A_STAR_FINE_GRID("New pathfinding algorithm. It will generate path that kind of looks like stair"),
+//    JPS_LEGACY("The improved pathfinding algorithm. Not suggested for usage. It will have problems on diagonal movements, thus giving wrong routes"),
+//    A_STAR_LEGACY("The first pathfinding algorithm. It may have problem on navigating through stairs. This is the one used by Minecraft for mob pathfind.")
+    @Dropdown(
+            description = "Select pathfind algorithm used by paths",
+            name = "Pathfind Algorithm",
+            options = {"THETA_STAR", "A_STAR_DIAGONAL", "A_STAR_FINE_GRID", "JPS_LEGACY", "A_STAR_LEGACY"},
+            category = "secrets",
+            subcategory = "Preferences"
+    )
+    public static int secretPathfindStrategy = 0;
+
+
+    @KeyBind(
+            name = "Toggle Pathfind Lines",
+            description = "A key for toggling pathfound line visibility.\nPress settings to edit the key",
+            category = "secrets",
+            subcategory = "Preferences"
+    )
+    public static OneKeyBind togglePathfindKeybind = new OneKeyBind(UKeyboard.KEY_NONE);
+
+    public static boolean togglePathfindStatus = false;
+
+    @KeyBind(
+            name = "Freeze Pathfind",
+            description = "Freeze Pathfind, meaning the pathfind lines won't change when you move.\nPress settings to edit the key",
+            category = "secrets",
+            subcategory = "Preferences"
+    )
+    public static OneKeyBind freezePathfindingKeybinding = new OneKeyBind(UKeyboard.KEY_NONE);
+    public static boolean freezePathfindingStatus = false;
+
+
+    @Dropdown(
+            name = "Mode",
+            options = {"PathFind to All", "Blood Rush", "Auto pathfind"},
+            category = "secrets"
+    )
+    public static int secretFindMode = 2;
+
+
+
+    @Page(
+            name = "PathFind to All Mode Settings",
+            location = PageLocation.BOTTOM,
+            category = "secrets"
+    )
+    public PathfindToALlPage pftap = new PathfindToALlPage();
+
+    /**
+     * This field is in addition to the selector, the user might want to disable the lines temporally and
+     * changing the mode would not solve that
+     */
+    public static boolean bloodRush = false;
+
+    @Page(
+            name = "Blood Rush Mode Settings",
+            location = PageLocation.BOTTOM,
+            category = "secrets"
+    )
+    public BloodRushPage brp = new BloodRushPage();
+
+
+    @Page(
+            name = "Auto pathfind Mode Settings",
+            location = PageLocation.BOTTOM,
+            category = "secrets"
+    )
+    public AutoPathfindPage app = new AutoPathfindPage();
+
 
 
 
@@ -522,7 +722,7 @@ public class DgOneCongifConfig extends Config {
     }
 
     public static AColor oneconftodgcolor(OneColor c){
-        return new AColor(c.getRed(), c.getBlue(), c.getGreen(), c.getAlpha());
+        return new AColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
     }
 
 
@@ -534,7 +734,25 @@ public class DgOneCongifConfig extends Config {
 
         hideMultipleIf(() -> !FeatureDungeonMap.centerMapOnPlayer, "shouldRotateWithPlayer");
 
-//        addDependency("fieldname", () -> bollthatdetemins);
+        registerKeyBind(BloodRushPage.keybind, () -> {
+            DgOneCongifConfig.bloodRush = !DgOneCongifConfig.bloodRush;
+            ChatTransmitter.addToQueue( ChatTransmitter.PREFIX + "§fToggled Blood Rush to §e "+(DgOneCongifConfig.bloodRush ? "on":"off"));
+        });
+
+        registerKeyBind(togglePathfindKeybind, () -> {
+            togglePathfindStatus = !togglePathfindStatus;
+            try {
+                ChatTransmitter.addToQueue( ChatTransmitter.PREFIX + "§fToggled Pathfind Line visibility to §e"+(togglePathfindStatus ? "on":"off"));
+            } catch (Exception ignored) {
+
+            }
+        });
+
+        registerKeyBind(freezePathfindingKeybinding, () -> {
+            freezePathfindingStatus = !freezePathfindingStatus;
+            ChatTransmitter.addToQueue(ChatTransmitter.PREFIX + "§fToggled Pathfind Freeze to §e"+(DgOneCongifConfig.freezePathfindingStatus ? "on":"off"));
+        });
+
     }
 
 

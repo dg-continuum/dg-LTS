@@ -18,35 +18,30 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.TooltipListener;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.AhUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class FeatureTooltipPrice extends SimpleFeature implements TooltipListener {
+public class FeatureTooltipPrice extends SimpleFeatureV2 {
     public FeatureTooltipPrice() {
-        super("", "", "", "tooltip.price");
+        super("tooltip.price");
     }
 
-
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.dungeonStat;
-    }
-
-    @Override
-    public void onTooltip(ItemTooltipEvent event) {
-        if (!isEnabled()) return;
+    @SubscribeEvent
+    public void dungeonTooltip(ItemTooltipEvent event) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.dungeonStat) return;
 
         boolean activated = !DgOneCongifConfig.tooltipPrice || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
 
@@ -113,4 +108,6 @@ public class FeatureTooltipPrice extends SimpleFeature implements TooltipListene
             }
         }
     }
+
+
 }

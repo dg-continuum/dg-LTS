@@ -18,7 +18,6 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.party.customgui;
 
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.MTooltip;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.MTooltipText;
@@ -140,7 +139,7 @@ public class PanelPartyListElement extends MPanel {
             color = RenderUtils.blendTwoColors(color, 0x44FFAA00);
         }
 
-        if (nodupe && dungeonClasses.contains(FeatureRegistry.PARTYKICKER_CUSTOM.getLastClass())) {
+        if (nodupe && dungeonClasses.contains(FeatureCustomPartyFinder.getLastClass())) {
             color = RenderUtils.blendTwoColors(color, 0x44FF0000);
             note = note.replace("nodupe", "§cnodupe§r").replace("no dupe", "§cno dupe§r").replace("nd", "§cnd§r");
         }

@@ -18,31 +18,25 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
-import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.SoundListener;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FeatureDecreaseExplosionSound extends SimpleFeature implements SoundListener {
+public class FeatureDecreaseExplosionSound extends SimpleFeatureV2 {
     public FeatureDecreaseExplosionSound() {
-       super("Misc", "", "", "qol.explosionsound");
+       super("qol.explosionsound");
     }
 
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.decreseExplosionSound;
-    }
-
-    @Override
-    public void onSound(PlaySoundEvent soundEvent) {
-        if (!SkyblockStatus.isOnSkyblock()) return;
+    @SubscribeEvent
+    public void onSoundEvent(PlaySoundEvent soundEvent) {
+        if(!DgOneCongifConfig.decreseExplosionSound) return;
 
         if (soundEvent.name.equalsIgnoreCase("random.explode") && soundEvent.result instanceof PositionedSoundRecord) {
             PositionedSoundRecord positionedSoundRecord = (PositionedSoundRecord) soundEvent.result;
-            PositionedSoundRecord neweff = new PositionedSoundRecord(
+
+            soundEvent.result = new PositionedSoundRecord(
                     positionedSoundRecord.getSoundLocation(),
                     positionedSoundRecord.getVolume() * (DgOneCongifConfig.explosionDecreseMultiplyer / 100),
                     positionedSoundRecord.getPitch(),
@@ -50,8 +44,7 @@ public class FeatureDecreaseExplosionSound extends SimpleFeature implements Soun
                     positionedSoundRecord.getYPosF(),
                     positionedSoundRecord.getZPosF()
             );
-
-            soundEvent.result = neweff;
         }
     }
+
 }

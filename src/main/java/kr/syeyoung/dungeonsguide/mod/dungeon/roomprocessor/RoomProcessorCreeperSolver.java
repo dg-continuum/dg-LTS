@@ -20,7 +20,7 @@ package kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor;
 
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -120,7 +120,7 @@ public class RoomProcessorCreeperSolver extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!FeatureRegistry.SOLVER_CREEPER.isEnabled()) return;
+        if (!DgOneCongifConfig.creeperSolver) return;
         World w = getDungeonRoom().getContext().getWorld();
         for (int i = 0; i < poses.size(); i++) {
             BlockPos[] poset = poses.get(i);

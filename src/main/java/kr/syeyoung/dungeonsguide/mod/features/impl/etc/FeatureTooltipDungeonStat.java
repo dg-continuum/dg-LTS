@@ -18,36 +18,44 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.TooltipListener;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FeatureTooltipDungeonStat extends SimpleFeature implements TooltipListener {
+public class FeatureTooltipDungeonStat extends SimpleFeatureV2 {
     public FeatureTooltipDungeonStat() {
-        super("", "", "", "tooltip.dungeonitem");
+        super("tooltip.dungeonitem");
     }
 
-    @Override
-    public void onTooltip(ItemTooltipEvent event) {
+
+    @SubscribeEvent
+    public void dungeonTooltip(ItemTooltipEvent event) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         if (!DgOneCongifConfig.dungeonStat) return;
 
         ItemStack hoveredItem = event.itemStack;
         NBTTagCompound compound = hoveredItem.getTagCompound();
-        if (compound == null)
+        if (compound == null) {
             return;
-        if (!compound.hasKey("ExtraAttributes"))
+        }
+        if (!compound.hasKey("ExtraAttributes")) {
             return;
+        }
         NBTTagCompound nbtTagCompound = compound.getCompoundTag("ExtraAttributes");
 
         int floor = nbtTagCompound.getInteger("item_tier");
         int percentage = nbtTagCompound.getInteger("baseStatBoostPercentage");
 
-        if (nbtTagCompound.hasKey("item_tier"))
+        if (nbtTagCompound.hasKey("item_tier")) {
             event.toolTip.add("§7Obtained in: §c"+(floor == 0 ? "Entrance" : "Floor "+floor));
-        if (nbtTagCompound.hasKey("baseStatBoostPercentage"))
+        }
+        if (nbtTagCompound.hasKey("baseStatBoostPercentage")) {
             event.toolTip.add("§7Stat Percentage: §"+(percentage == 50 ? "6§l":"c")+(percentage * 2)+"%");
+        }
     }
+
 }

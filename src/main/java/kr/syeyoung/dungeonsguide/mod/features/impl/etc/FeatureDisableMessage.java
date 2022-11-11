@@ -19,20 +19,19 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.etc;
 
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class FeatureDisableMessage extends SimpleFeature implements ChatListener {
+public class FeatureDisableMessage extends SimpleFeatureV2 {
     @Data
     @AllArgsConstructor
     public static class MessageData {
@@ -63,18 +62,19 @@ public class FeatureDisableMessage extends SimpleFeature implements ChatListener
 
 
     public FeatureDisableMessage() {
-        super("Misc.Chat", "", "", "fixes.messagedisable", true);
+        super("fixes.messagedisable");
     }
 
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.disableMessages;
+    @SubscribeEvent
+    public void onRenderWorld(ClientChatReceivedEvent postRender) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        onChat(postRender);
     }
 
-    @Override
+
     public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
         if (clientChatReceivedEvent.type == 2) return;
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.disableMessages) return;
         if (!SkyblockStatus.isOnSkyblock()) return;
         String msg = clientChatReceivedEvent.message.getFormattedText();
 

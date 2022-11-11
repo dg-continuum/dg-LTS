@@ -18,78 +18,38 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import lombok.val;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FeatureDungeonRoomName extends TextHUDFeature {
+public class FeatureDungeonRoomName extends SingleTextHud {
     public FeatureDungeonRoomName() {
-        super("Dungeon.HUDs", "Display name of the room you are in", "Display name of the room you are in", "dungeon.roomname", false, getFontRenderer().getStringWidth("You're in puzzle-tictactoe"), getFontRenderer().FONT_HEIGHT);
-        getStyles().add(new TextStyle("in", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("roomname", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-    }
-
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
-    public int getTotalSecretsInt() {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        int totalSecrets = 0;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-            if (dungeonRoom.getTotalSecrets() != -1)
-                totalSecrets += dungeonRoom.getTotalSecrets();
-        }
-        return totalSecrets;
-    }
-
-    private static final List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("You're in ","in"));
-        dummyText.add(new StyledText("puzzle-tictactoe","roomname"));
+        super("You're in", true);
     }
 
     @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor() != null;
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor() != null;
     }
 
-    @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("roomname", "in");
-    }
 
     @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public List<StyledText> getText() {
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-
-        Point roomPt = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().worldPointToRoomPoint(player.getPosition());
-        DungeonRoom dungeonRoom = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(roomPt);
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("You're in ","in"));
-        if (dungeonRoom == null) {
-            actualBit.add(new StyledText("Unknown","roomname"));
-        } else {
-            actualBit.add(new StyledText(dungeonRoom.getDungeonRoomInfo().getName(),"roomname"));
+    protected String getText(boolean example) {
+        if (example) {
+            return "puzzle-tictactoe";
         }
 
+        val player = Minecraft.getMinecraft().thePlayer;
+        if(player == null) return "";
 
-        return actualBit;
+        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if(context == null || context.getMapProcessor() == null) return "";
+        val roomPt = context.getMapProcessor().worldPointToRoomPoint(player.getPosition());
+        if(roomPt == null) return "";
+
+        val dungeonRoom = context.getRoomMapper().get(roomPt);
+        return dungeonRoom.getDungeonRoomInfo().getName();
     }
-
 }

@@ -21,8 +21,7 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.PlayerRenderListener;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -30,23 +29,20 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 
-public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListener {
+public class FeaturePlayerESP extends SimpleFeatureV2 {
     public FeaturePlayerESP() {
-        super("Dungeon.Teammates", "See players through walls", "See players through walls", "dungeon.playeresp", false);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return DgOneCongifConfig.playerEps;
+        super("dungeon.playeresp");
     }
 
     private boolean preCalled = false;
-    @Override
-    public void onEntityRenderPre(RenderPlayerEvent.Pre renderPlayerEvent) {
 
+    @SubscribeEvent
+    public void onRender(RenderPlayerEvent.Pre preRender) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
 
         if (preCalled) return;
         if (!DgOneCongifConfig.playerEps) return;
@@ -54,7 +50,7 @@ public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListe
 
         DungeonContext dungeonContext = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
         if (dungeonContext == null) return;
-        if (!dungeonContext.getPlayers().contains(renderPlayerEvent.entityPlayer.getName())) {
+        if (!dungeonContext.getPlayers().contains(preRender.entityPlayer.getName())) {
             return;
         }
 
@@ -68,17 +64,15 @@ public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListe
         GL11.glStencilFunc(GL11.GL_ALWAYS, 1, 0xFF);
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE);
 
-        EntityPlayer entity = renderPlayerEvent.entityPlayer;
+        EntityPlayer entity = preRender.entityPlayer;
         InventoryPlayer inv = entity.inventory;
         ItemStack[] armor = inv.armorInventory;
         inv.armorInventory = new ItemStack[4];
         ItemStack[] hand = inv.mainInventory;
         inv.mainInventory = new ItemStack[36];
 
-        float f = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * renderPlayerEvent.partialRenderTick;
-        try {
-            renderPlayerEvent.renderer.doRender((AbstractClientPlayer) renderPlayerEvent.entityPlayer, renderPlayerEvent.x, renderPlayerEvent.y, renderPlayerEvent.z, f, renderPlayerEvent.partialRenderTick);
-        } catch (Throwable t) {}
+        float f = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * preRender.partialRenderTick;
+        preRender.renderer.doRender((AbstractClientPlayer) preRender.entityPlayer, preRender.x, preRender.y, preRender.z, f, preRender.partialRenderTick);
 
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
         GL11.glStencilFunc(GL11.GL_NOTEQUAL, 1, 0xff);
@@ -86,14 +80,13 @@ public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListe
         GL11.glDepthFunc(GL11.GL_GEQUAL);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(renderPlayerEvent.x, renderPlayerEvent.y + 0.9, renderPlayerEvent.z);
+        GlStateManager.translate(preRender.x, preRender.y + 0.9, preRender.z);
         GlStateManager.scale(1.2f, 1.1f, 1.2f);
-        renderPlayerEvent.renderer.setRenderOutlines(true);
-        try {
-            renderPlayerEvent.renderer.doRender((AbstractClientPlayer) renderPlayerEvent.entityPlayer, 0,-0.9,0, f, renderPlayerEvent.partialRenderTick);
-        } catch (Throwable t) {}
+        preRender.renderer.setRenderOutlines(true);
+        preRender.renderer.doRender((AbstractClientPlayer) preRender.entityPlayer, 0,-0.9,0, f, preRender.partialRenderTick);
 
-        renderPlayerEvent.renderer.setRenderOutlines(false);
+
+        preRender.renderer.setRenderOutlines(false);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         GlStateManager.popMatrix();
 
@@ -106,8 +99,5 @@ public class FeaturePlayerESP extends SimpleFeature implements PlayerRenderListe
 
     }
 
-    @Override
-    public void onEntityRenderPost(RenderPlayerEvent.Post renderPlayerEvent) {
-    }
 
 }
