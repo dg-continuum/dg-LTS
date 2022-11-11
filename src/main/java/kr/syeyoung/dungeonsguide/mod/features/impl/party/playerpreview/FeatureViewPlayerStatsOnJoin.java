@@ -23,6 +23,7 @@ import io.github.moulberry.hychat.HyChat;
 import io.github.moulberry.hychat.chat.ChatManager;
 import io.github.moulberry.hychat.gui.GuiChatBox;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessResult;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
@@ -41,8 +42,6 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.api.playe
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.datarenders.DataRendererEditor;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.datarenders.DataRendererRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.datarenders.IDataRenderer;
-import kr.syeyoung.dungeonsguide.mod.features.listener.GuiClickListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.GuiPostRenderListener;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.party.PartyContext;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
@@ -66,6 +65,8 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -78,7 +79,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class FeatureViewPlayerStatsOnJoin extends SimpleFeature implements GuiPostRenderListener, GuiClickListener {
+public class FeatureViewPlayerStatsOnJoin extends SimpleFeature {
 
     static Minecraft mc = Minecraft.getMinecraft();
     protected Rectangle popupRect;
@@ -156,8 +157,10 @@ public class FeatureViewPlayerStatsOnJoin extends SimpleFeature implements GuiPo
                 });
     }
 
-    @Override
-    public void onGuiPostRender(GuiScreenEvent.DrawScreenEvent.Post rendered) {
+
+    @SubscribeEvent
+    public void onGuiRender(GuiScreenEvent.DrawScreenEvent.Post render) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         if (!(mc.currentScreen instanceof GuiChat)) {
             cancelRender();
             return;
@@ -473,9 +476,9 @@ public class FeatureViewPlayerStatsOnJoin extends SimpleFeature implements GuiPo
         fakePlayer = null;
         shouldDraw = false;
     }
-
-    @Override
-    public void onMouseInput(GuiScreenEvent.MouseInputEvent.Pre mouseInputEvent) {
+    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGH)
+    public void onGuiEventttt(GuiScreenEvent.MouseInputEvent.Pre input) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         ScaledResolution scaledResolution = new ScaledResolution(mc);
         int width = scaledResolution.getScaledWidth();
         int height = scaledResolution.getScaledHeight();
@@ -486,7 +489,7 @@ public class FeatureViewPlayerStatsOnJoin extends SimpleFeature implements GuiPo
             shouldDraw = false;
         if (popupRect == null || !popupRect.contains(mouseX, mouseY)) return;
 
-        mouseInputEvent.setCanceled(true);
+        input.setCanceled(true);
 
         int relX = mouseX - popupRect.x;
         int relY = mouseY - popupRect.y;

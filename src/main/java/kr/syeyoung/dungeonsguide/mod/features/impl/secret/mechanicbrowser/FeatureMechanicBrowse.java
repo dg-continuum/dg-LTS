@@ -24,45 +24,50 @@ import kr.syeyoung.dungeonsguide.mod.config.guiconfig.location.GuiGuiLocationCon
 import kr.syeyoung.dungeonsguide.mod.config.types.GUIRectangle;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.mod.features.GuiFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.GuiClickListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.GuiPreRenderListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.WorldRenderListener;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.MFloatSelectionButton;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.MPassiveLabelAndElement;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomprocessor.GeneralRoomProcessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.Optional;
 
-public class FeatureMechanicBrowse extends GuiFeature implements GuiPreRenderListener, GuiClickListener, WorldRenderListener {
+public class FeatureMechanicBrowse extends GuiFeature {
+    private MGuiMechanicBrowser mGuiMechanicBrowser;
+    private int lastWidth, lastHeight;
+
     public FeatureMechanicBrowse() {
-        super("Dungeon.Secrets.Secret Browser","Secret Browser", "Browse and Pathfind secrets and mechanics in the current room", "secret.mechanicbrowse", false, 100, 300);
+        super("Dungeon.Secrets.Secret Browser", "Secret Browser", "Browse and Pathfind secrets and mechanics in the current room", "secret.mechanicbrowse", false, 100, 300);
         addParameter("scale", new FeatureParameter<Float>("scale", "Scale", "Scale", 1.0f, "float"));
         mGuiMechanicBrowser = new MGuiMechanicBrowser(this);
         mGuiMechanicBrowser.setWorldAndResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
-        lastWidth = Minecraft.getMinecraft().displayWidth; lastHeight = Minecraft.getMinecraft().displayHeight;
+        lastWidth = Minecraft.getMinecraft().displayWidth;
+        lastHeight = Minecraft.getMinecraft().displayHeight;
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public double getScale() {
         return this.<Float>getParameter("scale").getValue();
     }
-
-    private MGuiMechanicBrowser mGuiMechanicBrowser;
-
 
     @Override
     public void drawDemo(float partialTicks) {
@@ -71,7 +76,7 @@ public class FeatureMechanicBrowse extends GuiFeature implements GuiPreRenderLis
         GlStateManager.scale(scale, scale, 1.0);
 
         Dimension bigDim = getFeatureRect().getRectangleNoScale().getSize();
-        Dimension effectiveDim = new Dimension((int) (bigDim.width / scale),(int)( bigDim.height / scale));
+        Dimension effectiveDim = new Dimension((int) (bigDim.width / scale), (int) (bigDim.height / scale));
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         Gui.drawRect(0, 0, effectiveDim.width, fr.FONT_HEIGHT + 4, 0xFF444444);
@@ -79,22 +84,29 @@ public class FeatureMechanicBrowse extends GuiFeature implements GuiPreRenderLis
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        fr.drawString("Selected: ", 2,2, 0xFFAAAAAA);
-        fr.drawString("Nothing", fr.getStringWidth("Selected: ") + 2,2, 0xFFAA0000);
+        fr.drawString("Selected: ", 2, 2, 0xFFAAAAAA);
+        fr.drawString("Nothing", fr.getStringWidth("Selected: ") + 2, 2, 0xFFAA0000);
         fr.drawString("Open Chat to Select Secrets", 2, fr.FONT_HEIGHT + 5, 0xFFAAAAAA);
     }
 
-    private int lastWidth, lastHeight;
+    @SubscribeEvent
+    public void onRender(RenderGameOverlayEvent.Post postRender) {
+        if (!(postRender.type == RenderGameOverlayEvent.ElementType.EXPERIENCE || postRender.type == RenderGameOverlayEvent.ElementType.JUMPBAR)) return;
 
-    @Override
-    public void drawScreen(float partialTicks) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+
         if (!isEnabled()) return;
         int i = Mouse.getEventX();
         int j = Minecraft.getMinecraft().displayHeight - Mouse.getEventY();
-        if (Minecraft.getMinecraft().displayWidth != lastWidth || Minecraft.getMinecraft().displayHeight != lastHeight) mGuiMechanicBrowser.initGui();
-        lastWidth = Minecraft.getMinecraft().displayWidth; lastHeight = Minecraft.getMinecraft().displayHeight;
-        mGuiMechanicBrowser.drawScreen(i,j,partialTicks);
+        if (Minecraft.getMinecraft().displayWidth != lastWidth || Minecraft.getMinecraft().displayHeight != lastHeight)
+            mGuiMechanicBrowser.initGui();
+        lastWidth = Minecraft.getMinecraft().displayWidth;
+        lastHeight = Minecraft.getMinecraft().displayHeight;
+        mGuiMechanicBrowser.drawScreen(i, j, postRender.partialTicks);
+
+        GlStateManager.enableBlend();
     }
+
 
     @Override
     public void setFeatureRect(GUIRectangle featureRect) {
@@ -103,10 +115,14 @@ public class FeatureMechanicBrowse extends GuiFeature implements GuiPreRenderLis
     }
 
     @Override
-    public void drawHUD(float partialTicks) { }
+    public void drawHUD(float partialTicks) {
+        // TODO document why this method is empty
+    }
 
-    @Override
-    public void onMouseInput(GuiScreenEvent.MouseInputEvent.Pre mouseInputEvent) {
+
+    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGH)
+    public void onGuiEvent(GuiScreenEvent.MouseInputEvent.Pre input) {
+
         if (!isEnabled()) return;
         try {
             mGuiMechanicBrowser.handleMouseInput();
@@ -116,20 +132,25 @@ public class FeatureMechanicBrowse extends GuiFeature implements GuiPreRenderLis
     }
 
 
-    @Override
-    public void onGuiPreRender(GuiScreenEvent.DrawScreenEvent.Pre rendered) {
+    @SubscribeEvent
+    public void onGuiRender(GuiScreenEvent.DrawScreenEvent.Pre render) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+
         if (!isEnabled()) return;
         int i = Mouse.getEventX();
         int j = Minecraft.getMinecraft().displayHeight - Mouse.getEventY();
-        mGuiMechanicBrowser.drawScreen(i, j, rendered.renderPartialTicks);
+        mGuiMechanicBrowser.drawScreen(i, j, render.renderPartialTicks);
+        GlStateManager.enableBlend();
     }
 
-    @Override
-    public void drawWorld(float partialTicks) {
+    @SubscribeEvent
+    public void onRenderWorld(RenderWorldLastEvent postRender) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         if (!isEnabled()) return;
         SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
         if (!skyblockStatus.isOnDungeon()) return;
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().isInitialized()) return;
+        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().isInitialized())
+            return;
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
 
         EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
@@ -141,23 +162,26 @@ public class FeatureMechanicBrowse extends GuiFeature implements GuiPreRenderLis
         if (id != null) {
             Optional.ofNullable(dungeonRoom.getMechanics().get(mGuiMechanicBrowser.getPanelMechanicBrowser().getSelectedID()))
                     .ifPresent(a -> {
-                        a.highlight(new Color(0,255,255,50), id +" ("+(
+                        a.highlight(new Color(0, 255, 255, 50), id + " (" + (
                                 dungeonRoom.getMechanics().get(id).getRepresentingPoint(dungeonRoom) != null ?
-                                String.format("%.1f", MathHelper.sqrt_double((dungeonRoom.getMechanics().get(id)).getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                                +"m)", dungeonRoom, partialTicks);
+                                        String.format("%.1f", MathHelper.sqrt_double((dungeonRoom.getMechanics().get(id)).getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                + "m)", dungeonRoom, postRender.partialTicks);
                     });
         }
     }
+
     @Override
     public List<MPanel> getTooltipForEditor(GuiGuiLocationConfig guiGuiLocationConfig) {
         List<MPanel> mPanels = super.getTooltipForEditor(guiGuiLocationConfig);
 
-            mPanels.add(new MPassiveLabelAndElement("Scale", new MFloatSelectionButton(FeatureMechanicBrowse.this.<Float>getParameter("scale").getValue()) {{
-                setOnUpdate(() ->{
+        mPanels.add(new MPassiveLabelAndElement("Scale", new MFloatSelectionButton(FeatureMechanicBrowse.this.<Float>getParameter("scale").getValue()) {
+            {
+                setOnUpdate(() -> {
                     FeatureMechanicBrowse.this.<Float>getParameter("scale").setValue(this.getData());
                     mGuiMechanicBrowser.initGui();
-                }); }
-            }));
+                });
+            }
+        }));
 
         return mPanels;
     }

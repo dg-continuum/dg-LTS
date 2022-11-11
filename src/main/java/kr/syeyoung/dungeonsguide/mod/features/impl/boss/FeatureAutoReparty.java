@@ -19,16 +19,23 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonQuitListener;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonLeftEvent;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class FeatureAutoReparty extends SimpleFeature implements DungeonQuitListener {
+public class FeatureAutoReparty extends SimpleFeatureV2 {
     public FeatureAutoReparty() {
-        super("Party.Reparty", "Auto reparty when dungeon finishes","Auto reparty on dungeon finish\n\nThis automates player chatting action, (disbanding, repartying) Thus it might be against hypixel's rules.\nBut mods like auto-gg exist so I'm leaving this feature.\nThis option is use-at-your-risk and you'll be responsible for ban if you somehow get banned because of this feature\n(Although it is not likely to happen)\nDefaults to off", "party.autoreparty", false);
+//        super("Party.Reparty", "Auto reparty when dungeon finishes","Auto reparty on dungeon finish\n\nThis automates player chatting action, (disbanding, repartying) Thus it might be against hypixel's rules.\nBut mods like auto-gg exist so I'm leaving this feature.\nThis option is use-at-your-risk and you'll be responsible for ban if you somehow get banned because of this feature\n(Although it is not likely to happen)\nDefaults to off", "party.autoreparty", false);
+        super("party.autoreparty");
+
     }
 
-    @Override
-    public void onDungeonQuit() {
-        if (isEnabled()) DungeonsGuide.getDungeonsGuide().getCommandReparty().requestReparty(true);
+    @SubscribeEvent
+    public void onDungeonLeft(DungeonLeftEvent leftEvent) {
+        if (false){
+            DungeonsGuide.getDungeonsGuide().getCommandReparty().requestReparty(true);
+        }
     }
+
+
 }

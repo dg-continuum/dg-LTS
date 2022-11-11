@@ -33,7 +33,6 @@ import kr.syeyoung.dungeonsguide.mod.config.Config;
 import kr.syeyoung.dungeonsguide.mod.cosmetics.CosmeticsManager;
 import kr.syeyoung.dungeonsguide.mod.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonFacade;
-import kr.syeyoung.dungeonsguide.mod.events.listener.FeatureListener;
 import kr.syeyoung.dungeonsguide.mod.events.listener.PacketListener;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistryV2;
@@ -161,7 +160,6 @@ public class DungeonsGuide implements IDungeonGuide {
         commandReparty = new CommandReparty();
         MinecraftForge.EVENT_BUS.register(commandReparty);
 
-        MinecraftForge.EVENT_BUS.register(new FeatureListener());
         MinecraftForge.EVENT_BUS.register(new PacketListener());
         MinecraftForge.EVENT_BUS.register(new Keybinds());
 

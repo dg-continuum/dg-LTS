@@ -19,11 +19,11 @@
 package kr.syeyoung.dungeonsguide.mod.features;
 
 import com.google.gson.JsonObject;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.config.guiconfig.GuiConfigV2;
 import kr.syeyoung.dungeonsguide.mod.config.guiconfig.location.GuiGuiLocationConfig;
 import kr.syeyoung.dungeonsguide.mod.config.types.GUIRectangle;
 import kr.syeyoung.dungeonsguide.mod.config.types.TypeConverterRegistry;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ScreenRenderListener;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
 import kr.syeyoung.dungeonsguide.mod.gui.elements.*;
 import lombok.AccessLevel;
@@ -34,6 +34,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -42,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public abstract class GuiFeature extends AbstractFeature implements ScreenRenderListener {
+public abstract class GuiFeature extends AbstractFeature {
     @Setter
     private GUIRectangle featureRect;
     @Setter(value = AccessLevel.PROTECTED)
@@ -62,19 +64,23 @@ public abstract class GuiFeature extends AbstractFeature implements ScreenRender
         this.featureRect = new GUIRectangle(0, 0, width, height);
     }
 
-    @Override
-    public void drawScreen(float partialTicks) {
+    @SubscribeEvent
+    public void onRender(RenderGameOverlayEvent.Post postRender) {
+        if (!(postRender.type == RenderGameOverlayEvent.ElementType.EXPERIENCE || postRender.type == RenderGameOverlayEvent.ElementType.JUMPBAR)) return;
+
+        if (!SkyblockStatus.isOnSkyblock()) return;
+
         if (!isEnabled()) return;
 
         GlStateManager.pushMatrix();
-        Rectangle featureRect = this.featureRect.getRectangleNoScale();
+        Rectangle featureRect1 = this.featureRect.getRectangleNoScale();
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         GlStateManager.scale(1.0/scaledResolution.getScaleFactor(), 1.0/scaledResolution.getScaleFactor(), 1);
-        clip(featureRect.x, featureRect.y, featureRect.width, featureRect.height);
+        clip(featureRect1.x, featureRect1.y, featureRect1.width, featureRect1.height);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
-        GlStateManager.translate(featureRect.x, featureRect.y, 0);
-        drawHUD(partialTicks);
+        GlStateManager.translate(featureRect1.x, featureRect1.y, 0);
+        drawHUD(postRender.partialTicks);
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GlStateManager.popMatrix();
@@ -84,6 +90,7 @@ public abstract class GuiFeature extends AbstractFeature implements ScreenRender
         GlStateManager.color(1,1,1,1);
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
     }
 
 

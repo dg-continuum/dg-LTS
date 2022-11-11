@@ -18,9 +18,9 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.party;
 
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureTerminalSolvers;
-import kr.syeyoung.dungeonsguide.mod.features.listener.GuiPostRenderListener;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -33,16 +33,18 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-public class FeatureGoodParties extends SimpleFeature implements GuiPostRenderListener {
+public class FeatureGoodParties extends SimpleFeature {
     public FeatureGoodParties() {
         super("Party Kicker", "Highlight parties in party viewer", "Highlight parties you can't join with red", "partykicker.goodparty",true);
     }
 
-    @Override
-    public void onGuiPostRender(GuiScreenEvent.DrawScreenEvent.Post rendered) {
+    @SubscribeEvent
+    public void onGuiRender(GuiScreenEvent.DrawScreenEvent.Post render) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
         if (!isEnabled()) return;
         if (!(Minecraft.getMinecraft().currentScreen instanceof GuiChest)) return;
         GuiChest chest = (GuiChest) Minecraft.getMinecraft().currentScreen;
@@ -51,7 +53,7 @@ public class FeatureGoodParties extends SimpleFeature implements GuiPostRenderLi
         if (!"Party Finder".equals(name)) return;
 
 
-        FeatureTerminalSolvers.prepareDrawing(rendered);
+        FeatureTerminalSolvers.prepareDrawing(render);
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         try {
 
@@ -110,4 +112,5 @@ public class FeatureGoodParties extends SimpleFeature implements GuiPostRenderLi
         GlStateManager.enableBlend();
         GlStateManager.enableLighting();
     }
+
 }

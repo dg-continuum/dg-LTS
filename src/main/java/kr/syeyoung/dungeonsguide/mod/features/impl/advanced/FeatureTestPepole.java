@@ -3,9 +3,9 @@ package kr.syeyoung.dungeonsguide.mod.features.impl.advanced;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.mod.features.GuiFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonStartListener;
 import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.stomp.StompManager;
@@ -30,6 +30,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +45,7 @@ import java.util.regex.Pattern;
 
 import static kr.syeyoung.dungeonsguide.mod.utils.TabListUtil.getString;
 
-public class FeatureTestPepole extends GuiFeature implements ChatListener, DungeonStartListener {
+public class FeatureTestPepole extends GuiFeature {
 
     Logger logger = LogManager.getLogger("FeatureTestPepole");
     private Set<String> lastmebersRaw;
@@ -219,9 +220,10 @@ public class FeatureTestPepole extends GuiFeature implements ChatListener, Dunge
         readynessIndicator.put("go", true);
     }
 
-    @Override
-    public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
-        String txt = clientChatReceivedEvent.message.getFormattedText();
+    @SubscribeEvent
+    public void onRenderWorld(ClientChatReceivedEvent postRender) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        String txt = postRender.message.getFormattedText();
         if (!txt.startsWith("§r§9Party §8>")) return;
 
         String chat = TextUtils.stripColor(txt.substring(txt.indexOf(":") + 1)).trim().toLowerCase();
@@ -252,8 +254,8 @@ public class FeatureTestPepole extends GuiFeature implements ChatListener, Dunge
 
     }
 
-    @Override
-    public void onDungeonStart() {
+    @SubscribeEvent
+    public void onDungeonStart(DungeonStartedEvent leftEvent) {
         ready.clear();
     }
 

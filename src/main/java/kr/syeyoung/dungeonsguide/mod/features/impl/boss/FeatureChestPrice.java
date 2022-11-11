@@ -18,9 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.GuiBackgroundRenderListener;
 import kr.syeyoung.dungeonsguide.mod.utils.AhUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -34,6 +33,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -41,20 +42,21 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class FeatureChestPrice extends SimpleFeature implements GuiBackgroundRenderListener {
+public class FeatureChestPrice extends SimpleFeature {
     public FeatureChestPrice() {
         super("Dungeon", "Show Profit of Dungeon Reward Chests","Show Profit of Dungeon Chests", "bossfight.profitchest", false);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @Override
-    public void onGuiBGRender(GuiScreenEvent.BackgroundDrawnEvent rendered) {
+    @SubscribeEvent
+    public void onGuiRender(GuiScreenEvent.BackgroundDrawnEvent render) {
         if (!isEnabled()) return;
-        if (!(rendered.gui instanceof GuiChest)) return;
-        if (!DungeonsGuide.getDungeonsGuide().getSkyblockStatus().isOnDungeon()) return;
+        if (!(render.gui instanceof GuiChest)) return;
+        if (!SkyblockStatus.isOnDungeon()) return;
 
         GlStateManager.disableLighting();
 
-        ContainerChest chest = (ContainerChest) ((GuiChest) rendered.gui).inventorySlots;
+        ContainerChest chest = (ContainerChest) ((GuiChest) render.gui).inventorySlots;
         if (!chest.getLowerChestInventory().getName().endsWith("Chest")) return;
         IInventory actualChest = chest.getLowerChestInventory();
 
@@ -94,8 +96,8 @@ public class FeatureChestPrice extends SimpleFeature implements GuiBackgroundRen
         int i = 222;
         int j = i - 108;
         int ySize = j + (actualChest.getSizeInventory() / 9) * 18;
-        int left = (rendered.gui.width + 176) / 2;
-        int top = (rendered.gui.height - ySize ) / 2;
+        int left = (render.gui.width + 176) / 2;
+        int top = (render.gui.height - ySize ) / 2;
 
         int width = 120;
 
