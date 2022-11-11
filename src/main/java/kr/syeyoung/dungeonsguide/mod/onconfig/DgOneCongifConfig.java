@@ -482,6 +482,14 @@ public class DgOneCongifConfig extends Config {
     )
     public DungeonSBTime dsbt = new DungeonSBTime();
 
+    @Page(
+            name = "Watcher Spawn Alert",
+            description = "Alert when watcher says 'That will be enough for now'",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public WacherWarning ww = new WacherWarning();
+
 
     @Switch(
             name = "enabled",

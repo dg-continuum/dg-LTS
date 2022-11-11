@@ -18,61 +18,50 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.hud.TextHud;
+import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonEndListener;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonEndedEvent;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonLeftEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-public class FeatureWatcherWarning extends TextHUDFeature implements ChatListener, DungeonEndListener {
+public class FeatureWatcherWarning extends TextHud {
+
+    private long warning = 0;
 
     public FeatureWatcherWarning() {
-        super("Dungeon.Blood Room","Watcher Spawn Alert", "Alert when watcher says 'That will be enough for now'", "dungen.watcherwarn", true, getFontRenderer().getStringWidth("Watcher finished spawning all mobs!"), getFontRenderer().FONT_HEIGHT);
-        getStyles().add(new TextStyle("warning", new AColor(0xFF, 0x69,0x17,255), new AColor(0, 0,0,0), false));
-        setEnabled(false);
+        super(true);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
     @Override
-    public boolean isHUDViewable() {
+    protected boolean shouldShow() {
         return warning > System.currentTimeMillis();
     }
 
-    @Override
-    public List<String> getUsedTextStyle() {
-        return Collections.singletonList("warning");
+    @SubscribeEvent
+    public void onDungeonLeft(DungeonLeftEvent event) {
+        warning = 0;
     }
 
-    private final UUID lastRoomUID = UUID.randomUUID();
-    private long warning = 0;
-
-    private static final List<StyledText> text = new ArrayList<StyledText>();
-    static {
-        text.add(new StyledText("Watcher finished spawning all mobs!", "warning"));
+    @SubscribeEvent
+    public void onDungeonEnd(DungeonEndedEvent event) {
+        warning = 0;
     }
 
-    @Override
-    public List<StyledText> getText() {
-        return text;
-    }
-
-    @Override
-    public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
-        if (clientChatReceivedEvent.message.getFormattedText().equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r"))  {
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (event.message.getFormattedText().equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")) {
             warning = System.currentTimeMillis() + 2500;
             DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-            if (context ==null) return;
+            if (context == null) return;
             for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
                 if (dungeonRoom != null && dungeonRoom.getColor() == 18)
                     dungeonRoom.setCurrentState(DungeonRoom.RoomState.DISCOVERED);
@@ -81,7 +70,7 @@ public class FeatureWatcherWarning extends TextHUDFeature implements ChatListene
     }
 
     @Override
-    public void onDungeonEnd() {
-        warning = 0;
+    protected void getLines(List<String> lines, boolean example) {
+        lines.add("Watcher finished spawning all mobs!");
     }
 }
