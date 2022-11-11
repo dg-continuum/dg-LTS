@@ -508,6 +508,14 @@ public class DgOneCongifConfig extends Config {
     public DungeonScorePage dsc = new DungeonScorePage();
 
     @Page(
+            name = "Action Viewer",
+            description = "View List of actions that needs to be taken",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public ActionsViewerPage avp = new ActionsViewerPage();
+
+    @Page(
             name = "Party Ready List",
             description = "Check if your party member have said r or not",
             location = PageLocation.BOTTOM,

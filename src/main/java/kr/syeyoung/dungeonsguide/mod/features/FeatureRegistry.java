@@ -31,7 +31,6 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknameColo
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknamePrefix;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeaturePressAnyKeyToCloseChest;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.FeatureViewPlayerStatsOnJoin;
-import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeatureActions;
 import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeatureCreateRefreshLine;
 import kr.syeyoung.dungeonsguide.mod.features.impl.secret.PathfindLineProperties;
 import kr.syeyoung.dungeonsguide.mod.features.impl.secret.mechanicbrowser.FeatureMechanicBrowse;
@@ -53,7 +52,6 @@ public class FeatureRegistry {
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_GLOBAL;
     public static FeatureMechanicBrowse SECRET_BROWSE;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_SECRET_BROWSER;
-    public static FeatureActions SECRET_ACTIONS;
     public static FeatureCreateRefreshLine SECRET_CREATE_REFRESH_LINE;
     public static PathfindLineProperties SECRET_BLOOD_RUSH_LINE_PROPERTIES;
     public static PathfindLineProperties SECRET_LINE_PROPERTIES_AUTOPATHFIND;
@@ -95,7 +93,6 @@ public class FeatureRegistry {
         try {
             SECRET_LINE_PROPERTIES_GLOBAL = register(new PathfindLineProperties("Dungeon.Secrets.Preferences", "Global Line Settings", "Global Line Settings", "secret.lineproperties.global", true, null));
             SECRET_CREATE_REFRESH_LINE = register(new FeatureCreateRefreshLine());
-            SECRET_ACTIONS = register(new FeatureActions());
             SECRET_LINE_PROPERTIES_SECRET_BROWSER = register(new PathfindLineProperties("Dungeon.Secrets.Secret Browser", "Line Settings", "Line Settings when pathfinding using Secret Browser", "secret.lineproperties.secretbrowser", true, SECRET_LINE_PROPERTIES_GLOBAL));
             SECRET_BROWSE = register(new FeatureMechanicBrowse());
             categoryDescription.put("ROOT.Secrets.Keybinds", "Useful keybinds / Toggle Pathfind lines, Freeze Pathfind lines, Refresh pathfind line or Trigger pathfind (you would want to use it, if you're using Pathfind to All)");
