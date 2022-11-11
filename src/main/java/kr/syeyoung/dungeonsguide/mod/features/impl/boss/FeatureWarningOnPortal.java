@@ -29,15 +29,20 @@ import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonScore;
-import kr.syeyoung.dungeonsguide.mod.features.text.*;
+import kr.syeyoung.dungeonsguide.mod.features.text.PanelTextParameterConfig;
+import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
+import kr.syeyoung.dungeonsguide.mod.features.text.StyledTextProvider;
+import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
 import kr.syeyoung.dungeonsguide.mod.gui.MPanel;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonScoreUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextProvider {
     public FeatureWarningOnPortal() {
@@ -105,7 +110,7 @@ public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextP
     public List<StyledText> getText() {
         ArrayList<StyledText> texts = new ArrayList<StyledText>();
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        FeatureDungeonScore.ScoreCalculation scoreCalculation = FeatureRegistry.DUNGEON_SCORE.calculateScore();
+        DungeonScoreUtil.ScoreCalculation scoreCalculation = DungeonScoreUtil.calculateScore();
 
         boolean failed = context.getDungeonRoomList().stream().anyMatch(a -> a.getCurrentState() == DungeonRoom.RoomState.FAILED);
         if (context.getMapProcessor().getUndiscoveredRoom() > 0) {
@@ -139,7 +144,7 @@ public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextP
         texts.add(new StyledText("Score Estimate","field_name"));
         texts.add(new StyledText(": ","field_separator"));
         texts.add(new StyledText(sum+" ","field_value"));
-        texts.add(new StyledText("("+FeatureRegistry.DUNGEON_SCORE.getLetter(sum)+")\n","field_etc"));
+        texts.add(new StyledText("("+ DungeonScoreUtil.getLetter(sum)+")\n","field_etc"));
 
 
         texts.add(new StyledText("Skill","field_name"));

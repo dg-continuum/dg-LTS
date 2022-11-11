@@ -18,292 +18,66 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
+import cc.polyfrost.oneconfig.config.annotations.Checkbox;
+import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
-import kr.syeyoung.dungeonsguide.mod.utils.DungeonUtil;
-import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
-import kr.syeyoung.dungeonsguide.mod.utils.TimeScoreUtil;
-import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResource;
-import kr.syeyoung.dungeonsguide.mod.wsresource.StaticResourceCache;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.util.MathHelper;
+import kr.syeyoung.dungeonsguide.mod.utils.DungeonScoreUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-public class FeatureDungeonScore extends TextHUDFeature {
+public class FeatureDungeonScore extends TextHud {
+    @Checkbox(
+            name = "Show each score instead of sum",
+            description = "Skill: 100 Explore: 58 S->S+(5 tombs) instead of Score: 305"
+    )
+    public static boolean verbose = false;
+
     public FeatureDungeonScore() {
-        super("Dungeon.HUDs", "Display Current Score", "Calculate and Display current score\nThis data is from pure calculation and can be different from actual score.", "dungeon.stats.score", false, 200, getFontRenderer().FONT_HEIGHT * 4);
-        this.setEnabled(false);
-        addParameter("verbose", new FeatureParameter<Boolean>("verbose", "Show each score instead of sum", "Skill: 100 Explore: 58 S->S+(5 tombs) instead of Score: 305", true, "boolean"));
-
-        getStyles().add(new TextStyle("scorename", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("score", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("brackets", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("etc",  new AColor(0xAA,0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("currentScore", new AColor(0xFF, 0xAA,0x00,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("arrow",  new AColor(0xAA,0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("nextScore", new AColor(0xFF, 0xAA,0x00,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("required",  new AColor(0xAA,0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-    }
-
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-    @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon();
-    }
-
-    private static final java.util.List<StyledText> dummyText=  new ArrayList<StyledText>();
-    private static final java.util.List<StyledText> dummyText2=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Score","scorename"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("305 ","score"));
-        dummyText.add(new StyledText("(","brackets"));
-        dummyText.add(new StyledText("S+","currentScore"));
-        dummyText.add(new StyledText(")","brackets"));
-
-
-
-        dummyText2.add(new StyledText("Skill","scorename"));
-        dummyText2.add(new StyledText(": ","separator"));
-        dummyText2.add(new StyledText("100 ","score"));
-        dummyText2.add(new StyledText("(","brackets"));
-        dummyText2.add(new StyledText("0 Deaths","etc"));
-        dummyText2.add(new StyledText(")\n","brackets"));
-        dummyText2.add(new StyledText("Explorer","scorename"));
-        dummyText2.add(new StyledText(": ","separator"));
-        dummyText2.add(new StyledText("99 ","score"));
-        dummyText2.add(new StyledText("(","brackets"));
-        dummyText2.add(new StyledText("Rooms O Secrets 39/40","etc"));
-        dummyText2.add(new StyledText(")\n","brackets"));
-        dummyText2.add(new StyledText("Time","scorename"));
-        dummyText2.add(new StyledText(": ","separator"));
-        dummyText2.add(new StyledText("100 ","score"));
-        dummyText2.add(new StyledText("Bonus","scorename"));
-        dummyText2.add(new StyledText(": ","separator"));
-        dummyText2.add(new StyledText("0 ","score"));
-        dummyText2.add(new StyledText("Total","scorename"));
-        dummyText2.add(new StyledText(": ","separator"));
-        dummyText2.add(new StyledText("299\n","score"));
-        dummyText2.add(new StyledText("S","currentScore"));
-        dummyText2.add(new StyledText("->","arrow"));
-        dummyText2.add(new StyledText("S+ ","nextScore"));
-        dummyText2.add(new StyledText("(","brackets"));
-        dummyText2.add(new StyledText("1 Required 1 crypt","required"));
-        dummyText2.add(new StyledText(")","brackets"));
-
+        super(false);
     }
 
     @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("scorename", "separator", "score", "brackets", "etc", "currentScore", "arrow", "nextScore", "required");
-
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon();
     }
 
     @Override
-    public java.util.List<StyledText> getDummyText() {
+    protected void getLines(List<String> lines, boolean example) {
 
-        if (this.<Boolean>getParameter("verbose").getValue()) {return dummyText2;} else return dummyText;
-    }
+        if(example){
+            if(verbose){
+                lines.add("Score: 305 (S+)");
+            } else {
+                lines.add("Skill: 100 (0 Deaths)");
+                lines.add("Explorer: 99 (Rooms O Secrets 39/40)");
+                lines.add("Time: 100 Bonus: 0 Total: 299");
+                lines.add("S->S+ (1 Required 1 crypt)");
+            }
 
-    @Override
-    public java.util.List<StyledText> getText() {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
+            return;
+        }
 
-        ScoreCalculation score = calculateScore();
-        if (score == null) return new ArrayList<StyledText>();
-        int sum = score.time + score.skill + score.explorer + score.bonus;
-        if (this.<Boolean>getParameter("verbose").getValue()) {
-            actualBit.add(new StyledText("Skill", "scorename"));
-            actualBit.add(new StyledText(": ", "separator"));
-            actualBit.add(new StyledText(score.skill + " ", "score"));
-            actualBit.add(new StyledText("(", "brackets"));
-            actualBit.add(new StyledText(score.deaths + " Deaths", "etc"));
-            actualBit.add(new StyledText(")\n", "brackets"));
-            actualBit.add(new StyledText("Explorer", "scorename"));
-            actualBit.add(new StyledText(": ", "separator"));
-            actualBit.add(new StyledText(score.explorer + " ", "score"));
-            actualBit.add(new StyledText("(", "brackets"));
-            actualBit.add(new StyledText("Rooms " + (score.fullyCleared ? "O" : "X") + " Secrets " + score.secrets + "/" + score.effectiveTotalSecrets +" of "+score.getTotalSecrets() + (score.totalSecretsKnown ? "" : "?"), "etc"));
-            actualBit.add(new StyledText(")\n", "brackets"));
-            actualBit.add(new StyledText("Time", "scorename"));
-            actualBit.add(new StyledText(": ", "separator"));
-            actualBit.add(new StyledText(score.time + " ", "score"));
-            actualBit.add(new StyledText("Bonus", "scorename"));
-            actualBit.add(new StyledText(": ", "separator"));
-            actualBit.add(new StyledText(score.bonus + " ", "score"));
-            actualBit.add(new StyledText("Total", "scorename"));
-            actualBit.add(new StyledText(": ", "separator"));
-            actualBit.add(new StyledText(sum + "\n", "score"));
-            actualBit.addAll(buildRequirement(score));
+        DungeonScoreUtil.ScoreCalculation score = DungeonScoreUtil.calculateScore();
+        if (score == null) {
+            return;
+        }
+        int sum = score.getTime() + score.getSkill() + score.getExplorer() + score.getBonus();
+        if (verbose) {
+            lines.add("Skill: " + score.getSkill() + "(" + score.getDeaths() + ")");
+
+            lines.add("Explorer: " + score.getExplorer() + "(Rooms " + (score.isFullyCleared() ? "O" : "X") + " Secrets " + score.getSecrets() + "/" + score.getEffectiveTotalSecrets() + " of " + score.getTotalSecrets() + (score.isTotalSecretsKnown() ? "" : "?") + ")");
+
+            lines.add("Time: " + score.getTime() + " Bonus: " + score.getBonus() + " Total: " + sum);
+
+            lines.add(buildRequirement(score));
+
         } else {
-            String letter = getLetter(sum);
-            actualBit.add(new StyledText("Score", "scorename"));
-            actualBit.add(new StyledText(": ", "separator"));
-            actualBit.add(new StyledText(sum + " ", "score"));
-            actualBit.add(new StyledText("(", "brackets"));
-            actualBit.add(new StyledText(letter, "currentScore"));
-            actualBit.add(new StyledText(")", "brackets"));
+            String letter = DungeonScoreUtil.getLetter(sum);
+            lines.add("Score: ( " + sum + " " + letter + ")");
         }
 
-        return actualBit;
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class ScoreCalculation {
-        private int skill, explorer, time, bonus, tombs;
-        private boolean fullyCleared;
-        private int secrets, totalSecrets, effectiveTotalSecrets;
-        private boolean totalSecretsKnown;
-        private int deaths;
-    }
-
-    public int getCompleteRooms() {
-        for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
-            String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-            if (name.startsWith("§r Completed Rooms: §r")) {
-                String milestone = TextUtils.stripColor(name).substring(18);
-                return Integer.parseInt(milestone);
-            }
-        }
-        return 0;
-    }
-    public int getTotalRooms() {
-        int compRooms = getCompleteRooms();
-        if (compRooms == 0) return 100;
-        return (int) (100 * (compRooms / (double) DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage()));
-    }
-    public int getUndiscoveredPuzzles() {
-        int cnt = 0;
-        for (NetworkPlayerInfo networkPlayerInfoIn : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
-            String name = networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-            if (name.startsWith("§r ???: ")) {
-                cnt ++;
-            }
-        }
-        return cnt;
-    }
-
-    public ScoreCalculation calculateScore() {
-        if (!skyblockStatus.isOnDungeon()) return null;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (context == null) return null;
-        if (!context.getMapProcessor().isInitialized()) return null;
-
-        int skill = 100;
-        int deaths = 0;
-        {
-            deaths = DungeonUtil.getTotalDeaths();
-            skill -= DungeonUtil.getTotalDeaths() * 2;
-            int totalCompRooms= 0;
-            int roomCnt = 0;
-            int roomSkillPenalty = 0;
-//            boolean bossroomIncomplete = true;
-            boolean traproomIncomplete = context.isTrapRoomGen();
-            int incompletePuzzles = getUndiscoveredPuzzles();
-
-            for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-//                if (dungeonRoom.getColor() == 74 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
-//                    bossroomIncomplete = false;
-                if (dungeonRoom.getColor() == 62 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
-                    traproomIncomplete = false;
-                if (dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
-                    totalCompRooms += dungeonRoom.getUnitPoints().size();
-                if (dungeonRoom.getColor() == 66 && (dungeonRoom.getCurrentState() == DungeonRoom.RoomState.DISCOVERED || dungeonRoom.getCurrentState() == DungeonRoom.RoomState.FAILED)) // INCOMPLETE PUZZLE ON MAP
-                    incompletePuzzles++;
-                roomCnt += dungeonRoom.getUnitPoints().size();
-            }
-            roomSkillPenalty += incompletePuzzles * 10;
-            if (context.getMapProcessor().getUndiscoveredRoom() != 0)
-                roomCnt = getTotalRooms();
-            roomSkillPenalty += (roomCnt - totalCompRooms) * 4;
-//            if (bossroomIncomplete) roomSkillPenalty -=1;
-            if (traproomIncomplete) roomSkillPenalty -=1;
-
-
-            skill -= roomSkillPenalty;
-
-
-
-            skill = MathHelper.clamp_int(skill, 0, 100);
-        }
-        int explorer = 0;
-        boolean fullyCleared = false;
-        boolean totalSecretsKnown = true;
-        int totalSecrets = 0;
-        int secrets = 0;
-        {
-            int completed = 0;
-            double total = 0;
-
-            for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
-                if (dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.FAILED)
-                    completed += dungeonRoom.getUnitPoints().size();
-                total += dungeonRoom.getUnitPoints().size();
-            }
-
-            totalSecrets =  DungeonUtil.getTotalSecretsInt() ;
-            totalSecretsKnown = DungeonUtil.sureOfTotalSecrets();
-
-            fullyCleared = completed >= getTotalRooms() && context.getMapProcessor().getUndiscoveredRoom() == 0;
-            explorer += MathHelper.clamp_int((int) Math.floor(6.0 / 10.0 * (context.getMapProcessor().getUndiscoveredRoom() != 0 ? DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() : completed / total * 100)), 0, 60);
-            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = DungeonUtil.getSecretsFound()) / Math.ceil(totalSecrets * context.getSecretPercentage())),0,40);
-        }
-        int time = 0;
-        {
-            int maxTime = context.getMaxSpeed();
-//            int timeSec = FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed() / 1000 - maxTime + 480;
-//
-//            if (timeSec <= 480) time = 100;
-//            else if (timeSec <= 580) time = (int) Math.ceil(148 - 0.1 * timeSec);
-//            else if (timeSec <= 980) time = (int) Math.ceil(119 - 0.05 * timeSec);
-//            else if (timeSec < 3060) time = (int) Math.ceil(3102 - (1/30.0) * timeSec);
-//            time = MathHelper.clamp_int(time, 0, 100); // just in case.
-            time = TimeScoreUtil.estimate(DungeonUtil.getTimeElapsed(), maxTime);
-        }
-        int bonus = 0;
-        int tombs;
-        {
-            bonus += tombs = MathHelper.clamp_int(DungeonUtil.getTombsFound(), 0, 5);
-            if (context.isGotMimic()) bonus += 2;
-            CompletableFuture<StaticResource> staticResourceCompletableFuture = StaticResourceCache.INSTANCE.getResource(StaticResourceCache.BONUS_SCORE);
-            if (staticResourceCompletableFuture.isDone()) {
-                try {
-                    bonus += Integer.parseInt(staticResourceCompletableFuture.get().getValue().trim());
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // amazing thing
-        return new ScoreCalculation(skill, explorer, time, bonus, tombs, fullyCleared, secrets, totalSecrets, (int)Math.ceil (totalSecrets * context.getSecretPercentage()), totalSecretsKnown, deaths);
-    }
-    public String getLetter(int score) {
-        if (score <= 99) return "D";
-        if (score <= 159) return "C";
-        if (score <= 229) return "B";
-        if (score <= 269) return "A";
-        if (score <= 299) return "S";
-        return "S+";
-    }
     public int getScoreRequirement(String letter) {
         if (letter.equals("D")) return 0;
         if (letter.equals("C")) return 100;
@@ -313,6 +87,7 @@ public class FeatureDungeonScore extends TextHUDFeature {
         if (letter.equals("S+")) return 300;
         return -1;
     }
+
     public String getNextLetter(String letter) {
         if (letter.equals("D")) return "C";
         if (letter.equals("C")) return "B";
@@ -321,31 +96,26 @@ public class FeatureDungeonScore extends TextHUDFeature {
         if (letter.equals("S")) return "S+";
         else return null;
     }
-    public List<StyledText> buildRequirement(ScoreCalculation calculation) {
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        int current = calculation.time + calculation.bonus + calculation.explorer + calculation.skill;
-        String currentLetter = getLetter(current);
-        String nextLetter=  getNextLetter(currentLetter);
+
+    public String buildRequirement(DungeonScoreUtil.ScoreCalculation calculation) {
+        int current = calculation.getTime() + calculation.getBonus() + calculation.getExplorer() + calculation.getSkill();
+        String currentLetter = DungeonScoreUtil.getLetter(current);
+        String nextLetter = getNextLetter(currentLetter);
         if (nextLetter == null) {
-            actualBit.add(new StyledText("S+ Expected","nextScore"));
-            return actualBit;
+            return "S+ Expected";
         }
         int req = getScoreRequirement(nextLetter);
-        int reqPT2 = req-  current;
+        int reqPT2 = req - current;
         int reqPT = req - current;
 
-        int tombsBreakable = Math.min(5 - calculation.tombs, reqPT);
+        int tombsBreakable = Math.min(5 - calculation.getTombs(), reqPT);
         reqPT -= tombsBreakable;
 
-        double secretPer = 40.0 / calculation.effectiveTotalSecrets;
+        double secretPer = 40.0 / calculation.getEffectiveTotalSecrets();
         int secrets = (int) Math.ceil(reqPT / secretPer);
 
-        actualBit.add(new StyledText(currentLetter,"currentScore"));
-        actualBit.add(new StyledText("->","arrow"));
-        actualBit.add(new StyledText(nextLetter+" ","nextScore"));
-        actualBit.add(new StyledText("(","brackets"));
-        actualBit.add(new StyledText(reqPT2+" required "+tombsBreakable+" crypt "+secrets+" secrets","required"));
-        actualBit.add(new StyledText(")","brackets"));
-        return actualBit;
+        return currentLetter + "->" + nextLetter + " (" + reqPT2 + " required " + tombsBreakable + " crypt " + secrets + " secrets)";
+
     }
+
 }

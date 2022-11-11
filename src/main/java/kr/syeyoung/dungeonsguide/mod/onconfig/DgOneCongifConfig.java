@@ -498,6 +498,15 @@ public class DgOneCongifConfig extends Config {
     )
     public PartyListPage plp = new PartyListPage();
 
+
+    @Page(
+            name = "Display Current Score",
+            description = "Calculate and Display current score. This data is from pure calculation and can be different from actual score.",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public DungeonScorePage dsc = new DungeonScorePage();
+
     @Switch(
             name = "enabled",
             size = 2,
