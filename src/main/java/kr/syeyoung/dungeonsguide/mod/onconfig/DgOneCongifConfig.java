@@ -621,6 +621,14 @@ public class DgOneCongifConfig extends Config {
     private static SpiritBowTimer sbt = new SpiritBowTimer();
 
     @Page(
+            name = "View Ability Cooldowns",
+            description = "A handy hud for viewing cooldown abilities",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    private static AboliityCooldown acd = new AboliityCooldown();
+
+    @Page(
             name = "Display Current Phase",
             description = "Displays the current phase of bossfight",
             location = PageLocation.BOTTOM,

@@ -29,7 +29,6 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknamePref
 import kr.syeyoung.dungeonsguide.mod.features.impl.discord.inviteViewer.PartyInviteViewer;
 import kr.syeyoung.dungeonsguide.mod.features.impl.discord.onlinealarm.PlayingDGAlarm;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.*;
-import kr.syeyoung.dungeonsguide.mod.features.impl.etc.ability.FeatureAbilityCooldown;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyList;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyReady;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.FeatureViewPlayerStatsOnJoin;
@@ -117,7 +116,6 @@ public class FeatureRegistry {
     public static FeatureViewPlayerStatsOnJoin PARTYKICKER_VIEWPLAYER;
     public static FeaturePartyList PARTY_LIST;
     public static FeaturePartyReady PARTY_READY;
-    public static FeatureAbilityCooldown ETC_ABILITY_COOLDOWN;
 
 
 
@@ -178,7 +176,6 @@ public class FeatureRegistry {
             PARTYKICKER_VIEWPLAYER = register(new FeatureViewPlayerStatsOnJoin());
             PARTY_LIST = register(new FeaturePartyList());
             PARTY_READY = register(new FeaturePartyReady());
-            ETC_ABILITY_COOLDOWN = register(new FeatureAbilityCooldown());
 
             COSMETIC_NICKNAMECOLOR = register(new FeatureNicknameColor());
             COSMETIC_PREFIX = register(new FeatureNicknamePrefix());
