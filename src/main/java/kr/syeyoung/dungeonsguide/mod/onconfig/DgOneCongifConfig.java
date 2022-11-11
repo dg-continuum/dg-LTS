@@ -557,6 +557,14 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean closeChestHelper = true;
 
+    @Switch(
+            name = "Show Profit of Dungeon Reward Chests",
+            description = "Show Profit of Dungeon Chests",
+            size = 2,
+            category = "Misc"
+    )
+    public static boolean chestProfit = true;
+
     @Slider(
             name = "Price Threshold",
             min = 1_000_000F,

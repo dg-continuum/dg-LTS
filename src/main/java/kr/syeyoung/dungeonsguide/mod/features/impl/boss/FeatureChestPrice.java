@@ -19,7 +19,8 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss;
 
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.mod.utils.AhUtils;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -42,15 +43,15 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class FeatureChestPrice extends SimpleFeature {
+public class FeatureChestPrice extends SimpleFeatureV2 {
     public FeatureChestPrice() {
-        super("Dungeon", "Show Profit of Dungeon Reward Chests","Show Profit of Dungeon Chests", "bossfight.profitchest", false);
+        super("bossfight.profitchest");
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onGuiRender(GuiScreenEvent.BackgroundDrawnEvent render) {
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.chestProfit) return;
         if (!(render.gui instanceof GuiChest)) return;
         if (!SkyblockStatus.isOnDungeon()) return;
 
