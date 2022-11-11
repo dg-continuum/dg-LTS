@@ -65,7 +65,7 @@ public class FeatureDungeonMilestone extends SingleTextHud {
         if (example) {
             return "9";
         }
-
+        if(Minecraft.getMinecraft().thePlayer == null) return "";
         for (val player : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
             String name = player.getDisplayName() != null ? player.getDisplayName().getFormattedText() : ScorePlayerTeam.formatPlayerName(player.getPlayerTeam(), player.getGameProfile().getName());
             if (name.startsWith("§r Milestone: §r")) {
