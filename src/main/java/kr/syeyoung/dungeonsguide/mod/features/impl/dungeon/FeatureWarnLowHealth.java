@@ -68,6 +68,7 @@ public class FeatureWarnLowHealth extends TextHud {
             lines.add("Steve is low: 500hp");
             return;
         }
+        if(Minecraft.getMinecraft().thePlayer == null) return;
 
         String lowestHealthName = "";
         int lowestHealth = Integer.MAX_VALUE;
