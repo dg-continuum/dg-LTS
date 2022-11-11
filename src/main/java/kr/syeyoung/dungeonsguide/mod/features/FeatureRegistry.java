@@ -76,7 +76,6 @@ public class FeatureRegistry {
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
     public static SimpleFeature BOSSFIGHT_CHESTPRICE;
     public static FeatureAutoReparty BOSSFIGHT_AUTOREPARTY;
-    public static FeatureHideAnimals BOSSFIGHT_HIDE_ANIMALS;
     public static FeatureBoxRealLivid BOSSFIGHT_BOX_REALLIVID;
     public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureSimonSaysSolver BOSSFIGHT_SIMONSAYS_SOLVER;
@@ -135,7 +134,6 @@ public class FeatureRegistry {
             BOSSFIGHT_WARNING_ON_PORTAL = register(new FeatureWarningOnPortal());
             BOSSFIGHT_CHESTPRICE = register(new FeatureChestPrice());
             BOSSFIGHT_AUTOREPARTY = register(new FeatureAutoReparty());
-            BOSSFIGHT_HIDE_ANIMALS = register(new FeatureHideAnimals());
             BOSSFIGHT_BOX_REALLIVID = register(new FeatureBoxRealLivid());
             BOSSFIGHT_TERMINAL_SOLVERS = register(new FeatureTerminalSolvers());
             BOSSFIGHT_SIMONSAYS_SOLVER = register(new FeatureSimonSaysSolver());

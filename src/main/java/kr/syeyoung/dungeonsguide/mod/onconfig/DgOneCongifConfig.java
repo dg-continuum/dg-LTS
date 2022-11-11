@@ -10,6 +10,7 @@ import kr.syeyoung.dungeonsguide.mod.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonMap;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
+import kr.syeyoung.dungeonsguide.mod.onconfig.dungeon.HideAnimal;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.HighlightMobs;
@@ -392,6 +393,14 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Mobs"
     )
     static HighlightMobs hb = new HighlightMobs();
+
+    @Page(
+            name = "Hide Animals",
+            description = "Hide Spirit Animals on F4. Click on Edit for precise setting",
+            location = PageLocation.BOTTOM,
+            category = "dungeon"
+    )
+    static HideAnimal ha = new HideAnimal();
 
 
     @Page(

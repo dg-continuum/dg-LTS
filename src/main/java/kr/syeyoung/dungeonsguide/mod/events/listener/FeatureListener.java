@@ -471,18 +471,6 @@ public class FeatureListener {
         }
     }
     @SubscribeEvent
-    public void onDungeonInitialize(BossroomEnterEvent enterEvent) {
-        try {
-            for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
-                if (abstractFeature instanceof BossroomEnterListener) {
-                    ((BossroomEnterListener) abstractFeature).onBossroomEnter();
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    @SubscribeEvent
     public void onDungeonInitialize(DungeonEndedEvent endedEvent) {
         try {
             for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {
