@@ -490,6 +490,13 @@ public class DgOneCongifConfig extends Config {
     )
     public WacherWarning ww = new WacherWarning();
 
+    @Page(
+            name = "Party List",
+            description = "Party List as GUI",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public PartyListPage plp = new PartyListPage();
 
     @Switch(
             name = "enabled",

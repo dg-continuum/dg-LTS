@@ -18,80 +18,51 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.party;
 
+import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.mod.party.PartyContext;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class FeaturePartyList extends TextHUDFeature {
+public class FeaturePartyList extends TextHud {
     public FeaturePartyList() {
-        super("Party","Party List", "Party List as GUI", "party.list", false, getFontRenderer().getStringWidth("Watcher finished spawning all mobs!"), getFontRenderer().FONT_HEIGHT*4);
-        getStyles().add(new TextStyle("name", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("player", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("allinvite", new AColor(0xAA,0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        setEnabled(false);
+        super(false);
     }
+
 
     @Override
-    public boolean isHUDViewable() {
-        return  PartyManager.INSTANCE.getPartyContext() != null;
+    protected boolean shouldShow() {
+        return PartyManager.INSTANCE.getPartyContext() != null;
     }
+
+
 
     @Override
-    public java.util.List<String> getUsedTextStyle() {
-        return Arrays.asList("name" ,"separator", "player", "allinvite");
-    }
+    protected void getLines(List<String> lines, boolean example) {
+        if(example){
+            lines.add("Leader: RaidShadowLegends");
+            lines.add("Moderator: rioho, Tricked");
+            lines.add("Member: steve");
+            lines.add("All invite Off");
+            return;
+        }
 
-    private static final List<StyledText> dummyText = new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Leader","name"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("syeyoung","player"));
-        dummyText.add(new StyledText("\nModerator","name"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("rioho, RaidShadowLegends, Tricked","player"));
-        dummyText.add(new StyledText("\nMember","name"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("Everyone","player"));
-        dummyText.add(new StyledText("\nAll invite Off","allinvite"));
-    }
-
-    @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public boolean doesScaleWithHeight() {
-        return false;
-    }
-
-    @Override
-    public List<StyledText> getText() {
         PartyContext pc = PartyManager.INSTANCE.getPartyContext();
-        List<StyledText> text= new ArrayList<>();
-            text.add(new StyledText("Leader","name"));
-            text.add(new StyledText(": ","separator"));
-            text.add(new StyledText(pc.getPartyOwner()+"","player"));
-            text.add(new StyledText("\nModerator","name"));
-            text.add(new StyledText(": ","separator"));
-            text.add(new StyledText(pc.getPartyModerator() == null ? "????" : String.join(", ", pc.getPartyModerator()) + (pc.isModeratorComplete() ? "" : " ?"),"player"));
-            text.add(new StyledText("\nMember","name"));
-            text.add(new StyledText(": ","separator"));
-            text.add(new StyledText(pc.getPartyMember() == null ? "????" : String.join(", ", pc.getPartyMember()) + (pc.isMemberComplete() ? "" : " ?"),"player"));
-            if (pc.getAllInvite() != null && !pc.getAllInvite())
-                text.add(new StyledText("\nAll invite Off","allinvite"));
-            else if (pc.getAllInvite() != null)
-                text.add(new StyledText("\nAll invite On","allinvite"));
-            else
-                text.add(new StyledText("\nAll invite Unknown","allinvite"));
-        return text;
+
+        if(pc == null) return;
+
+        lines.add("Leader: " + pc.getPartyOwner());
+        lines.add("Moderator: " + (pc.getPartyModerator() == null ? "????" : String.join(", ", pc.getPartyModerator()) + (pc.isModeratorComplete() ? "" : " ?")));
+        lines.add("Member: " + (pc.getPartyMember() == null ? "????" : String.join(", ", pc.getPartyMember()) + (pc.isMemberComplete() ? "" : " ?")));
+
+        if (pc.getAllInvite() != null && !pc.getAllInvite()) {
+            lines.add(" All invite Off");
+        } else if (pc.getAllInvite() != null) {
+            lines.add(" All invite On");
+        } else {
+            lines.add(" All invite Unknown");
+        }
+
+
     }
 }

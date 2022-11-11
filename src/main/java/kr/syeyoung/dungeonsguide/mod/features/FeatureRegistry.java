@@ -71,7 +71,6 @@ public class FeatureRegistry {
     public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureSimonSaysSolver BOSSFIGHT_SIMONSAYS_SOLVER;
     public static FeatureViewPlayerStatsOnJoin PARTYKICKER_VIEWPLAYER;
-    public static FeaturePartyList PARTY_LIST;
     public static FeaturePartyReady PARTY_READY;
     public static FeatureNicknamePrefix COSMETIC_PREFIX;
     public static FeatureNicknameColor COSMETIC_NICKNAMECOLOR;
@@ -120,7 +119,6 @@ public class FeatureRegistry {
             BOSSFIGHT_TERMINAL_SOLVERS = register(new FeatureTerminalSolvers());
             BOSSFIGHT_SIMONSAYS_SOLVER = register(new FeatureSimonSaysSolver());
             PARTYKICKER_VIEWPLAYER = register(new FeatureViewPlayerStatsOnJoin());
-            PARTY_LIST = register(new FeaturePartyList());
             PARTY_READY = register(new FeaturePartyReady());
 
             COSMETIC_NICKNAMECOLOR = register(new FeatureNicknameColor());
