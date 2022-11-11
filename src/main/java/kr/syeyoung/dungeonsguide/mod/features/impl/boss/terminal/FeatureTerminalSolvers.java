@@ -18,8 +18,9 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal;
 
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
-import kr.syeyoung.dungeonsguide.mod.features.listener.*;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -29,19 +30,18 @@ import net.minecraft.inventory.Slot;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FeatureTerminalSolvers extends SimpleFeature implements GuiOpenListener, TickListener, GuiPostRenderListener, GuiClickListener, TooltipListener {
-    public FeatureTerminalSolvers() {
-        super("Dungeon.Bossfight.Floor 7+","F7 GUI Terminal Solver", "Solve f7 gui terminals. (color, startswith, order, navigate, correct panes)", "bossfight.terminals");
-    }
+public class FeatureTerminalSolvers extends SimpleFeatureV2 {
+    public static final List<TerminalSolutionProvider> solutionProviders = new ArrayList<>();
 
-    public static final List<TerminalSolutionProvider> solutionProviders = new ArrayList<TerminalSolutionProvider>();
-
-    static  {
+    static {
         solutionProviders.add(new WhatStartsWithSolutionProvider());
         solutionProviders.add(new SelectAllColorSolutionProivider());
         solutionProviders.add(new SelectInOrderSolutionProvider());
@@ -49,64 +49,46 @@ public class FeatureTerminalSolvers extends SimpleFeature implements GuiOpenList
         solutionProviders.add(new CorrectThePaneSolutionProvider());
     }
 
+    private final List<Slot> clicked = new ArrayList<>();
     private TerminalSolutionProvider solutionProvider;
     private TerminalSolution solution;
-    private final List<Slot> clicked = new ArrayList<Slot>();
 
-    @Override
-    public void onGuiOpen(GuiOpenEvent event) {
-        if (!isEnabled()) return;
-        solution = null;
-        solutionProvider = null;
-        clicked.clear();
-        if (event.gui instanceof GuiChest) {
-            ContainerChest cc = (ContainerChest) ((GuiChest) event.gui).inventorySlots;
-            for (TerminalSolutionProvider solutionProvider : solutionProviders) {
-                if (solutionProvider.isApplicable(cc)) {
-                    solution = solutionProvider.provideSolution(cc, clicked);
-                    this.solutionProvider = solutionProvider;
-                }
-            }
-        }
+    public FeatureTerminalSolvers() {
+        super("bossfight.terminals");
     }
 
-    @Override
-    public void onTick() {
-        if (!isEnabled()) return;
+    @SubscribeEvent
+    public void dungeonTooltip(ItemTooltipEvent event) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.terminalSolver) return;
         if (solutionProvider == null) return;
-        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiChest)) {
-            solution = null;
-            solutionProvider = null;
-            clicked.clear();
-            return;
-        }
-        ContainerChest cc = (ContainerChest) ((GuiChest) Minecraft.getMinecraft().currentScreen).inventorySlots;
+        event.toolTip.clear();
 
-        solution = solutionProvider.provideSolution(cc, clicked);
     }
 
-    @Override
-    public void onGuiPostRender(GuiScreenEvent.DrawScreenEvent.Post rendered) {
-        if (!isEnabled()) return;
+    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGH)
+    public void onPreMouse(GuiScreenEvent.MouseInputEvent.Pre e) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.terminalSolver) return;
+        if (Mouse.getEventButton() == -1) return;
         if (solutionProvider == null) return;
-        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiChest)) {
-            solution = null;
-            solutionProvider = null;
-            clicked.clear();
+        if (solution == null) return;
+        if (solution.getCurrSlots() == null) {
             return;
         }
+        Slot s = ((GuiChest) Minecraft.getMinecraft().currentScreen).getSlotUnderMouse();
+        if (solution.getCurrSlots().contains(s)) {
+            clicked.add(s);
+        }
+
+    }
+
+    @SubscribeEvent
+    public void onGuiRender(GuiScreenEvent.DrawScreenEvent.Post render) {
+        if (stateChecks()) return;
 
         if (solution != null) {
-            int i = 222;
-            int j = i - 108;
-            int ySize = j + (((ContainerChest)(((GuiChest) Minecraft.getMinecraft().currentScreen).inventorySlots)).getLowerChestInventory().getSizeInventory() / 9) * 18;
-            int left = (rendered.gui.width - 176) / 2;
-            int top = (rendered.gui.height - ySize ) / 2;
-            GlStateManager.pushMatrix();
-            GlStateManager.disableDepth();
-            GlStateManager.disableLighting();
-            GlStateManager.colorMask(true, true, true, false);
-            GlStateManager.translate(left, top, 0);
+            prepareDrawing(render);
             if (solution.getCurrSlots() != null) {
                 for (Slot currSlot : solution.getCurrSlots()) {
                     int x = currSlot.xDisplayPosition;
@@ -128,26 +110,61 @@ public class FeatureTerminalSolvers extends SimpleFeature implements GuiOpenList
         GlStateManager.enableLighting();
     }
 
-    @Override
-    public void onMouseInput(GuiScreenEvent.MouseInputEvent.Pre mouseInputEvent) {
-        if (!isEnabled()) return;
-        if (Mouse.getEventButton() == -1) return;
-        if (solutionProvider == null) return;
-        if (solution == null) return;
-        if (solution.getCurrSlots() == null) {
-            return;
+    public static void prepareDrawing(GuiScreenEvent.DrawScreenEvent.Post render) {
+        int i = 222;
+        int j = i - 108;
+        int ySize = j + (((ContainerChest) (((GuiChest) Minecraft.getMinecraft().currentScreen).inventorySlots)).getLowerChestInventory().getSizeInventory() / 9) * 18;
+        int left = (render.gui.width - 176) / 2;
+        int top = (render.gui.height - ySize) / 2;
+        GlStateManager.pushMatrix();
+        GlStateManager.disableDepth();
+        GlStateManager.disableLighting();
+        GlStateManager.colorMask(true, true, true, false);
+        GlStateManager.translate(left, top, 0);
+    }
+
+    private boolean stateChecks() {
+        if (!SkyblockStatus.isOnSkyblock()) return true;
+
+        if (!DgOneCongifConfig.terminalSolver) return true;
+        if (solutionProvider == null) return true;
+        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiChest)) {
+            solution = null;
+            solutionProvider = null;
+            clicked.clear();
+            return true;
         }
-        Slot s = ((GuiChest) Minecraft.getMinecraft().currentScreen).getSlotUnderMouse();
-        if (solution.getCurrSlots().contains(s)) {
-            clicked.add(s);
-            return;
+        return false;
+    }
+
+    @SubscribeEvent
+    public void onGuiOpenn(GuiOpenEvent tick) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (!DgOneCongifConfig.terminalSolver) return;
+        solution = null;
+        solutionProvider = null;
+        clicked.clear();
+        if (tick.gui instanceof GuiChest) {
+            ContainerChest cc = (ContainerChest) ((GuiChest) tick.gui).inventorySlots;
+            for (TerminalSolutionProvider solutionProvider1 : solutionProviders) {
+                if (solutionProvider1.isApplicable(cc)) {
+                    solution = solutionProvider1.provideSolution(cc, clicked);
+                    this.solutionProvider = solutionProvider1;
+                }
+            }
         }
     }
 
-    @Override
-    public void onTooltip(ItemTooltipEvent event) {
-        if (!isEnabled()) return;
-        if (solutionProvider == null) return;
-        event.toolTip.clear();
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent tick) {
+        if (tick.phase == TickEvent.Phase.END && tick.type == TickEvent.Type.CLIENT) {
+            if (stateChecks()) return;
+            ContainerChest cc = (ContainerChest) ((GuiChest) Minecraft.getMinecraft().currentScreen).inventorySlots;
+
+            solution = solutionProvider.provideSolution(cc, clicked);
+
+        }
     }
+
+
 }

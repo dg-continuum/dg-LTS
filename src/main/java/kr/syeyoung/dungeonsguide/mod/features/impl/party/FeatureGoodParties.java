@@ -19,6 +19,7 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.party;
 
 import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureTerminalSolvers;
 import kr.syeyoung.dungeonsguide.mod.features.listener.GuiPostRenderListener;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -50,16 +51,7 @@ public class FeatureGoodParties extends SimpleFeature implements GuiPostRenderLi
         if (!"Party Finder".equals(name)) return;
 
 
-        int i = 222;
-        int j = i - 108;
-        int ySize = j + (((ContainerChest)(((GuiChest) Minecraft.getMinecraft().currentScreen).inventorySlots)).getLowerChestInventory().getSizeInventory() / 9) * 18;
-        int left = (rendered.gui.width - 176) / 2;
-        int top = (rendered.gui.height - ySize ) / 2;
-        GlStateManager.pushMatrix();
-        GlStateManager.disableDepth();
-        GlStateManager.disableLighting();
-        GlStateManager.colorMask(true, true, true, false);
-        GlStateManager.translate(left, top, 0);
+        FeatureTerminalSolvers.prepareDrawing(rendered);
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         try {
 

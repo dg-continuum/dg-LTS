@@ -129,6 +129,13 @@ public class DgOneCongifConfig extends Config {
     public static boolean simonySaysSolver = true;
 
     @Switch(
+            name = "F7 GUI Terminal Solver",
+            description = "Solve f7 gui terminals. (color, startswith, order, navigate, correct panes)",
+            category = "Solvers"
+    )
+    public static boolean terminalSolver = true;
+
+    @Switch(
             name = "Creeper",
             description = "Draws line between prismarine lamps in creeper room",
             category = "Solvers"

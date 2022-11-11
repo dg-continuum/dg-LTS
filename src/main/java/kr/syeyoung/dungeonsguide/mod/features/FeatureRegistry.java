@@ -24,7 +24,6 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.advanced.FeatureRoomDebugInfo
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.FeatureAutoReparty;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.FeatureChestPrice;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.FeatureWarningOnPortal;
-import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureTerminalSolvers;
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknameColor;
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknamePrefix;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeaturePressAnyKeyToCloseChest;
@@ -63,7 +62,6 @@ public class FeatureRegistry {
     public static FeatureWarningOnPortal BOSSFIGHT_WARNING_ON_PORTAL;
     public static SimpleFeature BOSSFIGHT_CHESTPRICE;
     public static FeatureAutoReparty BOSSFIGHT_AUTOREPARTY;
-    public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureViewPlayerStatsOnJoin PARTYKICKER_VIEWPLAYER;
     public static FeatureNicknamePrefix COSMETIC_PREFIX;
     public static FeatureNicknameColor COSMETIC_NICKNAMECOLOR;
@@ -106,7 +104,6 @@ public class FeatureRegistry {
             BOSSFIGHT_WARNING_ON_PORTAL = register(new FeatureWarningOnPortal());
             BOSSFIGHT_CHESTPRICE = register(new FeatureChestPrice());
             BOSSFIGHT_AUTOREPARTY = register(new FeatureAutoReparty());
-            BOSSFIGHT_TERMINAL_SOLVERS = register(new FeatureTerminalSolvers());
             PARTYKICKER_VIEWPLAYER = register(new FeatureViewPlayerStatsOnJoin());
 
             COSMETIC_NICKNAMECOLOR = register(new FeatureNicknameColor());
