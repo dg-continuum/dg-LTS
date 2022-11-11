@@ -507,6 +507,14 @@ public class DgOneCongifConfig extends Config {
     )
     public DungeonScorePage dsc = new DungeonScorePage();
 
+    @Page(
+            name = "Party Ready List",
+            description = "Check if your party member have said r or not",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public PartyReadyPage pr = new PartyReadyPage();
+
     @Switch(
             name = "enabled",
             size = 2,

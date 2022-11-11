@@ -18,132 +18,47 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.party;
 
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import cc.polyfrost.oneconfig.hud.TextHud;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.mod.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
-import kr.syeyoung.dungeonsguide.mod.features.listener.DungeonStartListener;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.mod.party.PartyContext;
 import kr.syeyoung.dungeonsguide.mod.party.PartyManager;
 import kr.syeyoung.dungeonsguide.mod.utils.TextUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.*;
 
-public class FeaturePartyReady extends TextHUDFeature implements ChatListener, DungeonStartListener {
+public class FeaturePartyReady extends TextHud {
     public FeaturePartyReady() {
-        super("Party","Party Ready List", "Check if your party member have said r or not", "party.readylist", false, getFontRenderer().getStringWidth("Watcher finished spawning all mobs!"), getFontRenderer().FONT_HEIGHT*4);
-        getStyles().add(new TextStyle("player", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("ready", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("notready", new AColor(0xFF, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("terminal", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        setEnabled(true);
+        super(true);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @Override
-    public boolean isHUDViewable() {
-        return  PartyManager.INSTANCE.getPartyContext() != null && PartyManager.INSTANCE.getPartyContext().isPartyExistHypixel() && "Dungeon Hub".equals(DungeonContext.getDungeonName());
+    @SubscribeEvent
+    public void onDungeonStart(DungeonStartedEvent leftEvent) {
+        ready.clear();
+        terminal.clear();
     }
 
-    @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("separator", "player", "ready", "notready", "terminal");
-    }
-
-    private static final List<StyledText> dummyText = new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("syeyoung","player"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("Ready","ready"));
-        dummyText.add(new StyledText(" 4","terminal"));
-        dummyText.add(new StyledText("\nrioho","player"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("Ready","ready"));
-        dummyText.add(new StyledText(" 3","terminal"));
-        dummyText.add(new StyledText("\nRaidShadowLegends","player"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("Not Ready","notready"));
-        dummyText.add(new StyledText(" 2t","terminal"));
-        dummyText.add(new StyledText("\nTricked","player"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("Ready","ready"));
-        dummyText.add(new StyledText(" ss","terminal"));
-        dummyText.add(new StyledText("\nMr. Penguin","player"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("Not Ready","notready"));
-        dummyText.add(new StyledText(" 2b","terminal"));
-    }
-
-    @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
-    @Override
-    public boolean doesScaleWithHeight() {
-        return false;
-    }
-
-    private Set<String> ready = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-    private Map<String, String> terminal = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-    @Override
-    public List<StyledText> getText() {
-        PartyContext pc = PartyManager.INSTANCE.getPartyContext();
-        List<StyledText> text= new ArrayList<>();
-        boolean first = true;
-        for (String partyRawMember : pc.getPartyRawMembers()) {
-            text.add(new StyledText((first ? "":"\n") + partyRawMember, "player"));
-            text.add(new StyledText(": ","separator"));
-            if (ready.contains(partyRawMember))
-                text.add(new StyledText("Ready","ready"));
-            else
-                text.add(new StyledText("Not Ready","notready"));
-            if (terminal.get(partyRawMember) != null) {
-                text.add(new StyledText(" "+ terminal.get(partyRawMember), "terminal"));
-            }
-            first =false;
-        }
-        return text;
-    }
-
-    private static final List<String> readyPhrase = Arrays.asList("r", "rdy", "ready");
-    private static final List<String> negator = Arrays.asList("not ", "not", "n", "n ");
-    private static final List<String> terminalPhrase = Arrays.asList("ss", "s1", "1", "2b", "2t", "3", "4", "s3", "s4", "s2", "2");
-    private static final Map<String, Boolean> readynessIndicator = new HashMap<>();
-    static {
-        readyPhrase.forEach(val -> readynessIndicator.put(val, true));
-        for (String s : negator) {
-            readyPhrase.forEach(val -> readynessIndicator.put(s+val, false));
-        }
-        readynessIndicator.put("dont start", false);
-        readynessIndicator.put("don't start", false);
-        readynessIndicator.put("dont go", false);
-        readynessIndicator.put("don't go", false);
-        readynessIndicator.put("start", true);
-        readynessIndicator.put("go", true);
-    }
-
-
-    @Override
-    public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
-        String txt = clientChatReceivedEvent.message.getFormattedText();
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent event) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        String txt = event.message.getFormattedText();
         if (!txt.startsWith("§r§9Party §8>")) return;
 
         String chat = TextUtils.stripColor(txt.substring(txt.indexOf(":")+1)).trim().toLowerCase();
 
 
-
         String usernamearea = TextUtils.stripColor(txt.substring(13, txt.indexOf(":")));
         String username = null;
         for (String s : usernamearea.split(" ")) {
-            if (s.isEmpty()) continue;
-            if (s.startsWith("[")) continue;
-            username = s;
-            break;
+            if (!s.isEmpty() && !s.startsWith("[")) {
+                username = s;
+                break;
+            }
         }
 
 
@@ -157,24 +72,82 @@ public class FeaturePartyReady extends TextHUDFeature implements ChatListener, D
                 }
             }
         }
-        if (status == null);
-        else if (status) ready.add(username);
-        else ready.remove(username);
-
-
-        String term = "";
-        for (String s : terminalPhrase) {
-            if (chat.equals(s) || chat.startsWith(s+" ") || chat.endsWith(" "+s) || chat.contains(" "+s+" ")) {
-                term += s+" ";
+        if (status != null) {
+            if (Boolean.TRUE.equals(status)) {
+                ready.add(username);
+            } else {
+                ready.remove(username);
             }
         }
-        if (!term.isEmpty())
-            terminal.put(username, term);
+
+
+        StringBuilder term = new StringBuilder();
+        for (String s : terminalPhrase) {
+            if (chat.equals(s) || chat.startsWith(s+" ") || chat.endsWith(" "+s) || chat.contains(" "+s+" ")) {
+                term.append(s).append(" ");
+            }
+        }
+        if (term.length() > 0) {
+            terminal.put(username, term.toString());
+        }
     }
 
     @Override
-    public void onDungeonStart() {
-        ready.clear();
-        terminal.clear();
+    protected boolean shouldShow() {
+        return PartyManager.INSTANCE.getPartyContext() != null && PartyManager.INSTANCE.getPartyContext().isPartyExistHypixel() && "Dungeon Hub".equals(DungeonContext.getDungeonName());
     }
+
+    @Override
+    protected void getLines(List<String> lines, boolean example) {
+        if(example){
+            lines.add("syeyoung: Ready");
+            lines.add("rioho: Ready");
+            lines.add("RaidShadowLegends: Not Ready 2t");
+            lines.add("Tricked: Ready ss");
+            lines.add("MrPenguin: Not Ready 2b");
+            return;
+        }
+
+
+        PartyContext pc = PartyManager.INSTANCE.getPartyContext();
+        if(pc == null) return;
+
+        for (String partyRawMember : pc.getPartyRawMembers()) {
+            StringBuilder a = new StringBuilder();
+            a.append(partyRawMember);
+            a.append(": ");
+            if (ready.contains(partyRawMember)) {
+                a.append("Ready");
+            } else {
+                a.append("Not Ready");
+            }
+            if (terminal.get(partyRawMember) != null) {
+                a.append(" ");
+                a.append(terminal.get(partyRawMember));
+            }
+            lines.add(a.toString());
+        }
+    }
+
+    private final Set<String> ready = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+    private final Map<String, String> terminal = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private static final List<String> readyPhrase = Arrays.asList("r", "rdy", "ready");
+    private static final List<String> negator = Arrays.asList("not ", "not", "n", "n ");
+    private static final List<String> terminalPhrase = Arrays.asList("ss", "s1", "1", "2b", "2t", "3", "4", "s3", "s4", "s2", "2");
+    private static final Map<String, Boolean> readynessIndicator = new HashMap<>();
+
+    static {
+        readyPhrase.forEach(val -> readynessIndicator.put(val, true));
+        for (String s : negator) {
+            readyPhrase.forEach(val -> readynessIndicator.put(s+val, false));
+        }
+        readynessIndicator.put("dont start", false);
+        readynessIndicator.put("don't start", false);
+        readynessIndicator.put("dont go", false);
+        readynessIndicator.put("don't go", false);
+        readynessIndicator.put("start", true);
+        readynessIndicator.put("go", true);
+    }
+
 }

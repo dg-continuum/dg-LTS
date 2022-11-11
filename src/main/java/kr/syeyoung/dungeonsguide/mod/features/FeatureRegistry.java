@@ -30,7 +30,6 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.boss.terminal.FeatureTerminal
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknameColor;
 import kr.syeyoung.dungeonsguide.mod.features.impl.cosmetics.FeatureNicknamePrefix;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeaturePressAnyKeyToCloseChest;
-import kr.syeyoung.dungeonsguide.mod.features.impl.party.FeaturePartyReady;
 import kr.syeyoung.dungeonsguide.mod.features.impl.party.playerpreview.FeatureViewPlayerStatsOnJoin;
 import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeatureActions;
 import kr.syeyoung.dungeonsguide.mod.features.impl.secret.FeatureCreateRefreshLine;
@@ -72,7 +71,6 @@ public class FeatureRegistry {
     public static FeatureTerminalSolvers BOSSFIGHT_TERMINAL_SOLVERS;
     public static FeatureSimonSaysSolver BOSSFIGHT_SIMONSAYS_SOLVER;
     public static FeatureViewPlayerStatsOnJoin PARTYKICKER_VIEWPLAYER;
-    public static FeaturePartyReady PARTY_READY;
     public static FeatureNicknamePrefix COSMETIC_PREFIX;
     public static FeatureNicknameColor COSMETIC_NICKNAMECOLOR;
     public static FeatureRoomDebugInfo ADVANCED_DEBUG_ROOM;
@@ -119,7 +117,6 @@ public class FeatureRegistry {
             BOSSFIGHT_TERMINAL_SOLVERS = register(new FeatureTerminalSolvers());
             BOSSFIGHT_SIMONSAYS_SOLVER = register(new FeatureSimonSaysSolver());
             PARTYKICKER_VIEWPLAYER = register(new FeatureViewPlayerStatsOnJoin());
-            PARTY_READY = register(new FeaturePartyReady());
 
             COSMETIC_NICKNAMECOLOR = register(new FeatureNicknameColor());
             COSMETIC_PREFIX = register(new FeatureNicknamePrefix());
