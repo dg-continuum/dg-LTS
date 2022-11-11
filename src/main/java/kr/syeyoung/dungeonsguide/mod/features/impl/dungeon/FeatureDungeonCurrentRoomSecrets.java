@@ -18,77 +18,32 @@
 
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
-import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.config.types.AColor;
+import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.mod.features.listener.ChatListener;
-import kr.syeyoung.dungeonsguide.mod.features.text.StyledText;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextHUDFeature;
-import kr.syeyoung.dungeonsguide.mod.features.text.TextStyle;
+import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FeatureDungeonCurrentRoomSecrets extends TextHUDFeature implements ChatListener {
-    public FeatureDungeonCurrentRoomSecrets() {
-        super("Dungeon.HUDs", "Display # Secrets in current room", "Display what your actionbar says", "dungeon.stats.secretsroom", true, getFontRenderer().getStringWidth("Secrets In Room: 8/8"), getFontRenderer().FONT_HEIGHT);
-        this.setEnabled(false);
-        getStyles().add(new TextStyle("title", new AColor(0x00, 0xAA,0xAA,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("currentSecrets", new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("separator2", new AColor(0x55, 0x55,0x55,255), new AColor(0, 0,0,0), false));
-        getStyles().add(new TextStyle("totalSecrets",  new AColor(0x55, 0xFF,0xFF,255), new AColor(0, 0,0,0), false));
-    }
-
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-
-
-    private static final List<StyledText> dummyText=  new ArrayList<StyledText>();
-    static {
-        dummyText.add(new StyledText("Secrets In Room","title"));
-        dummyText.add(new StyledText(": ","separator"));
-        dummyText.add(new StyledText("5","currentSecrets"));
-        dummyText.add(new StyledText("/","separator2"));
-        dummyText.add(new StyledText("8","totalSecrets"));
-    }
-
-    @Override
-    public boolean isHUDViewable() {
-        return skyblockStatus.isOnDungeon();
-    }
-
-    @Override
-    public List<String> getUsedTextStyle() {
-        return Arrays.asList("title", "separator", "currentSecrets", "separator2", "totalSecrets");
-    }
-
-    @Override
-    public List<StyledText> getDummyText() {
-        return dummyText;
-    }
-
+public class FeatureDungeonCurrentRoomSecrets extends SingleTextHud {
     private int latestCurrSecrets = 0;
     private int latestTotalSecrets = 0;
 
-
-    @Override
-    public List<StyledText> getText() {
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() != null) return new ArrayList<StyledText>();
-        List<StyledText> actualBit = new ArrayList<StyledText>();
-        actualBit.add(new StyledText("Secrets In Room","title"));
-        actualBit.add(new StyledText(": ","separator"));
-        actualBit.add(new StyledText(latestCurrSecrets +"","currentSecrets"));
-        actualBit.add(new StyledText("/","separator2"));
-        actualBit.add(new StyledText(latestTotalSecrets +"","totalSecrets"));
-        return actualBit;
+    public FeatureDungeonCurrentRoomSecrets() {
+//        super("Dungeon.HUDs",
+//                "Display # Secrets in current room",
+//                "",
+//                "dungeon.stats.secretsroom",
+//                true,
+//                getFontRenderer().getStringWidth("Secrets In Room: 8/8"),
+//                getFontRenderer().FONT_HEIGHT);
+        super("Secrets In Room", true);
     }
 
-    @Override
-    public void onChat(ClientChatReceivedEvent chat) {
-        if (chat.type != 2) return;
-        String text = chat.message.getFormattedText();
+    @SubscribeEvent
+    public void onChat(ClientChatReceivedEvent events) {
+        if (!SkyblockStatus.isOnSkyblock()) return;
+        if (events.type != 2) return;
+        String text = events.message.getFormattedText();
         if (!text.contains("/")) return;
 
         int secretsIndex = text.indexOf("Secrets");
@@ -104,5 +59,19 @@ public class FeatureDungeonCurrentRoomSecrets extends TextHUDFeature implements 
             latestCurrSecrets = Integer.parseInt(it.split("/")[0]);
             latestTotalSecrets = Integer.parseInt(it.split("/")[1]);
         }
+    }
+
+    @Override
+    protected boolean shouldShow() {
+        return SkyblockStatus.isOnDungeon();
+    }
+
+    @Override
+    protected String getText(boolean example) {
+        if (example) {
+            return "8/8";
+        }
+        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null) return "";
+        return latestCurrSecrets + "/" + latestTotalSecrets;
     }
 }

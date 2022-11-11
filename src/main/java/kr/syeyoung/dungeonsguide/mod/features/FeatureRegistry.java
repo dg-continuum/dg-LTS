@@ -65,7 +65,6 @@ public class FeatureRegistry {
     public static FeatureWatcherWarning DUNGEON_WATCHERWARNING;
     public static FeatureDungeonMilestone DUNGEON_MILESTONE;
     public static FeatureDungeonSBTime DUNGEON_SBTIME;
-    public static FeatureDungeonCurrentRoomSecrets DUNGEON_SECRETS_ROOM;
     public static FeatureDungeonScore DUNGEON_SCORE;
     public static FeatureWarnLowHealth DUNGEON_LOWHEALTH_WARN;
     public static SimpleFeature DUNGEON_INTERMODCOMM;
@@ -110,7 +109,6 @@ public class FeatureRegistry {
             DUNGEON_INTERMODCOMM = register(new SimpleFeature("Dungeon.Teammates", "Communicate With Other's Dungeons Guide", "Sends total secret in the room to others\nSo that they can use the data to calculate total secret in dungeon run\n\nThis automates player chatting action, (chatting data) Thus it might be against hypixel's rules.\nBut mods like auto-gg which also automate player action and is kinda allowed mod exist so I'm leaving this feature.\nThis option is use-at-your-risk and you'll be responsible for ban if you somehow get banned because of this feature\n(Although it is not likely to happen)\nDefaults to off", "dungeon.intermodcomm", false));
             DUNGEON_LOWHEALTH_WARN = register(new FeatureWarnLowHealth());
             DUNGEON_SCORE = register(new FeatureDungeonScore());
-            DUNGEON_SECRETS_ROOM = register(new FeatureDungeonCurrentRoomSecrets());
             DUNGEON_SBTIME = register(new FeatureDungeonSBTime());
             DUNGEON_MILESTONE = register(new FeatureDungeonMilestone());
             DUNGEON_WATCHERWARNING = register(new FeatureWatcherWarning());

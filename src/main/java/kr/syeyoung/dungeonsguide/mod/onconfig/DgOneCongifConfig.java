@@ -12,10 +12,7 @@ import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.FeatureDungeonMap;
 import kr.syeyoung.dungeonsguide.mod.features.impl.dungeon.TestMap;
 import kr.syeyoung.dungeonsguide.mod.onconfig.dungeon.HideAnimal;
 import kr.syeyoung.dungeonsguide.mod.onconfig.huds.*;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.CryptsDisplay;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DeathDisplay;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DungeonRealTime;
-import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.DungeonSecrets;
+import kr.syeyoung.dungeonsguide.mod.onconfig.huds.dungeon.*;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.DisableMessage;
 import kr.syeyoung.dungeonsguide.mod.onconfig.misc.HighlightMobs;
 import kr.syeyoung.dungeonsguide.mod.onconfig.secrets.AutoPathfindPage;
@@ -453,6 +450,13 @@ public class DgOneCongifConfig extends Config {
     )
     public DungeonRealTime drt = new DungeonRealTime();
 
+    @Page(
+            name = "Display # Secrets in current room",
+            description = "Display what your actionbar says",
+            location = PageLocation.BOTTOM,
+            category = "HUD"
+    )
+    public CurrentRoomDungeonSecrets crds = new CurrentRoomDungeonSecrets();
 
 
     @Switch(
