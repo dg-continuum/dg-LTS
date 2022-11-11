@@ -19,35 +19,36 @@
 package kr.syeyoung.dungeonsguide.mod.features.impl.dungeon;
 
 import kr.syeyoung.dungeonsguide.mod.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.mod.features.FeatureParameter;
-import kr.syeyoung.dungeonsguide.mod.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.mod.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.mod.features.impl.boss.FeatureChestPrice;
+import kr.syeyoung.dungeonsguide.mod.onconfig.DgOneCongifConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.input.Mouse;
 
-public class FeaturePressAnyKeyToCloseChest extends SimpleFeature {
+public class FeaturePressAnyKeyToCloseChest extends SimpleFeatureV2 {
     public FeaturePressAnyKeyToCloseChest() {
-        super("Dungeon", "Press Any Mouse Button or Key to close Secret Chest", "dungeon.presskeytoclose");
-        addParameter("threshold", new FeatureParameter<Integer>("threshold", "Price Threshold", "The maximum price of item for chest to be closed. Default 1m", 1000000, "integer"));
-        MinecraftForge.EVENT_BUS.register(this);
+        super("dungeon.presskeytoclose");
     }
 
     @SubscribeEvent
     public void onKey(GuiScreenEvent.KeyboardInputEvent event) {
         GuiScreen screen = Minecraft.getMinecraft().currentScreen;
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.closeChestHelper) return;
         if (!SkyblockStatus.isOnDungeon()) return;
 
-        if (screen instanceof GuiChest){
-            ContainerChest ch = (ContainerChest) ((GuiChest)screen).inventorySlots;
+        a(screen);
+    }
+
+    private void a(GuiScreen screen) {
+        if (screen instanceof GuiChest) {
+            ContainerChest ch = (ContainerChest) ((GuiChest) screen).inventorySlots;
             if (!("Large Chest".equals(ch.getLowerChestInventory().getName())
                     || "Chest".equals(ch.getLowerChestInventory().getName()))) return;
             IInventory actualChest = ch.getLowerChestInventory();
@@ -57,8 +58,7 @@ public class FeaturePressAnyKeyToCloseChest extends SimpleFeature {
                 priceSum += FeatureChestPrice.getPrice(actualChest.getStackInSlot(i));
             }
 
-            int threshold = this.<Integer>getParameter("threshold").getValue();
-            if (priceSum < threshold) {
+            if (priceSum < (int) DgOneCongifConfig.closeChestHelperThreschkid) {
                 Minecraft.getMinecraft().thePlayer.closeScreen();
             }
         }
@@ -69,26 +69,11 @@ public class FeaturePressAnyKeyToCloseChest extends SimpleFeature {
         if (!SkyblockStatus.isOnSkyblock()) return;
 
         GuiScreen screen = Minecraft.getMinecraft().currentScreen;
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.closeChestHelper) return;
         if (!SkyblockStatus.isOnDungeon()) return;
         if (Mouse.getEventButton() == -1) return;
 
-        if (screen instanceof GuiChest){
-            ContainerChest ch = (ContainerChest) ((GuiChest)screen).inventorySlots;
-            if (!("Large Chest".equals(ch.getLowerChestInventory().getName())
-                    || "Chest".equals(ch.getLowerChestInventory().getName()))) return;
-            IInventory actualChest = ch.getLowerChestInventory();
-
-            int priceSum = 0;
-            for (int i = 0; i < actualChest.getSizeInventory(); i++) {
-                priceSum += FeatureChestPrice.getPrice(actualChest.getStackInSlot(i));
-            }
-
-            int threshold = this.<Integer>getParameter("threshold").getValue();
-            if (priceSum < threshold) {
-                Minecraft.getMinecraft().thePlayer.closeScreen();
-            }
-        }
+        a(screen);
     }
 
 }

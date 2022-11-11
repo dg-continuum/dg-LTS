@@ -550,6 +550,24 @@ public class DgOneCongifConfig extends Config {
     public PartyReadyPage pr = new PartyReadyPage();
 
     @Switch(
+            name = "Enabled",
+            size = 2,
+            category = "Misc",
+            subcategory = "Press Any Mouse Button or Key to close Secret Chest"
+    )
+    public static boolean closeChestHelper = true;
+
+    @Slider(
+            name = "Price Threshold",
+            min = 1_000_000F,
+            max = 100_000_000F,
+            description = "The maximum price of item for chest to be closed. Default 1m",
+            category = "Misc",
+            subcategory = "Press Any Mouse Button or Key to close Secret Chest"
+    )
+    public static float closeChestHelperThreschkid = 1000000;
+
+    @Switch(
             name = "enabled",
             size = 2,
             description = "Automatically accept reparty",
@@ -557,6 +575,7 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Auto accept reparty"
     )
     public static boolean autoRp = true;
+
 
     @Switch(
             name = "Spirit Boots Fixer",
