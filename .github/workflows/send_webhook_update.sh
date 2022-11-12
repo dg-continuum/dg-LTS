@@ -35,8 +35,8 @@ case "$STATUS" in
   SUCCESS)
     color="$COLOR_SUCCESS"
     status_message="Build succeeded."
-    to_upload=$(echo build/libs/*-dep.jar)
-    upload_name=NotEnoughUpdates-beta-dep.jar
+    to_upload=$(echo build/libs/*-all.jar)
+    upload_name=Dglts-beta-dep.jar
     ;;
 esac
 
