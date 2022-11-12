@@ -1,20 +1,29 @@
-package kr.syeyoung.dungeonsguide.whosonline.api.messages.client;
+package kr.syeyoung.dungeonsguide.whosonline.api.messages.client
 
-import lombok.Data;
+import lombok.Data
 
 @Data
-public class C02OnlineCheckBulk {
-    public final String t = "/is_online/bulk";
+class C02OnlineCheckBulk (val c: OBJ?) {
+    val t = "/is_online/bulk"
 
-    /**
-     * array of uuids to check if they are online
-     */
-    public final OBJ c;
+    data class OBJ(val nonce: String, val uuids: Array<String>) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
 
-    @Data
-    public static class OBJ {
-        public final String[] uuids;
-        public final String nonce;
+            other as OBJ
+
+            if (nonce != other.nonce) return false
+            if (!uuids.contentEquals(other.uuids)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = nonce.hashCode()
+            result = 31 * result + uuids.contentHashCode()
+            return result
+        }
     }
 
 }

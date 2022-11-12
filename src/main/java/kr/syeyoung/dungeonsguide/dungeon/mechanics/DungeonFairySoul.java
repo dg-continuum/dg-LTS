@@ -42,12 +42,10 @@ import java.util.function.Predicate;
 @Data
 public class DungeonFairySoul implements DungeonMechanic {
     private static final long serialVersionUID = 156412742320519783L;
-    private OffsetPoint secretPoint = new OffsetPoint(0,0,0);
+    private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
     private List<String> preRequisite = new ArrayList<String>();
 
-
-    @Override
-    public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
+    static Set<AbstractAction> getAbstractActions(String state, OffsetPoint secretPoint, List<String> preRequisite) {
         if (!"navigate".equalsIgnoreCase(state))
             throw new IllegalArgumentException(state + " is not valid state for secret");
 
@@ -72,18 +70,23 @@ public class DungeonFairySoul implements DungeonMechanic {
     }
 
     @Override
+    public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
+        return getAbstractActions(state, secretPoint, preRequisite);
+    }
+
+    @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
         BlockPos pos = getSecretPoint().getBlockPos(dungeonRoom);
-        RenderUtils.highlightBlock(pos, color,partialTicks);
-        RenderUtils.drawTextAtWorld("F-"+name, pos.getX() +0.5f, pos.getY()+0.375f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() +0.5f, pos.getY()+0f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.highlightBlock(pos, color, partialTicks);
+        RenderUtils.drawTextAtWorld("F-" + name, pos.getX() + 0.5f, pos.getY() + 0.375f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
 
     public DungeonFairySoul clone() throws CloneNotSupportedException {
         DungeonFairySoul dungeonSecret = new DungeonFairySoul();
         dungeonSecret.secretPoint = (OffsetPoint) secretPoint.clone();
-        dungeonSecret.preRequisite = new ArrayList<String>(preRequisite);
+        dungeonSecret.preRequisite = new ArrayList<>(preRequisite);
         return dungeonSecret;
     }
 
@@ -97,10 +100,12 @@ public class DungeonFairySoul implements DungeonMechanic {
     public Set<String> getPossibleStates(DungeonRoom dungeonRoom) {
         return Sets.newHashSet("navigate");
     }
+
     @Override
     public Set<String> getTotalPossibleStates(DungeonRoom dungeonRoom) {
-        return Sets.newHashSet("no-state","navigate");
+        return Sets.newHashSet("no-state", "navigate");
     }
+
     @Override
     public OffsetPoint getRepresentingPoint(DungeonRoom dungeonRoom) {
         return secretPoint;

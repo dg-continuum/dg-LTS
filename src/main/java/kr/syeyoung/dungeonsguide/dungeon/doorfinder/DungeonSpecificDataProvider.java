@@ -18,7 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.doorfinder;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,9 +29,10 @@ public interface DungeonSpecificDataProvider {
     BlockPos findDoor(World w, String dungeonName);
 
     Vector2d findDoorOffset(World w, String dungeonName);
+
     BossfightProcessor createBossfightProcessor(World w, String dungeonName);
 
-    boolean isTrapSpawn(String dungeonName);
+    boolean hasTrapRoom(String dungeonName);
 
     double secretPercentage(String dungeonName);
 

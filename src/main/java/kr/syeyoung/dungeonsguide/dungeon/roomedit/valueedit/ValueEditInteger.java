@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit;
 
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MIntegerSelectionButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabelAndElement;
@@ -30,10 +30,6 @@ public class ValueEditInteger extends MPanel implements ValueEdit<Integer> {
     private Parameter parameter;
 
 
-    @Override
-    public void renderWorld(float partialTicks) {
-
-    }
     public ValueEditInteger(final Parameter parameter2) {
         this.parameter = parameter2;
         {
@@ -43,8 +39,8 @@ public class ValueEditInteger extends MPanel implements ValueEdit<Integer> {
                     return parameter.getPreviousData().toString();
                 }
             };
-            MLabelAndElement mLabelAndElement = new MLabelAndElement("Prev",label);
-            mLabelAndElement.setBounds(new Rectangle(0,0,getBounds().width,20));
+            MLabelAndElement mLabelAndElement = new MLabelAndElement("Prev", label);
+            mLabelAndElement.setBounds(new Rectangle(0, 0, getBounds().width, 20));
             add(mLabelAndElement);
         }
         {
@@ -56,15 +52,20 @@ public class ValueEditInteger extends MPanel implements ValueEdit<Integer> {
                     parameter.setNewData(textField.getData());
                 }
             });
-            MLabelAndElement mLabelAndElement = new MLabelAndElement("New",textField);
-            mLabelAndElement.setBounds(new Rectangle(0,20,getBounds().width,20));
+            MLabelAndElement mLabelAndElement = new MLabelAndElement("New", textField);
+            mLabelAndElement.setBounds(new Rectangle(0, 20, getBounds().width, 20));
             add(mLabelAndElement);
         }
     }
 
     @Override
+    public void renderWorld(float partialTicks) {
+
+    }
+
+    @Override
     public void onBoundsUpdate() {
-        for (MPanel panel :getChildComponents()){
+        for (MPanel panel : getChildComponents()) {
             panel.setSize(new Dimension(getBounds().width, 20));
         }
     }
@@ -76,7 +77,7 @@ public class ValueEditInteger extends MPanel implements ValueEdit<Integer> {
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,0,parentWidth, parentHeight));
+        this.setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
     }
 
     public static class Generator implements ValueEditCreator<ValueEditInteger> {

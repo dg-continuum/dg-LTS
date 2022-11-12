@@ -20,12 +20,8 @@ package kr.syeyoung.dungeonsguide;
 
 import cc.polyfrost.oneconfig.events.EventManager;
 import kr.syeyoung.dungeonsguide.auth.AuthManager;
-import kr.syeyoung.dungeonsguide.auth.InvalidDungeonsGuideCredentialsException;
-import kr.syeyoung.dungeonsguide.auth.ResourceManager;
-import kr.syeyoung.dungeonsguide.url.DGStreamHandlerFactory;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -40,9 +36,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 @Mod(modid = Main.MOD_ID, version = Main.VERSION)
 public class Main {
@@ -52,7 +45,7 @@ public class Main {
     Logger logger = LogManager.getLogger("DG-main");
 
 
-    IDungeonGuide dgInstance;
+    DungeonsGuide dgInstance;
 
     private boolean isLoaded = false;
 
@@ -101,57 +94,26 @@ public class Main {
     public void preInit(final FMLPreInitializationEvent preInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(new YoMamaOutdated());
 
-        ProgressManager.ProgressBar progressBar = null;
+        ProgressManager.ProgressBar progressBar = ProgressManager.push("DungeonsGuide", 6);
 
-        try {
-            try (InputStream premiumControlClass = this.getClass().getResourceAsStream("/kr/syeyoung/dungeonsguide/e.class")) {
-                progressBar = ProgressManager.push("DungeonsGuide", premiumControlClass == null ? 7 : 6);
-            }
-
-            AuthManager.getInstance().setBaseserverurl(SERVER_URL);
-            AuthManager.getInstance().init();
+        AuthManager.getInstance().setBaseserverurl(SERVER_URL);
+        AuthManager.getInstance().init();
 
 
-            configDir = new File(preInitializationEvent.getModConfigurationDirectory(), "dungeonsguide");
+        configDir = new File(preInitializationEvent.getModConfigurationDirectory(), "dungeonsguide");
 
 
-            String version = null;
-            try (InputStream resourceAsStream = this.getClass().getResourceAsStream("/kr/syeyoung/dungeonsguide/DungeonsGuide.class")) {
-                if (resourceAsStream == null) {
-                    if (System.getProperty("dg.version") == null) {
-                        version = "nlatest";
-                    } else {
-                        version = System.getProperty("dg.version");
-                    }
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            ResourceManager.getInstance().setBaseUrl(Main.SERVER_URL);
-            ResourceManager.getInstance().setBASE64_X509ENCODEDKEYSPEC(Main.SOME_FUNNY_KEY_THING);
+        progressBar.step("Initializing");
 
-            if(!AuthManager.getInstance().isPlebUser() && version != null){
-                ResourceManager.getInstance().downloadAssets(version);
-            }
+        dgInstance = new DungeonsGuide();
 
-            URL.setURLStreamHandlerFactory(new DGStreamHandlerFactory());
-            LaunchClassLoader classLoader = (LaunchClassLoader) Main.class.getClassLoader();
-            classLoader.addURL(new URL("z:///"));
+        EventManager.INSTANCE.register(dgInstance);
 
-            progressBar.step("Initializing");
+        dgInstance.preinit();
 
-            dgInstance = new DungeonsGuide();
+        finishUpProgressBar(progressBar);
+        isLoaded = true;
 
-            EventManager.INSTANCE.register(dgInstance);
-
-            dgInstance.preinit();
-
-            finishUpProgressBar(progressBar);
-            isLoaded = true;
-
-        } catch (IOException | InvalidDungeonsGuideCredentialsException e) {
-            handleException(e, progressBar);
-        }
     }
 
 

@@ -156,7 +156,9 @@ public class FeatureChestPrice extends SimpleFeatureV2 {
             for (String key : actualKeys) {
                 String id2 = id + "::" + key + "-" + enchants.getInteger(key);
                 AhUtils.AuctionData auctionData = AhUtils.auctions.get(id2);
-                totalLowestPrice += auctionData.lowestBin;
+                if(auctionData != null){
+                    totalLowestPrice += auctionData.lowestBin;
+                }
             }
             return totalLowestPrice;
         } else {

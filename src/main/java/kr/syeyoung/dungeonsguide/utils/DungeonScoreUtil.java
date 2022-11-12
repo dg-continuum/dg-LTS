@@ -59,7 +59,7 @@ public class DungeonScoreUtil {
             int roomCnt = 0;
             int roomSkillPenalty = 0;
 //            boolean bossroomIncomplete = true;
-            boolean traproomIncomplete = context.isTrapRoomGen();
+            boolean traproomIncomplete = context.isHasTrapRoom();
             int incompletePuzzles = getUndiscoveredPuzzles();
 
             for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {

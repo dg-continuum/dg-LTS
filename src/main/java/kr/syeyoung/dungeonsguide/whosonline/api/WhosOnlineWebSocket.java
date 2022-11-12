@@ -34,7 +34,11 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     private final ScheduledExecutorService se;
     private final SimpleFuse timeoutFuse;
     long lastPong = -1;
-    @Getter
+
+    public StompClient.StompClientStatus getStatus() {
+        return status;
+    }
+
     private StompClient.StompClientStatus status;
     @Getter
     private long ping;

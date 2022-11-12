@@ -26,12 +26,14 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.dungeon.events.SerializableBlockPos;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonMapUpdateEvent;
 import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonRoomDiscoverEvent;
 import kr.syeyoung.dungeonsguide.dungeon.map.DungeonMapData;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.features.impl.dungeon.FeatureCollectScore;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
+import kr.syeyoung.dungeonsguide.utils.SimpleLock;
+import kr.syeyoung.dungeonsguide.utils.SimpleTimeFuse;
+import kr.syeyoung.dungeonsguide.utils.SimpleTimer;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -56,20 +58,25 @@ public class MapProcessor {
     private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 1), new Vector2d(0, -1), new Vector2d(1, 0), new Vector2d(-1, 0));
     private static final Set<Vector2d> door_dirs = Sets.newHashSet(new Vector2d(0, 0.5), new Vector2d(0, -0.5), new Vector2d(0.5, 0), new Vector2d(-0.5, 0));
     private static final Minecraft mc = Minecraft.getMinecraft();
+    final SimpleTimer processMapThrottle = new SimpleTimer(5);
+    final SimpleTimeFuse waitDelay = new SimpleTimeFuse(100);
+    final SimpleLock processMapLock = new SimpleLock();
     private final DungeonContext context;
     @Getter
     private final BiMap<String, String> mapIconToPlayerMap = HashBiMap.create();
     private final List<Point> roomsFound = new ArrayList<>();
-    Logger logger = LogManager.getLogger("MapProcessor");
+    static final Logger logger = LogManager.getLogger("MapProcessor");
     /**
      * If the player on the map is closer than value this it won't save it
      * this should be done with render-distance but whateva
      */
     int clossnessDistance = 50;
+    ExecutorService es = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Dg-MapProcessor-%d").build());
     @Getter
     @Setter
     private Dimension unitRoomDimension;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Dimension doorDimensions; // width: width of door, height: gap between rooms
     @Getter
     @Setter
@@ -83,53 +90,40 @@ public class MapProcessor {
     private boolean processed = false;
     @Getter
     private MapData latestMapData;
-    private int waitDelay = 0;
-    private boolean processlock;
 
     public MapProcessor(DungeonContext context) {
         this.context = context;
     }
 
-    private static void error(String prefix) {
-        ChatTransmitter.addToQueue(new ChatComponentText(ChatTransmitter.PREFIX + prefix));
+    public static Point mapPointToRoomPoint(Point mapPoint, Point topLeftMapPoint, Dimension unitRoomDimension, Dimension doorDimensions) {
+        int x = (int) ((mapPoint.x - topLeftMapPoint.x) / ((double) unitRoomDimension.width + doorDimensions.height));
+        int y = (int) ((mapPoint.y - topLeftMapPoint.y) / ((double) unitRoomDimension.height + doorDimensions.height));
+        return new Point(x, y);
     }
 
-
-    ExecutorService es = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Dg-MapProcessor-%d").build());
-
-
-    int processMapThroddle;
-
     public void tick() {
-        if (waitDelay < 5) {
-            waitDelay++;
-            return;
-        }
-//        if (bugged) {
-//            return;
-//        }
-        ItemStack stack = Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(8);
+        if (waitDelay.isBlown()) {
+            ItemStack stack = Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(8);
 
-        if (stack == null || !(stack.getItem() instanceof ItemMap)) {
-            return;
-        }
-
-        MapData mapData = ((ItemMap) stack.getItem()).getMapData(stack, mc.theWorld);
-
-        if (mapData != null) {
-
-            if(processMapThroddle > 5 && !processlock){
-                processMapData(mapData);
-                processMapThroddle = 0;
+            if (stack == null || !(stack.getItem() instanceof ItemMap)) {
+                return;
             }
-            processMapThroddle++;
 
-        }
+            MapData mapData = ((ItemMap) stack.getItem()).getMapData(stack, mc.theWorld);
 
-        latestMapData = mapData;
+            if (mapData != null) {
+                processMapThrottle.tick();
+                if (processMapThrottle.shouldRun() && processMapLock.isUnlocked()) {
+                    processMapData(mapData);
+                }
 
-        if (latestMapData != null && mapIconToPlayerMap.size() < context.getPlayers().size() && initialized) {
-            getPlayersFromMap(latestMapData);
+                latestMapData = mapData;
+            }
+
+
+            if (latestMapData != null && mapIconToPlayerMap.size() < context.getPlayers().size() && initialized) {
+                getPlayersFromMap(latestMapData);
+            }
         }
 
     }
@@ -139,10 +133,9 @@ public class MapProcessor {
 
         // i just cant get this to work sad
         if (isThereDifference(latestMapData, mapColorData)) {
-            context.createEvent(new DungeonMapUpdateEvent(mapColorData));
 
             es.execute(() -> {
-                processlock = true;
+                processMapLock.lock();
                 if (doorDimensions == null || !initialized) {
                     assembleMap(mapColorData);
                 } else {
@@ -152,15 +145,16 @@ public class MapProcessor {
                 if (context.isEnded()) {
                     processFinishedMap(mapColorData);
                 }
-                processlock = false;
+                processMapLock.unLock();
             });
 
         }
 
     }
 
-    void assembleMap(final byte[] mapData){
+    void assembleMap(final byte[] mapData) {
         DungeonMapData data = new DungeonMapData(context, Minecraft.getMinecraft());
+
 
         data.eat(mapData);
 
@@ -174,13 +168,6 @@ public class MapProcessor {
 
         doorDimensions = data.doorDimensions;
 
-    }
-
-
-    public static Point mapPointToRoomPoint(Point mapPoint, Point topLeftMapPoint, Dimension unitRoomDimension, Dimension doorDimensions) {
-        int x = (int) ((mapPoint.x - topLeftMapPoint.x) / ((double) unitRoomDimension.width + doorDimensions.height));
-        int y = (int) ((mapPoint.y - topLeftMapPoint.y) / ((double) unitRoomDimension.height + doorDimensions.height));
-        return new Point(x, y);
     }
 
     public BlockPos mapPointToWorldPoint(Point mapPoint) {
@@ -249,10 +236,7 @@ public class MapProcessor {
                         }
                         MapUtils.record(mapData, mapPoint.x, mapPoint.y + 1, new Color(0, 255, 0, 80));
                     }
-                    continue;
-                }
-
-                if (color != 0 && color != 85) {
+                } else if (color != 0 && color != 85) {
                     MapUtils.record(mapData, mapPoint.x, mapPoint.y, new Color(0, 255, 255, 80));
                     DungeonRoom room = buildRoom(mapData, new Point(x, y));
 
@@ -407,7 +391,7 @@ public class MapProcessor {
     public boolean isThereDifference(MapData latestMapData, byte[] colorData1) {
         byte[] colorData = null;
 
-        if(latestMapData != null){
+        if (latestMapData != null) {
             colorData = latestMapData.colors;
         }
 

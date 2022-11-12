@@ -18,8 +18,9 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.doorfinder;
 
-import kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.impl.NormalModeDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.impl.MasterModeDataProvider;
+import kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.impl.NormalModeDataProvider;
+import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class DungeonSpecificDataProviderRegistry {
     }
 
     public static DungeonSpecificDataProvider getDoorFinder(String dungeonName) {
-        for (Map.Entry<Pattern, DungeonSpecificDataProvider> doorFinderEntry :doorFinders.entrySet()){
+        for (val doorFinderEntry : doorFinders.entrySet()) {
             if (doorFinderEntry.getKey().matcher(dungeonName).matches()) return doorFinderEntry.getValue();
         }
         return null;

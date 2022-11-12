@@ -36,7 +36,7 @@ import java.security.cert.CertificateException;
 import java.util.*;
 
 public class AhUtils {
-    public static volatile Map<String, AuctionData> auctions = new HashMap<String, AuctionData>();
+    public static volatile Map<String, AuctionData> auctions = new HashMap<>();
 
     static Logger logger = LogManager.getLogger("AhUtils");
 
@@ -60,7 +60,7 @@ public class AhUtils {
                     logger.error("Error loading auctions {}", String.valueOf(Throwables.getRootCause(e)));
                 }
             }
-        },  0L, 1800000L);
+        },  0L, 1_800_000L);
     }
 
     public static void loadAuctions() throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchPaddingException, BadPaddingException, KeyStoreException, IllegalBlockSizeException, KeyManagementException {

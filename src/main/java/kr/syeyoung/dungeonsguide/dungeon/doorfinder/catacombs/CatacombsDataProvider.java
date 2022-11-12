@@ -14,7 +14,7 @@ import java.util.Set;
 
 public abstract class CatacombsDataProvider implements DungeonSpecificDataProvider {
 
-    private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0,1), new Vector2d(0, -1), new Vector2d(1, 0), new Vector2d(-1 , 0));
+    private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 1), new Vector2d(0, -1), new Vector2d(1, 0), new Vector2d(-1, 0));
 
     @Nullable
     static Vector2d getVector2d(World w, Collection<EntityArmorStand> armorStand, Set<Vector2d> directions) {
@@ -22,7 +22,7 @@ public abstract class CatacombsDataProvider implements DungeonSpecificDataProvid
         BlockPos pos = mort.getPosition();
         pos = pos.add(0, 3, 0);
         for (int i = 0; i < 5; i++) {
-            for (Vector2d vector2d: directions) {
+            for (Vector2d vector2d : directions) {
                 BlockPos test = pos.add(vector2d.x * i, 0, vector2d.y * i);
                 if (w.getChunkFromBlockCoords(test).getBlock(test) == Blocks.iron_bars) {
                     return vector2d;
@@ -32,7 +32,7 @@ public abstract class CatacombsDataProvider implements DungeonSpecificDataProvid
         return null;
     }
 
-    public static Collection<EntityArmorStand> getMorts(World w){
+    public static Collection<EntityArmorStand> getMorts(World w) {
         return w.getEntities(EntityArmorStand.class, input -> input.getName().equals("§bMort"));
     }
 
@@ -40,8 +40,8 @@ public abstract class CatacombsDataProvider implements DungeonSpecificDataProvid
      * This gets all morts checks for iron bars near him
      * and based on iron bars determine the door location
      *
-     * @param w World that we are going to look for the door in
-     *          world is explicitly specified instead of mc.theWorld bc we can use cached worlds
+     * @param w           World that we are going to look for the door in
+     *                    world is explicitly specified instead of mc.theWorld bc we can use cached worlds
      * @param dungeonName dungeon type eg master mode, currently unused
      * @return Block pos of the dungeon entrance
      */
@@ -53,10 +53,10 @@ public abstract class CatacombsDataProvider implements DungeonSpecificDataProvid
             BlockPos pos = mort.getPosition();
             pos = pos.add(0, 3, 0);
             for (int i = 0; i < 5; i++) {
-                for (Vector2d vector2d:directions) {
+                for (Vector2d vector2d : directions) {
                     BlockPos test = pos.add(vector2d.x * i, 0, vector2d.y * i);
                     if (w.getChunkFromBlockCoords(test).getBlock(test) == Blocks.iron_bars) {
-                        return pos.add(vector2d.x * (i + 2), -2, vector2d.y * (i+2));
+                        return pos.add(vector2d.x * (i + 2), -2, vector2d.y * (i + 2));
                     }
                 }
             }

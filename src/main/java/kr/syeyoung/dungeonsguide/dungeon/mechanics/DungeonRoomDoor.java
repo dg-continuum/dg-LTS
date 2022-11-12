@@ -26,7 +26,6 @@ import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import lombok.Getter;
 import net.minecraft.util.BlockPos;
 
 import java.awt.*;
@@ -34,7 +33,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DungeonRoomDoor implements DungeonMechanic {
-    @Getter
+    public DungeonDoor getDoorfinder() {
+        return doorfinder;
+    }
+
     private final DungeonDoor doorfinder;
     private OffsetPoint offsetPoint;
 

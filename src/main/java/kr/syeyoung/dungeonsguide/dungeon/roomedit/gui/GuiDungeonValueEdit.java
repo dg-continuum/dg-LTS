@@ -18,15 +18,16 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.gui;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
-import kr.syeyoung.dungeonsguide.gui.elements.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditRegistry;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.gui.MGui;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
+import kr.syeyoung.dungeonsguide.gui.elements.MButton;
+import kr.syeyoung.dungeonsguide.gui.elements.MLabel;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
@@ -85,43 +86,45 @@ public class GuiDungeonValueEdit extends MGui {
                 getMainPanel().add(save);
             }
             updateClassSelection();
-        } catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     public void updateClassSelection() {
         currentValueEdit.getChildComponents().clear();
 
-        ValueEditCreator valueEditCreator = ValueEditRegistry.getValueEditMap(editingObj == null ?"null":editingObj.getClass().getName());
+        ValueEditCreator valueEditCreator = ValueEditRegistry.getValueEditMap(editingObj == null ? "null" : editingObj.getClass().getName());
 
         MPanel valueEdit = (MPanel) valueEditCreator.createValueEdit(new Parameter("", editingObj, editingObj));
         if (valueEdit == null) {
             MLabel valueEdit2 = new MLabel() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0, 0, parentWidth,20));
+                    setBounds(new Rectangle(0, 0, parentWidth, 20));
                 }
             };
             valueEdit2.setText("No Value Edit");
-            valueEdit2.setBounds(new Rectangle(0,0,150,20));
+            valueEdit2.setBounds(new Rectangle(0, 0, 150, 20));
             valueEdit = valueEdit2;
             this.valueEdit = null;
-        } else{
+        } else {
             this.valueEdit = (ValueEdit) valueEdit;
         }
         valueEdit.resize0(currentValueEdit.getBounds().width, currentValueEdit.getBounds().height);
         currentValueEdit.add(valueEdit);
     }
+
     @Override
     public void initGui() {
         super.initGui();
         // update bounds
-        getMainPanel().setBounds(new Rectangle(10, Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight),200,300));
+        getMainPanel().setBounds(new Rectangle(10, Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight), 200, 300));
 
 
         for (int i = 0; i < addons.size(); i++) {
-            addons.get(i).setBounds(new Rectangle(0, getMainPanel().getBounds().height - (i+1) * 20 - 20, getMainPanel().getBounds().width, 20));
+            addons.get(i).setBounds(new Rectangle(0, getMainPanel().getBounds().height - (i + 1) * 20 - 20, getMainPanel().getBounds().width, 20));
         }
-        save.setBounds(new Rectangle(0 ,getMainPanel().getBounds().height - 20, getMainPanel().getBounds().width, 20));
+        save.setBounds(new Rectangle(0, getMainPanel().getBounds().height - 20, getMainPanel().getBounds().width, 20));
     }
 
 }

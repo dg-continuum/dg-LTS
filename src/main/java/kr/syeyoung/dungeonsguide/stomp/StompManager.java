@@ -3,6 +3,7 @@ package kr.syeyoung.dungeonsguide.stomp;
 import com.google.common.base.Throwables;
 import kr.syeyoung.dungeonsguide.auth.AuthManager;
 import kr.syeyoung.dungeonsguide.events.impl.StompConnectedEvent;
+import kr.syeyoung.dungeonsguide.events.impl.StompDiedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +52,7 @@ public class StompManager {
 
     @SubscribeEvent
     public void onStompDied(StompDiedEvent event) {
-        logger.info("Stomp Connection closed, trying to reconnect - {} - {}", event.reason, event.code);
+        logger.info("Stomp Connection closed, trying to reconnect - {} - {}", event.getReason(), event.getCode());
         connectStomp();
     }
 

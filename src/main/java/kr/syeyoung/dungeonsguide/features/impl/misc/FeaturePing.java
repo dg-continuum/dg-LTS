@@ -3,7 +3,7 @@ package kr.syeyoung.dungeonsguide.features.impl.misc;
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.events.listener.PacketListener;
+import kr.syeyoung.dungeonsguide.events.PacketListener;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.TitleRender;
 import net.minecraft.client.Minecraft;

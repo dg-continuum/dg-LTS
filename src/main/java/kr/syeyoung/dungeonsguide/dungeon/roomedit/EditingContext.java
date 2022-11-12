@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -29,6 +29,17 @@ import java.util.Stack;
 public class EditingContext {
 
     private static EditingContext editingContext;
+    @Getter
+    private final DungeonRoom room;
+    @Getter
+    private final Stack<GuiScreen> guiStack = new Stack<GuiScreen>();
+    private GuiDungeonRoomEdit guiDungeonRoomEdit;
+    @Getter
+    private GuiScreen current;
+
+    private EditingContext(DungeonRoom dungeonRoom) {
+        this.room = dungeonRoom;
+    }
 
     public static void createEditingContext(DungeonRoom dungeonRoom) {
         editingContext = new EditingContext(dungeonRoom);
@@ -43,27 +54,13 @@ public class EditingContext {
         Minecraft.getMinecraft().displayGuiScreen(null);
     }
 
-
-    private EditingContext(DungeonRoom dungeonRoom) {
-        this.room = dungeonRoom;
-    }
-
-    @Getter
-    private final DungeonRoom room;
-
-    @Getter
-    private final Stack<GuiScreen> guiStack = new Stack<GuiScreen>();
-
     public boolean isEditingSecrets() {
         return guiDungeonRoomEdit.isEditingSelected();
     }
+
     public void endEditing() {
         guiDungeonRoomEdit.endEditing();
     }
-
-    private GuiDungeonRoomEdit guiDungeonRoomEdit;
-    @Getter
-    private GuiScreen current;
 
     public void openGui(GuiScreen gui) {
         if (gui instanceof GuiDungeonRoomEdit) guiDungeonRoomEdit = (GuiDungeonRoomEdit) gui;

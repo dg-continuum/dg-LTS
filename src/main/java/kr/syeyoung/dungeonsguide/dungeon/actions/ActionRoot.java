@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionRoot extends AbstractAction {
     private Set<AbstractAction> preRequisite = new HashSet<>();
 

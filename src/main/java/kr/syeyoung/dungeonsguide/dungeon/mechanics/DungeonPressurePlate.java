@@ -28,22 +28,24 @@ import lombok.Data;
 import net.minecraft.util.BlockPos;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 @Data
 public class DungeonPressurePlate implements DungeonMechanic {
     private static final long serialVersionUID = 7450034718355390645L;
     private OffsetPoint platePoint = new OffsetPoint(0, 0, 0);
-    private List<String> preRequisite = new ArrayList<String>();
+    private List<String> preRequisite = new ArrayList<>();
     private String triggering = "";
 
     @Override
     public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
-        if (state.equals(getCurrentState(dungeonRoom))) return Collections.emptySet();
+        if (state.equals(getCurrentState(dungeonRoom))) {
+            return Collections.emptySet();
+        }
         if (state.equalsIgnoreCase("navigate")) {
             Set<AbstractAction> base;
-            Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
+            Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
             preRequisites = actionMove.getPreRequisite();
@@ -54,15 +56,18 @@ public class DungeonPressurePlate implements DungeonMechanic {
             }
             return base;
         }
-        if (!("triggered".equalsIgnoreCase(state) || "untriggered".equalsIgnoreCase(state)))
+        if (!("triggered".equalsIgnoreCase(state) || "untriggered".equalsIgnoreCase(state))) {
             throw new IllegalArgumentException(state + " is not valid state for secret");
-        if (state.equalsIgnoreCase(getCurrentState(dungeonRoom))) return Collections.emptySet();
+        }
+        if (state.equalsIgnoreCase(getCurrentState(dungeonRoom))) {
+            return Collections.emptySet();
+        }
 
-        Set<AbstractAction> base;
-        Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
+        Set<AbstractAction> base = new HashSet<>();
+        Set<AbstractAction> preRequisites = new HashSet<>();
         if ("triggered".equalsIgnoreCase(state)) {
-            ActionDropItem actionClick;
-            preRequisites.add(actionClick = new ActionDropItem(platePoint));
+            ActionDropItem actionClick = new ActionDropItem(platePoint);
+            preRequisites.add(actionClick);
             preRequisites = actionClick.getPreRequisite();
         }
         ActionMove actionMove = new ActionMove(platePoint);
@@ -89,7 +94,7 @@ public class DungeonPressurePlate implements DungeonMechanic {
         DungeonPressurePlate dungeonSecret = new DungeonPressurePlate();
         dungeonSecret.platePoint = (OffsetPoint) platePoint.clone();
         dungeonSecret.triggering = triggering;
-        dungeonSecret.preRequisite = new ArrayList<String>(preRequisite);
+        dungeonSecret.preRequisite = new ArrayList<>(preRequisite);
         return dungeonSecret;
     }
 
@@ -113,10 +118,11 @@ public class DungeonPressurePlate implements DungeonMechanic {
     @Override
     public Set<String> getPossibleStates(DungeonRoom dungeonRoom) {
         String currentStatus = getCurrentState(dungeonRoom);
-        if (currentStatus.equalsIgnoreCase("triggered"))
+        if (currentStatus.equalsIgnoreCase("triggered")) {
             return Sets.newHashSet("navigate", "untriggered");
-        else if (currentStatus.equalsIgnoreCase("untriggered"))
+        } else if (currentStatus.equalsIgnoreCase("untriggered")) {
             return Sets.newHashSet("navigate", "triggered");
+        }
         return Sets.newHashSet("navigate");
     }
 

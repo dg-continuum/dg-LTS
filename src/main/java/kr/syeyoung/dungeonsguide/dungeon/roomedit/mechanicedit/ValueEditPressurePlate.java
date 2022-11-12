@@ -21,33 +21,32 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.mechanicedit;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonPressurePlate;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabelAndElement;
 import kr.syeyoung.dungeonsguide.gui.elements.MTextField;
 import kr.syeyoung.dungeonsguide.gui.elements.MValue;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
+
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Collections;
 
 public class ValueEditPressurePlate extends MPanel implements ValueEdit<DungeonPressurePlate> {
-    private Parameter parameter;
-
     // scroll pane
     // just create
     // add set
     private final DungeonPressurePlate dungeonPressureplate;
-
     private final MLabel label;
     private final MValue<OffsetPoint> value;
     private final MTextField preRequisite;
     private final MLabelAndElement preRequisite2;
     private final MTextField target;
     private final MLabelAndElement target2;
+    private Parameter parameter;
 
 
     public ValueEditPressurePlate(final Parameter parameter2) {
@@ -70,8 +69,8 @@ public class ValueEditPressurePlate extends MPanel implements ValueEdit<DungeonP
             }
         };
         preRequisite.setText(TextUtils.join(dungeonPressureplate.getPreRequisite(), ","));
-        preRequisite2 = new MLabelAndElement("Req.",preRequisite);
-        preRequisite2.setBounds(new Rectangle(0,40,getBounds().width,20));
+        preRequisite2 = new MLabelAndElement("Req.", preRequisite);
+        preRequisite2.setBounds(new Rectangle(0, 40, getBounds().width, 20));
         add(preRequisite2);
 
 
@@ -82,17 +81,17 @@ public class ValueEditPressurePlate extends MPanel implements ValueEdit<DungeonP
             }
         };
         target.setText(dungeonPressureplate.getTriggering());
-        target2 = new MLabelAndElement("Target",target);
-        target2.setBounds(new Rectangle(0,60,getBounds().width,20));
+        target2 = new MLabelAndElement("Target", target);
+        target2.setBounds(new Rectangle(0, 60, getBounds().width, 20));
         add(target2);
     }
 
     @Override
     public void onBoundsUpdate() {
-        label.setBounds(new Rectangle(0,0,getBounds().width, 20));
-        value.setBounds(new Rectangle(0,20,getBounds().width, 20));
-        preRequisite2.setBounds(new Rectangle(0,40,getBounds().width,20));
-        target2.setBounds(new Rectangle(0,60,getBounds().width,20));
+        label.setBounds(new Rectangle(0, 0, getBounds().width, 20));
+        value.setBounds(new Rectangle(0, 20, getBounds().width, 20));
+        preRequisite2.setBounds(new Rectangle(0, 40, getBounds().width, 20));
+        target2.setBounds(new Rectangle(0, 60, getBounds().width, 20));
     }
 
     @Override
@@ -102,12 +101,12 @@ public class ValueEditPressurePlate extends MPanel implements ValueEdit<DungeonP
 
     @Override
     public void renderWorld(float partialTicks) {
-        dungeonPressureplate.highlight(new Color(0,255,0,50), parameter.getName(), EditingContext.getEditingContext().getRoom(), partialTicks);
+        dungeonPressureplate.highlight(new Color(0, 255, 0, 50), parameter.getName(), EditingContext.getEditingContext().getRoom(), partialTicks);
     }
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,0,parentWidth, parentHeight));
+        this.setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
     }
 
     public static class Generator implements ValueEditCreator<ValueEditPressurePlate> {
@@ -125,7 +124,7 @@ public class ValueEditPressurePlate extends MPanel implements ValueEdit<DungeonP
         @Override
         public Object cloneObj(Object object) {
             try {
-                return ((DungeonPressurePlate)object).clone();
+                return ((DungeonPressurePlate) object).clone();
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }

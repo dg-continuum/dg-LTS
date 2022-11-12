@@ -33,14 +33,6 @@ import java.util.Map;
 public class ValueEditRegistry {
     private static final Map<String, ValueEditCreator> valueEditMap = new HashMap<String, ValueEditCreator>();
 
-    public static ValueEditCreator getValueEditMap(String className) {
-        return valueEditMap.get(className);
-    }
-
-    public static List<String> getClassesSupported() {
-        return new ArrayList<String>(valueEditMap.keySet());
-    }
-
     static {
         valueEditMap.put("null", new ValueEditNull());
         valueEditMap.put(String.class.getName(), new ValueEditString.Generator());
@@ -66,5 +58,13 @@ public class ValueEditRegistry {
         valueEditMap.put(DungeonLever.class.getName(), new ValueEditLever.Generator());
         valueEditMap.put(DungeonDoor.class.getName(), new ValueEditDoor.Generator());
         valueEditMap.put(DungeonOnewayDoor.class.getName(), new ValueEditOnewayDoor.Generator());
+    }
+
+    public static ValueEditCreator getValueEditMap(String className) {
+        return valueEditMap.get(className);
+    }
+
+    public static List<String> getClassesSupported() {
+        return new ArrayList<String>(valueEditMap.keySet());
     }
 }

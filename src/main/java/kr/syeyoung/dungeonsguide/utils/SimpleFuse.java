@@ -16,7 +16,7 @@ package kr.syeyoung.dungeonsguide.utils;
  * @author Eryk Ruta
  */
 public class SimpleFuse {
-    boolean state = false;
+    volatile boolean state = false;
 
     public boolean isBlown(){
         return state;

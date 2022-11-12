@@ -67,6 +67,7 @@ public class ActionDropItem extends AbstractAction {
         }
         return (predicate == null || predicate.apply(item.get(0)));
     }
+
     @Override
     public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
         BlockPos pos = target.getBlockPos(dungeonRoom);

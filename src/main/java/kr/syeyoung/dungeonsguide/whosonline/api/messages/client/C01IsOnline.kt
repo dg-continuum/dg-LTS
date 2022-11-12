@@ -1,20 +1,14 @@
-package kr.syeyoung.dungeonsguide.whosonline.api.messages.client;
+package kr.syeyoung.dungeonsguide.whosonline.api.messages.client
 
-import lombok.Data;
+import lombok.AllArgsConstructor
+import lombok.Data
 
 @Data
-public class C01IsOnline {
-    public final String t = "/is_online";
+@AllArgsConstructor
+class C01IsOnline(val c: OBJ) {
+    val t = "/is_online"
 
-    /**
-     * The uuid to check
-     */
-    public final OBJ c;
 
-    @Data
-    public static class OBJ {
-        public final String uuid;
-        public final String nonce;
-    }
+    data class OBJ(val uuid: String?, val nonce: String?)
 
 }

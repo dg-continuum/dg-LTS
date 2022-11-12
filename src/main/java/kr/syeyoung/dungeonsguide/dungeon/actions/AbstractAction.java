@@ -27,7 +27,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import java.util.Set;
 
 public abstract class AbstractAction {
-    public void onPlayerInteract(DungeonRoom dungeonRoom, PlayerInteractEvent event, ActionRouteProperties actionRouteProperties){
+    public void onPlayerInteract(DungeonRoom dungeonRoom, PlayerInteractEvent event, ActionRouteProperties actionRouteProperties) {
 
     }
 

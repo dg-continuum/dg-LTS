@@ -18,7 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.actions;
 
-import kr.syeyoung.dungeonsguide.dungeon.DungeonActionContext;
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
@@ -36,12 +36,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionInteract extends AbstractAction {
     private Set<AbstractAction> preRequisite = new HashSet<>();
     private OffsetPoint target;
     private Predicate<Entity> predicate = entity -> false;
     private int radius;
+    private boolean interacted = false;
 
     public ActionInteract(OffsetPoint target) {
         this.target = target;
@@ -57,12 +58,11 @@ public class ActionInteract extends AbstractAction {
         return interacted;
     }
 
-    private boolean interacted = false;
     @Override
     public void onLivingInteract(DungeonRoom dungeonRoom, PlayerInteractEntityEvent event, ActionRouteProperties actionRouteProperties) {
         if (interacted) return;
 
-        Vec3 spawnLoc = DungeonActionContext.getSpawnLocation().get(event.getEntity().getEntityId());
+        Vec3 spawnLoc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().get(event.getEntity().getEntityId());
         if (spawnLoc == null) {
             return;
         }
@@ -78,12 +78,12 @@ public class ActionInteract extends AbstractAction {
     @Override
     public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
         BlockPos pos = target.getBlockPos(dungeonRoom);
-        RenderUtils.highlightBlock(pos, new Color(0, 255,255,50),partialTicks, true);
+        RenderUtils.highlightBlock(pos, new Color(0, 255, 255, 50), partialTicks, true);
         RenderUtils.drawTextAtWorld("Interact", pos.getX() + 0.5f, pos.getY() + 0.3f, pos.getZ() + 0.5f, 0xFFFFFF00, 0.02f, false, false, partialTicks);
     }
 
     @Override
     public String toString() {
-        return "InteractEntity\n- target: "+target.toString()+"\n- radius: "+radius+"\n- predicate: "+(predicate.test(null) ? "null" : predicate.getClass().getSimpleName());
+        return "InteractEntity\n- target: " + target.toString() + "\n- radius: " + radius + "\n- predicate: " + (predicate.test(null) ? "null" : predicate.getClass().getSimpleName());
     }
 }

@@ -34,17 +34,6 @@ public class ActionTree implements Cloneable {
     private AbstractAction current;
     private Set<ActionTree> children;
 
-    @Override
-    public int hashCode() { return current == null ? 0 : current.hashCode(); }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ActionTree that = (ActionTree) o;
-        return Objects.equals(parent, that.parent) && Objects.equals(current, that.current) && Objects.equals(children, that.children);
-    }
-
     public static ActionTree buildActionTree(Set<AbstractAction> actions, DungeonRoom dungeonRoom) {
         ActionRoot root = new ActionRoot();
         root.setPreRequisite(actions);
@@ -58,14 +47,13 @@ public class ActionTree implements Cloneable {
         tree.setChildren(set);
         return tree;
     }
+
     public static ActionTree buildActionTree(AbstractAction actions, DungeonRoom dungeonRoom) {
         return buildActionTree(null, actions, dungeonRoom, new HashMap<>());
     }
 
-
-
-    private static ActionTree buildActionTree(ActionTree parent, @NotNull AbstractAction action,@NotNull DungeonRoom dungeonRoom, @NotNull Map<AbstractAction, ActionTree> alreadyBuilt) {
-        if (alreadyBuilt.containsKey(action))  {
+    private static ActionTree buildActionTree(ActionTree parent, @NotNull AbstractAction action, @NotNull DungeonRoom dungeonRoom, @NotNull Map<AbstractAction, ActionTree> alreadyBuilt) {
+        if (alreadyBuilt.containsKey(action)) {
             ActionTree tree = alreadyBuilt.get(action);
             tree.getParent().add(parent);
             return tree;
@@ -81,7 +69,7 @@ public class ActionTree implements Cloneable {
         HashSet<ActionTree> set = new HashSet<>();
 
         Set<AbstractAction> preRequisites = action.getPreRequisites(dungeonRoom);
-        if(preRequisites != null){
+        if (preRequisites != null) {
             for (AbstractAction action2 : preRequisites) {
                 ActionTree e = buildActionTree(tree, action2, dungeonRoom, alreadyBuilt);
                 set.add(e);
@@ -90,5 +78,18 @@ public class ActionTree implements Cloneable {
 
         tree.setChildren(set);
         return tree;
+    }
+
+    @Override
+    public int hashCode() {
+        return current == null ? 0 : current.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ActionTree that = (ActionTree) o;
+        return Objects.equals(parent, that.parent) && Objects.equals(current, that.current) && Objects.equals(children, that.children);
     }
 }

@@ -3,6 +3,7 @@ package kr.syeyoung.dungeonsguide.utils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -32,9 +33,9 @@ public class BlockCache {
 
 
     @SuppressWarnings("UnstableApiUsage")
-    public IBlockState getBlockState(@NotNull BlockPos pos){
+    public static IBlockState getBlockState(@NotNull BlockPos pos){
         if(DgOneCongifConfig.DEBUG_BLOCKCACHING){
-            return cache.getUnchecked(pos);
+            return DungeonsGuide.getDungeonsGuide().getBlockCache().cache.getUnchecked(pos);
         } else {
             return Minecraft.getMinecraft().theWorld.getBlockState(pos);
         }

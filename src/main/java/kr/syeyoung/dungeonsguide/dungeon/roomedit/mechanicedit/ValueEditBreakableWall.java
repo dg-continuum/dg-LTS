@@ -22,33 +22,31 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonBreakableWall;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
-import kr.syeyoung.dungeonsguide.gui.elements.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
+import kr.syeyoung.dungeonsguide.gui.elements.*;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraft.init.Blocks;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 public class ValueEditBreakableWall extends MPanel implements ValueEdit<DungeonBreakableWall> {
-    private Parameter parameter;
-
     // scroll pane
     // just create
     // add set
     private final DungeonBreakableWall dungeonBreakableWall;
-
     private final MLabel label;
     private final MValue<OffsetPointSet> value;
     private final MTextField preRequisite;
     private final MLabelAndElement preRequisite2;
     private final MButton updateOnlyAir;
+    private Parameter parameter;
 
     public ValueEditBreakableWall(final Parameter parameter2) {
         this.parameter = parameter2;
@@ -67,7 +65,7 @@ public class ValueEditBreakableWall extends MPanel implements ValueEdit<DungeonB
         updateOnlyAir.setText("Update Air");
         updateOnlyAir.setBackgroundColor(Color.green);
         updateOnlyAir.setForeground(Color.black);
-        updateOnlyAir.setBounds(new Rectangle(0,40,getBounds().width, 20));
+        updateOnlyAir.setBounds(new Rectangle(0, 40, getBounds().width, 20));
         add(updateOnlyAir);
         updateOnlyAir.setOnActionPerformed(new Runnable() {
             @Override
@@ -89,17 +87,17 @@ public class ValueEditBreakableWall extends MPanel implements ValueEdit<DungeonB
             }
         };
         preRequisite.setText(TextUtils.join(dungeonBreakableWall.getPreRequisite(), ","));
-        preRequisite2 = new MLabelAndElement("Req.",preRequisite);
-        preRequisite2.setBounds(new Rectangle(0,60,getBounds().width,20));
+        preRequisite2 = new MLabelAndElement("Req.", preRequisite);
+        preRequisite2.setBounds(new Rectangle(0, 60, getBounds().width, 20));
         add(preRequisite2);
     }
 
     @Override
     public void onBoundsUpdate() {
-        label.setBounds(new Rectangle(0,0,getBounds().width, 20));
-        value.setBounds(new Rectangle(0,20,getBounds().width, 20));
-        updateOnlyAir.setBounds(new Rectangle(0,40,getBounds().width, 20));
-        preRequisite2.setBounds(new Rectangle(0,60,getBounds().width,20));
+        label.setBounds(new Rectangle(0, 0, getBounds().width, 20));
+        value.setBounds(new Rectangle(0, 20, getBounds().width, 20));
+        updateOnlyAir.setBounds(new Rectangle(0, 40, getBounds().width, 20));
+        preRequisite2.setBounds(new Rectangle(0, 60, getBounds().width, 20));
     }
 
     @Override
@@ -109,12 +107,12 @@ public class ValueEditBreakableWall extends MPanel implements ValueEdit<DungeonB
 
     @Override
     public void renderWorld(float partialTicks) {
-        dungeonBreakableWall.highlight(new Color(0,255,255,50), parameter.getName(), EditingContext.getEditingContext().getRoom(), partialTicks);
+        dungeonBreakableWall.highlight(new Color(0, 255, 255, 50), parameter.getName(), EditingContext.getEditingContext().getRoom(), partialTicks);
     }
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,0,parentWidth, parentHeight));
+        this.setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
     }
 
     public static class Generator implements ValueEditCreator<ValueEditBreakableWall> {
@@ -132,7 +130,7 @@ public class ValueEditBreakableWall extends MPanel implements ValueEdit<DungeonB
         @Override
         public Object cloneObj(Object object) {
             try {
-                return ((DungeonBreakableWall)object).clone();
+                return ((DungeonBreakableWall) object).clone();
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }

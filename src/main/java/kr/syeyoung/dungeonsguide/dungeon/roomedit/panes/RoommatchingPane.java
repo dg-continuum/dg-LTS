@@ -28,22 +28,21 @@ import java.util.UUID;
 
 public class RoommatchingPane extends MPanel {
     private final DungeonRoom dungeonRoom;
-
-    private RoomMatchDisplayPane displayPane;
-
     private final MTextField textField;
     private final MButton calculate;
+    private RoomMatchDisplayPane displayPane;
+
     public RoommatchingPane(final DungeonRoom dungeonRoom) {
         this.dungeonRoom = dungeonRoom;
 
         {
             textField = new MTextField();
-            textField.setBounds(new Rectangle(0,0,getBounds().width - 100, 20));
+            textField.setBounds(new Rectangle(0, 0, getBounds().width - 100, 20));
             add(textField);
         }
         {
             calculate = new MButton();
-            calculate.setBounds(new Rectangle(getBounds().width - 100,0,100, 20));
+            calculate.setBounds(new Rectangle(getBounds().width - 100, 0, 100, 20));
             calculate.setText("match");
             calculate.setOnActionPerformed(new Runnable() {
                 @Override
@@ -60,7 +59,7 @@ public class RoommatchingPane extends MPanel {
 
 
                         displayPane = new RoomMatchDisplayPane(dungeonRoom, uid, rotation);
-                        displayPane.setBounds(new Rectangle(0,25,getBounds().width,getBounds().height-25));
+                        displayPane.setBounds(new Rectangle(0, 25, getBounds().width, getBounds().height - 25));
                         add(displayPane);
                     } catch (Throwable t) {
                         t.printStackTrace();
@@ -73,12 +72,12 @@ public class RoommatchingPane extends MPanel {
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(5,5,parentWidth-10,parentHeight-10));
+        this.setBounds(new Rectangle(5, 5, parentWidth - 10, parentHeight - 10));
     }
 
     @Override
     public void onBoundsUpdate() {
-        textField.setBounds(new Rectangle(0,0,getBounds().width - 100, 20));
-        calculate.setBounds(new Rectangle(getBounds().width - 100,0,100, 20));
+        textField.setBounds(new Rectangle(0, 0, getBounds().width - 100, 20));
+        calculate.setBounds(new Rectangle(getBounds().width - 100, 0, 100, 20));
     }
 }

@@ -31,30 +31,26 @@ import java.util.UUID;
 @Setter
 public class DungeonRoomInfo implements Serializable {
     private static final long serialVersionUID = -8291811286448196640L;
+    private transient boolean registered;
+    private boolean isUserMade = false;
+    private short shape;
+    private byte color;
+    private int[][] blocks;
+    private UUID uuid;
+    private String name;
+    private String processorId = "default";
+    private Map<String, Object> properties = new HashMap<>();
 
+    public Map<String, DungeonMechanic> getMechanics() {
+        return mechanics;
+    }
+
+    private Map<String, DungeonMechanic> mechanics = new HashMap<>();
+    private int totalSecrets = -1;
     public DungeonRoomInfo(short shape, byte color) {
         this.uuid = UUID.randomUUID();
         this.name = this.uuid.toString();
         this.shape = shape;
         this.color = color;
     }
-
-    private transient boolean registered;
-
-    private boolean isUserMade = false;
-
-    private short shape;
-    private byte color;
-
-    private int[][] blocks;
-
-    private UUID uuid;
-    private String name;
-
-    private String processorId = "default";
-
-    private Map<String, Object> properties = new HashMap<>();
-
-    private Map<String, DungeonMechanic> mechanics = new HashMap<>();
-    private int totalSecrets = -1;
 }

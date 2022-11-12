@@ -33,7 +33,7 @@ public class DungeonEvent implements Serializable {
     private String eventName;
     private DungeonEventData data;
 
-    public DungeonEvent(DungeonEventData eventData){
+    public DungeonEvent(DungeonEventData eventData) {
         this.data = eventData;
         this.realTimeElapsed = DungeonContext.getTimeElapsed();
         this.skyblockTimeElapsed = DungeonUtil.getTimeElapsed();

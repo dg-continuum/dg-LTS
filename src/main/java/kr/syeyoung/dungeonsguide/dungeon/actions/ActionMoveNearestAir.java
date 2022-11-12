@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.actions;
 
-import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
+import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import lombok.Data;
@@ -34,10 +34,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionMoveNearestAir extends AbstractAction {
     private Set<AbstractAction> preRequisite = new HashSet<>();
+
+    public OffsetPoint getTarget() {
+        return target;
+    }
+
     private OffsetPoint target;
+    private int tick = -1;
+    private List<Vec3> poses;
+    private Future<List<Vec3>> latestFuture;
 
     public ActionMoveNearestAir(OffsetPoint target) {
         this.target = target;
@@ -52,17 +60,15 @@ public class ActionMoveNearestAir extends AbstractAction {
     public boolean isComplete(DungeonRoom dungeonRoom) {
         return target.getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) < 25;
     }
+
     @Override
     public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
         ActionMove.draw(dungeonRoom, partialTicks, actionRouteProperties, flag, target, poses);
     }
 
-    private int tick = -1;
-    private List<Vec3> poses;
-    private Future<List<Vec3>> latestFuture;
     @Override
     public void onTick(DungeonRoom dungeonRoom, ActionRouteProperties actionRouteProperties) {
-        tick = (tick+1) % Math.max(1, actionRouteProperties.getLineRefreshRate());
+        tick = (tick + 1) % Math.max(1, actionRouteProperties.getLineRefreshRate());
         if (latestFuture != null && latestFuture.isDone()) {
             try {
                 poses = latestFuture.get();
@@ -85,8 +91,9 @@ public class ActionMoveNearestAir extends AbstractAction {
             latestFuture = dungeonRoom.createEntityPathTo(dungeonRoom.getContext().getWorld(), Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom), Integer.MAX_VALUE, 10000);
         }
     }
+
     @Override
     public String toString() {
-        return "MoveNearestAir\n- target: "+target.toString();
+        return "MoveNearestAir\n- target: " + target.toString();
     }
 }

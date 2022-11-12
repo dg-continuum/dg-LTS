@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.chat;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -27,10 +26,8 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.simple.SimpleLogger;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,12 +40,12 @@ public class ChatProcessor {
 
     private static final Logger logger = LogManager.getLogger("DG-ChatProcessor");
     private ChatProcessor() {
-        Logger l = LogManager.getLogger(GuiNewChat.class);
-        if (l instanceof SimpleLogger) {
-            ((SimpleLogger) l).setLevel(Level.OFF);
-        } else if (l instanceof org.apache.logging.log4j.core.Logger) {
-            ((org.apache.logging.log4j.core.Logger) l).setLevel(Level.OFF);
-        }
+//        Logger l = LogManager.getLogger(GuiNewChat.class);
+//        if (l instanceof SimpleLogger) {
+//            ((SimpleLogger) l).setLevel(Level.OFF);
+//        } else if (l instanceof org.apache.logging.log4j.core.Logger) {
+//            ((org.apache.logging.log4j.core.Logger) l).setLevel(Level.OFF);
+//        }
     }
 
     private Queue<ChatSubscriber> chatSubscriberQueue = new ConcurrentLinkedQueue<>();
@@ -90,7 +87,6 @@ public class ChatProcessor {
     public void onMessage(ClientChatReceivedEvent chatReceivedEvent) {
         if (chatReceivedEvent.type == 2) return;
         String txt = chatReceivedEvent.message.getFormattedText();
-        logger.info("[CHAT] {}", txt);
 
         int processed = 0;
         int listenened = 0;

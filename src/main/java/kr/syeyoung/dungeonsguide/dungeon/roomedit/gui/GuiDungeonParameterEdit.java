@@ -18,16 +18,16 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.gui;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
-import kr.syeyoung.dungeonsguide.gui.elements.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.panes.DynamicEditor;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditRegistry;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.gui.MGui;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
+import kr.syeyoung.dungeonsguide.gui.elements.*;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
@@ -37,14 +37,10 @@ public class GuiDungeonParameterEdit extends MGui {
 
     private final Parameter parameter;
     private final DungeonRoom dungeonRoom;
-
-    private String classSelection;
-
     private final MPanel currentValueEdit;
-
     private final MButton save;
     private final MButton delete;
-
+    private String classSelection;
     @Getter
     private ValueEdit valueEdit;
 
@@ -62,15 +58,15 @@ public class GuiDungeonParameterEdit extends MGui {
             MLabelAndElement mLabelAndElement = new MLabelAndElement("Name", mTextField);
 
             mTextField.setText(parameter.getName());
-            mLabelAndElement.setBounds(new Rectangle(0,0,200, 20));
+            mLabelAndElement.setBounds(new Rectangle(0, 0, 200, 20));
             getMainPanel().add(mLabelAndElement);
         }
         {
-            classSelection = parameter.getNewData() == null ?"null" : parameter.getNewData().getClass().getName();
+            classSelection = parameter.getNewData() == null ? "null" : parameter.getNewData().getClass().getName();
             final MStringSelectionButton mStringSelectionButton = new MStringSelectionButton(processorParameterEditPane.allowedClass(), classSelection) {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0, 20, parentWidth,20));
+                    setBounds(new Rectangle(0, 20, parentWidth, 20));
                 }
 
                 @Override
@@ -87,14 +83,14 @@ public class GuiDungeonParameterEdit extends MGui {
                     updateClassSelection();
                 }
             });
-            mStringSelectionButton.setBounds(new Rectangle(0,20,150,20));
+            mStringSelectionButton.setBounds(new Rectangle(0, 20, 150, 20));
             getMainPanel().add(mStringSelectionButton);
         }
         {
-            currentValueEdit = new MPanel(){
+            currentValueEdit = new MPanel() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0, 40, parentWidth,parentHeight - 60));
+                    setBounds(new Rectangle(0, 40, parentWidth, parentHeight - 60));
                 }
             };
             getMainPanel().add(currentValueEdit);
@@ -103,7 +99,7 @@ public class GuiDungeonParameterEdit extends MGui {
             delete = new MButton() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0,parentHeight - 20, parentWidth / 2, 20));
+                    setBounds(new Rectangle(0, parentHeight - 20, parentWidth / 2, 20));
                 }
             };
             delete.setText("Delete");
@@ -116,10 +112,10 @@ public class GuiDungeonParameterEdit extends MGui {
                 }
             });
 
-            save = new MButton(){
+            save = new MButton() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(parentWidth / 2,parentHeight - 20, parentWidth / 2, 20));
+                    setBounds(new Rectangle(parentWidth / 2, parentHeight - 20, parentWidth / 2, 20));
                 }
             };
             save.setText("Go back");
@@ -141,7 +137,7 @@ public class GuiDungeonParameterEdit extends MGui {
 
         ValueEditCreator valueEditCreator = ValueEditRegistry.getValueEditMap(classSelection);
 
-        if (!classSelection.equals(parameter.getNewData() == null ?"null" :parameter.getNewData().getClass().getName())) {
+        if (!classSelection.equals(parameter.getNewData() == null ? "null" : parameter.getNewData().getClass().getName())) {
             parameter.setNewData(valueEditCreator.createDefaultValue(parameter));
             parameter.setPreviousData(valueEditCreator.cloneObj(parameter.getNewData()));
         }
@@ -151,23 +147,24 @@ public class GuiDungeonParameterEdit extends MGui {
             MLabel valueEdit2 = new MLabel() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0, 0, parentWidth,20));
+                    setBounds(new Rectangle(0, 0, parentWidth, 20));
                 }
             };
             valueEdit2.setText("No Value Edit");
-            valueEdit2.setBounds(new Rectangle(0,0,150,20));
+            valueEdit2.setBounds(new Rectangle(0, 0, 150, 20));
             valueEdit = valueEdit2;
             this.valueEdit = null;
-        } else{
+        } else {
             this.valueEdit = (ValueEdit) valueEdit;
         }
         valueEdit.resize0(currentValueEdit.getBounds().width, currentValueEdit.getBounds().height);
         currentValueEdit.add(valueEdit);
     }
+
     @Override
     public void initGui() {
         super.initGui();
         // update bounds
-        getMainPanel().setBounds(new Rectangle(10, Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight),200,300));
+        getMainPanel().setBounds(new Rectangle(10, Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight), 200, 300));
     }
 }

@@ -40,10 +40,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionBreakWithSuperBoom extends AbstractAction {
     private Set<AbstractAction> preRequisite = new HashSet<AbstractAction>();
     private OffsetPoint target;
+
+    public ActionBreakWithSuperBoom(OffsetPoint target) {
+        this.target = target;
+    }
 
     @Override
     public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
@@ -53,10 +57,6 @@ public class ActionBreakWithSuperBoom extends AbstractAction {
     @Override
     public boolean isComplete(DungeonRoom dungeonRoom) {
         return false;
-    }
-
-    public ActionBreakWithSuperBoom(OffsetPoint target) {
-        this.target = target;
     }
 
     @Override
@@ -92,12 +92,12 @@ public class ActionBreakWithSuperBoom extends AbstractAction {
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
 
-        RenderUtils.highlightBlock(blockpos, new Color(0, 255,255,50), partialTicks, true);
+        RenderUtils.highlightBlock(blockpos, new Color(0, 255, 255, 50), partialTicks, true);
         RenderUtils.drawTextAtWorld("Superboom", blockpos.getX() + 0.5f, blockpos.getY() + 0.5f, blockpos.getZ() + 0.5f, 0xFFFFFF00, 0.03f, false, false, partialTicks);
     }
 
     @Override
     public String toString() {
-        return "BreakWithSuperboom\n- target: "+target.toString();
+        return "BreakWithSuperboom\n- target: " + target.toString();
     }
 }

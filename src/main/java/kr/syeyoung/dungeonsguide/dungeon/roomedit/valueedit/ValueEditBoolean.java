@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit;
 
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabelAndElement;
 import kr.syeyoung.dungeonsguide.gui.elements.MStringSelectionButton;
@@ -40,8 +40,8 @@ public class ValueEditBoolean extends MPanel implements ValueEdit<Boolean> {
                     return parameter.getPreviousData().toString();
                 }
             };
-            MLabelAndElement mLabelAndElement = new MLabelAndElement("Prev",label);
-            mLabelAndElement.setBounds(new Rectangle(0,0,getBounds().width,20));
+            MLabelAndElement mLabelAndElement = new MLabelAndElement("Prev", label);
+            mLabelAndElement.setBounds(new Rectangle(0, 0, getBounds().width, 20));
             add(mLabelAndElement);
         }
         {
@@ -53,15 +53,15 @@ public class ValueEditBoolean extends MPanel implements ValueEdit<Boolean> {
                     parameter.setNewData(Boolean.valueOf(textField.getSelected()));
                 }
             });
-            MLabelAndElement mLabelAndElement = new MLabelAndElement("New",textField);
-            mLabelAndElement.setBounds(new Rectangle(0,20,getBounds().width,20));
+            MLabelAndElement mLabelAndElement = new MLabelAndElement("New", textField);
+            mLabelAndElement.setBounds(new Rectangle(0, 20, getBounds().width, 20));
             add(mLabelAndElement);
         }
     }
 
     @Override
     public void onBoundsUpdate() {
-        for (MPanel panel :getChildComponents()){
+        for (MPanel panel : getChildComponents()) {
             panel.setSize(new Dimension(getBounds().width, 20));
         }
     }
@@ -78,7 +78,7 @@ public class ValueEditBoolean extends MPanel implements ValueEdit<Boolean> {
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,0,parentWidth, parentHeight));
+        this.setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
     }
 
     public static class Generator implements ValueEditCreator<ValueEditBoolean> {

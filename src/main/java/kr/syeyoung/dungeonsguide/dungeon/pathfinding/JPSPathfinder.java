@@ -24,38 +24,31 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.util.*;
-import net.minecraft.world.World;
 
 import java.util.*;
 
 public class JPSPathfinder {
-    private final BlockPos min, max;
-    private final World world;
-
-    private Vec3 start;
-    private Vec3 destination;
-    private DungeonRoom dungeonRoom;
+    private final DungeonRoom dungeonRoom;
+    private final IntHashMap<Node> nodeMap = new IntHashMap();
+    @Getter
+    private final LinkedList<Vec3> route = new LinkedList<>();
+    @Getter
+    private final PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparing((Node a) -> a == null ? Float.MAX_VALUE : a.f).thenComparing(a -> a == null ? Float.MAX_VALUE : a.x).thenComparing(a -> a == null ? Float.MAX_VALUE : a.y).thenComparing(a -> a == null ? Float.MAX_VALUE : a.z));
 
     @Getter
     private AxisAlignedBB destinationBB;
+    private int tx, ty, tz;
 
-    public JPSPathfinder(DungeonRoom dungeonRoom){
-        this.min = new BlockPos(dungeonRoom.getMinx(), 0, dungeonRoom.getMinz());
-        this.max = new BlockPos(dungeonRoom.getMaxx(), 255, dungeonRoom.getMaxz());
+    public JPSPathfinder(DungeonRoom dungeonRoom) {
 
-        this.world = dungeonRoom.getCachedWorld();
         this.dungeonRoom = dungeonRoom;
     }
 
-    private IntHashMap<Node> nodeMap = new IntHashMap();
-
-    private Node openNode(int x, int y, int z)
-    {
+    private Node openNode(int x, int y, int z) {
         int i = Node.makeHash(x, y, z);
         Node node = this.nodeMap.lookup(i);
 
-        if (node == null)
-        {
+        if (node == null) {
             node = new Node(x, y, z);
             this.nodeMap.addKey(i, node);
         }
@@ -63,58 +56,50 @@ public class JPSPathfinder {
         return node;
     }
 
-    @Getter
-    private LinkedList<Vec3> route = new LinkedList<>();
-
-    @Getter
-    private PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparing((Node a) -> a == null ? Float.MAX_VALUE : a.f).thenComparing(a -> a == null ? Float.MAX_VALUE :  a.x).thenComparing(a -> a == null ? Float.MAX_VALUE :  a.y).thenComparing(a -> a == null ? Float.MAX_VALUE :  a.z));
-
-    private int tx, ty, tz;
-
     private Node addNode(Node parent, Node jumpPt, boolean addToOpen) {
         float ng = parent.g + distSq(jumpPt.x - parent.x, jumpPt.y - parent.y, jumpPt.z - parent.z);
 
         if (ng < jumpPt.g) {
             if (addToOpen)
-            open.remove(jumpPt);
+                open.remove(jumpPt);
             jumpPt.g = ng;
             jumpPt.h = jumpPt.h == -1 ? distSq(tx - jumpPt.x, ty - jumpPt.y, tz - jumpPt.z) : jumpPt.h;
             jumpPt.f = jumpPt.h + jumpPt.g;
             jumpPt.parent = parent;
             if (addToOpen)
-            open.add(jumpPt);
+                open.add(jumpPt);
         }
         return jumpPt;
     }
 
-
-    long arr[];
-
     public boolean pathfind(Vec3 from, Vec3 to, float within, long timeout) {
-        route.clear(); nodeMap.clearMap();
+        route.clear();
+        nodeMap.clearMap();
 
         {
-            from = new Vec3(((int)(from.xCoord * 2)) / 2.0, ((int)(from.yCoord * 2)) / 2.0, ((int)(from.zCoord* 2)) / 2.0);
-            to = new Vec3(((int)(to.xCoord * 2)) / 2.0, ((int)(to.yCoord * 2)) / 2.0, ((int)(to.zCoord* 2)) / 2.0);
+            from = new Vec3(((int) (from.xCoord * 2)) / 2.0, ((int) (from.yCoord * 2)) / 2.0, ((int) (from.zCoord * 2)) / 2.0);
+            to = new Vec3(((int) (to.xCoord * 2)) / 2.0, ((int) (to.yCoord * 2)) / 2.0, ((int) (to.zCoord * 2)) / 2.0);
         }
 
-        this.start = from; this.destination = to;
-        tx = (int)(to.xCoord * 2);
-        ty = (int)(to.yCoord * 2);
-        tz = (int)(to.zCoord * 2);
+        tx = (int) (to.xCoord * 2);
+        ty = (int) (to.yCoord * 2);
+        tz = (int) (to.zCoord * 2);
 
-        destinationBB = AxisAlignedBB.fromBounds((to.xCoord - within)* 2, (to.yCoord - within) * 2, (to.zCoord - within) * 2, (to.xCoord + within) * 2, (to.yCoord + within)* 2, (to.zCoord + within) *2);
+        destinationBB = AxisAlignedBB.fromBounds((to.xCoord - within) * 2, (to.yCoord - within) * 2, (to.zCoord - within) * 2, (to.xCoord + within) * 2, (to.yCoord + within) * 2, (to.zCoord + within) * 2);
         open.clear();
         Node start;
-        open.add(start = openNode((int)from.xCoord * 2 + 1, (int)from.yCoord * 2, (int)from.zCoord * 2+1));
-        start.g = 0; start.f = 0; start.h = (float) from.squareDistanceTo(to);
+        open.add(start = openNode((int) from.xCoord * 2 + 1, (int) from.yCoord * 2, (int) from.zCoord * 2 + 1));
+        start.g = 0;
+        start.f = 0;
+        start.h = (float) from.squareDistanceTo(to);
 
-        Node end = null; float minDist = Float.MAX_VALUE;
+        Node end = null;
+        float minDist = Float.MAX_VALUE;
         long forceEnd = System.currentTimeMillis() + timeout + 999999999L;
-        while(!open.isEmpty()) {
+        while (!open.isEmpty()) {
             if (forceEnd < System.currentTimeMillis() && timeout != -1) break;
             Node n = open.poll();
-            n.closed= true;
+            n.closed = true;
             if (minDist > n.h) {
                 minDist = n.h;
                 end = n;
@@ -161,123 +146,131 @@ public class JPSPathfinder {
                 for (int j = -1; j <= 1; j++)
                     for (int k = -1; k <= 1; k++) {
                         if (i == 0 && j == 0 && k == 0) continue;
-                        nexts.add(openNode(x+i, y+j, z+k));
+                        nexts.add(openNode(x + i, y + j, z + k));
                     }
         } else if (determinant == 1) {
-            nexts.add(openNode(nx,ny,nz));
-            for (int i = -1; i<=1; i++) {
-                for (int j = - 1; j<=1; j++) {
+            nexts.add(openNode(nx, ny, nz));
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
                     if (i == 0 && j == 0) continue;
-                    if (dx != 0 && dungeonRoom.isBlocked(x, y + i, z + j)) nexts.add(openNode(nx,y+i,z+j));
-                    if (dy != 0 && dungeonRoom.isBlocked(x + i, y, z + j)) nexts.add(openNode(x+i,ny,z+j));
-                    if (dz != 0 && dungeonRoom.isBlocked(x + i, y + j, z)) nexts.add(openNode(x+i,y+j,nz));
+                    if (dx != 0 && dungeonRoom.isBlocked(x, y + i, z + j)) nexts.add(openNode(nx, y + i, z + j));
+                    if (dy != 0 && dungeonRoom.isBlocked(x + i, y, z + j)) nexts.add(openNode(x + i, ny, z + j));
+                    if (dz != 0 && dungeonRoom.isBlocked(x + i, y + j, z)) nexts.add(openNode(x + i, y + j, nz));
                 }
             }
         } else if (determinant == 2) {
-            if (dz != 0) nexts.add(openNode(x,y,nz));
-            if (dy != 0) nexts.add(openNode(x,ny,z));
-            if (dx != 0) nexts.add(openNode(nx,y,z));
-            nexts.add(openNode(nx,ny,nz));
+            if (dz != 0) nexts.add(openNode(x, y, nz));
+            if (dy != 0) nexts.add(openNode(x, ny, z));
+            if (dx != 0) nexts.add(openNode(nx, y, z));
+            nexts.add(openNode(nx, ny, nz));
             if (dx == 0) {
-                if (dungeonRoom.isBlocked(x, y, z-dz)) {
-                    nexts.add(openNode(x, ny, z-dz));
-                    if (dungeonRoom.isBlocked(x+1, y, z-dz)) nexts.add(openNode(x+1, ny, z-dz));
-                    if (dungeonRoom.isBlocked(x-1, y, z-dz)) nexts.add(openNode(x-1, ny, z-dz));
+                if (dungeonRoom.isBlocked(x, y, z - dz)) {
+                    nexts.add(openNode(x, ny, z - dz));
+                    if (dungeonRoom.isBlocked(x + 1, y, z - dz)) nexts.add(openNode(x + 1, ny, z - dz));
+                    if (dungeonRoom.isBlocked(x - 1, y, z - dz)) nexts.add(openNode(x - 1, ny, z - dz));
                 }
-                if (dungeonRoom.isBlocked(x, y-dy, z)) {
-                    nexts.add(openNode(x, y-dy, nz));
-                    if (dungeonRoom.isBlocked(x+1, y-dy, z)) nexts.add(openNode(x+1, y-dy, nz));
-                    if (dungeonRoom.isBlocked(x-1, y-dy, z)) nexts.add(openNode(x+1, y-dy, nz));
+                if (dungeonRoom.isBlocked(x, y - dy, z)) {
+                    nexts.add(openNode(x, y - dy, nz));
+                    if (dungeonRoom.isBlocked(x + 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz));
+                    if (dungeonRoom.isBlocked(x - 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz));
                 }
             } else if (dy == 0) {
-                if (dungeonRoom.isBlocked(x, y, z-dz)) {
-                    nexts.add(openNode(nx, y, z-dz));
-                    if (dungeonRoom.isBlocked(x, y+1, z-dz)) nexts.add(openNode(nx, y+1, z-dz));
-                    if (dungeonRoom.isBlocked(x, y-1, z-dz)) nexts.add(openNode(nx, y-1, z-dz));
+                if (dungeonRoom.isBlocked(x, y, z - dz)) {
+                    nexts.add(openNode(nx, y, z - dz));
+                    if (dungeonRoom.isBlocked(x, y + 1, z - dz)) nexts.add(openNode(nx, y + 1, z - dz));
+                    if (dungeonRoom.isBlocked(x, y - 1, z - dz)) nexts.add(openNode(nx, y - 1, z - dz));
                 }
-                if (dungeonRoom.isBlocked(x-dx, y, z)) {
-                    nexts.add(openNode(x-dx, y, nz));
-                    if (dungeonRoom.isBlocked(x-dx, y+1, z)) nexts.add(openNode(x-dx, y+1, nz));
-                    if (dungeonRoom.isBlocked(x-dx, y-1, z)) nexts.add(openNode(x-dx, y-1, nz));
+                if (dungeonRoom.isBlocked(x - dx, y, z)) {
+                    nexts.add(openNode(x - dx, y, nz));
+                    if (dungeonRoom.isBlocked(x - dx, y + 1, z)) nexts.add(openNode(x - dx, y + 1, nz));
+                    if (dungeonRoom.isBlocked(x - dx, y - 1, z)) nexts.add(openNode(x - dx, y - 1, nz));
                 }
             } else if (dz == 0) {
-                if (dungeonRoom.isBlocked(x, y-dy, z)) {
-                    nexts.add(openNode(nx, y-dy, z));
-                    if (dungeonRoom.isBlocked(x, y-dy, z+1)) nexts.add(openNode(nx, y-dy, z+1));
-                    if (dungeonRoom.isBlocked(x, y-dy, z-1)) nexts.add(openNode(nx, y-dy, z-1));
+                if (dungeonRoom.isBlocked(x, y - dy, z)) {
+                    nexts.add(openNode(nx, y - dy, z));
+                    if (dungeonRoom.isBlocked(x, y - dy, z + 1)) nexts.add(openNode(nx, y - dy, z + 1));
+                    if (dungeonRoom.isBlocked(x, y - dy, z - 1)) nexts.add(openNode(nx, y - dy, z - 1));
                 }
-                if (dungeonRoom.isBlocked(x-dx, y, z)) {
-                    nexts.add(openNode(x-dx, ny, z));
-                    if (dungeonRoom.isBlocked(x-dx, y, z+1)) nexts.add(openNode(x-dx, ny, z+1));
-                    if (dungeonRoom.isBlocked(x-dx, y, z-1)) nexts.add(openNode(x-dx, ny, z-1));
+                if (dungeonRoom.isBlocked(x - dx, y, z)) {
+                    nexts.add(openNode(x - dx, ny, z));
+                    if (dungeonRoom.isBlocked(x - dx, y, z + 1)) nexts.add(openNode(x - dx, ny, z + 1));
+                    if (dungeonRoom.isBlocked(x - dx, y, z - 1)) nexts.add(openNode(x - dx, ny, z - 1));
                 }
             }
         } else if (determinant == 3) {
-            nexts.add(openNode(x,y,nz));
-            nexts.add(openNode(x,ny,z));
-            nexts.add(openNode(nx,y,z));
-            nexts.add(openNode(nx,y,nz));
-            nexts.add(openNode(x,ny,nz));
-            nexts.add(openNode(nx,ny,z));
-            nexts.add(openNode(nx,ny,nz));
+            nexts.add(openNode(x, y, nz));
+            nexts.add(openNode(x, ny, z));
+            nexts.add(openNode(nx, y, z));
+            nexts.add(openNode(nx, y, nz));
+            nexts.add(openNode(x, ny, nz));
+            nexts.add(openNode(nx, ny, z));
+            nexts.add(openNode(nx, ny, nz));
 
-            if (dungeonRoom.isBlocked(x,y,z-dz)) {
-                nexts.add(openNode(x,ny,z-dz));
-                nexts.add(openNode(nx,ny,z-dz));
-                nexts.add(openNode(nx,y,z-dz));
+            if (dungeonRoom.isBlocked(x, y, z - dz)) {
+                nexts.add(openNode(x, ny, z - dz));
+                nexts.add(openNode(nx, ny, z - dz));
+                nexts.add(openNode(nx, y, z - dz));
             }
-            if (dungeonRoom.isBlocked(x-dx,y,z)) {
-                nexts.add(openNode(x-dx,ny,nz));
-                nexts.add(openNode(x-dx,ny,z));
-                nexts.add(openNode(x-dx,y,nz));
+            if (dungeonRoom.isBlocked(x - dx, y, z)) {
+                nexts.add(openNode(x - dx, ny, nz));
+                nexts.add(openNode(x - dx, ny, z));
+                nexts.add(openNode(x - dx, y, nz));
             }
-            if (dungeonRoom.isBlocked(x,y-dy,z)) {
-                nexts.add(openNode(x,y-dy,nz));
-                nexts.add(openNode(nx,y-dy,z));
-                nexts.add(openNode(nx,y-dy,nz));
+            if (dungeonRoom.isBlocked(x, y - dy, z)) {
+                nexts.add(openNode(x, y - dy, nz));
+                nexts.add(openNode(nx, y - dy, z));
+                nexts.add(openNode(nx, y - dy, nz));
             }
         }
         return nexts;
     }
 
     public Node expand(int x, int y, int z, int dx, int dy, int dz) {
-        while(true) {
-            int nx =  x + dx, ny = y + dy, nz = z + dz;
+        while (true) {
+            int nx = x + dx, ny = y + dy, nz = z + dz;
             if (dungeonRoom.isBlocked(nx, ny, nz)) return null;
 
-            if (nx > destinationBB.minX && nx < destinationBB.maxX && ny > destinationBB.minY && ny < destinationBB.maxY && nz > destinationBB.minZ && nz < destinationBB.maxZ) return openNode(nx,ny,nz);
+            if (nx > destinationBB.minX && nx < destinationBB.maxX && ny > destinationBB.minY && ny < destinationBB.maxY && nz > destinationBB.minZ && nz < destinationBB.maxZ)
+                return openNode(nx, ny, nz);
 
             int determinant = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
             if (determinant == 1) {
-                for (int i = -1; i<=1; i++) {
-                    for (int j = - 1; j<=1; j++) {
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
                         if (i == 0 && j == 0) continue;
-                        if (dx != 0 && dungeonRoom.isBlocked(nx, ny + i, nz + j) && !dungeonRoom.isBlocked(nx+dx, ny + i, nz + j)) return  openNode(nx,ny,nz);
-                        if (dy != 0 && dungeonRoom.isBlocked(nx + i, ny, nz + j) && !dungeonRoom.isBlocked(nx + i, ny+dy, nz + j)) return openNode(nx,ny,nz);
-                        if (dz != 0 && dungeonRoom.isBlocked(nx + i, ny + j , nz) && !dungeonRoom.isBlocked(nx + i, ny + j , nz+dz)) return openNode(nx,ny,nz);
+                        if (dx != 0 && dungeonRoom.isBlocked(nx, ny + i, nz + j) && !dungeonRoom.isBlocked(nx + dx, ny + i, nz + j))
+                            return openNode(nx, ny, nz);
+                        if (dy != 0 && dungeonRoom.isBlocked(nx + i, ny, nz + j) && !dungeonRoom.isBlocked(nx + i, ny + dy, nz + j))
+                            return openNode(nx, ny, nz);
+                        if (dz != 0 && dungeonRoom.isBlocked(nx + i, ny + j, nz) && !dungeonRoom.isBlocked(nx + i, ny + j, nz + dz))
+                            return openNode(nx, ny, nz);
                     }
                 }
             } else if (determinant == 2) {
                 for (EnumFacing value : EnumFacing.VALUES) {
-                    if (value.getFrontOffsetX() == dx || value.getFrontOffsetY() == dy || value.getFrontOffsetZ() == dz) continue;
+                    if (value.getFrontOffsetX() == dx || value.getFrontOffsetY() == dy || value.getFrontOffsetZ() == dz)
+                        continue;
                     int tx = nx + value.getFrontOffsetX();
                     int ty = ny + value.getFrontOffsetY();
                     int tz = nz + value.getFrontOffsetZ();
                     if (dungeonRoom.isBlocked(tx, ty, tz)) return openNode(nx, ny, nz);
                 }
-                if (dx != 0 &&  expand(nx, ny, nz, dx, 0,0) != null) return openNode(nx,ny,nz);
-                if (dy != 0 && expand(nx, ny, nz, 0, dy,0) != null) return openNode(nx,ny,nz);
-                if (dz != 0 && expand(nx, ny, nz, 0, 0,dz) != null) return openNode(nx,ny,nz);
+                if (dx != 0 && expand(nx, ny, nz, dx, 0, 0) != null) return openNode(nx, ny, nz);
+                if (dy != 0 && expand(nx, ny, nz, 0, dy, 0) != null) return openNode(nx, ny, nz);
+                if (dz != 0 && expand(nx, ny, nz, 0, 0, dz) != null) return openNode(nx, ny, nz);
             } else if (determinant == 3) {
-                if (dungeonRoom.isBlocked(x, ny, nz ) || dungeonRoom.isBlocked(nx, y , nz) || dungeonRoom.isBlocked(nx, ny, z)) return openNode(nx,ny,nz);
+                if (dungeonRoom.isBlocked(x, ny, nz) || dungeonRoom.isBlocked(nx, y, nz) || dungeonRoom.isBlocked(nx, ny, z))
+                    return openNode(nx, ny, nz);
                 if (expand(nx, ny, nz, dx, 0, 0) != null ||
                         expand(nx, ny, nz, dx, dy, 0) != null ||
                         expand(nx, ny, nz, dx, 0, dz) != null ||
                         expand(nx, ny, nz, 0, dy, 0) != null ||
                         expand(nx, ny, nz, 0, dy, dz) != null ||
-                        expand(nx, ny, nz, 0, 0, dz) != null) return openNode(nx,ny,nz);
+                        expand(nx, ny, nz, 0, 0, dz) != null) return openNode(nx, ny, nz);
             }
-            x = nx; y = ny; z = nz;
+            x = nx;
+            y = ny;
+            z = nz;
         }
     }
 
@@ -292,8 +285,7 @@ public class JPSPathfinder {
         @EqualsAndHashCode.Exclude
         private Node parent;
 
-        public static int makeHash(int x, int y, int z)
-        {
+        public static int makeHash(int x, int y, int z) {
             return y & 255 | (x & 32767) << 8 | (z & 32767) << 24 | (x < 0 ? Integer.MIN_VALUE : 0) | (z < 0 ? 32768 : 0);
         }
 

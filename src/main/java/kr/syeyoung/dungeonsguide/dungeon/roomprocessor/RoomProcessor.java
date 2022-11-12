@@ -29,20 +29,27 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 public interface RoomProcessor {
     void tick();
+
     void drawScreen(float partialTicks);
+
     void drawWorld(float partialTicks);
+
     void chatReceived(IChatComponent chat);
+
     void actionbarReceived(IChatComponent chat);
 
     boolean readGlobalChat();
 
     void onPostGuiRender(GuiScreenEvent.DrawScreenEvent.Post event);
+
     void onEntityUpdate(LivingEvent.LivingUpdateEvent updateEvent);
+
     void onEntityDeath(LivingDeathEvent deathEvent);
 
     void onKeybindPress(KeyBindPressedEvent keyInputEvent);
 
     void onInteract(PlayerInteractEntityEvent event);
+
     void onInteractBlock(PlayerInteractEvent event);
 
     void onBlockUpdate(BlockUpdateEvent blockUpdateEvent);

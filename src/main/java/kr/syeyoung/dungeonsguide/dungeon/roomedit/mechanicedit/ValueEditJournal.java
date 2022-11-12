@@ -20,15 +20,15 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.mechanicedit;
 
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonJournal;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabelAndElement;
 import kr.syeyoung.dungeonsguide.gui.elements.MTextField;
 import kr.syeyoung.dungeonsguide.gui.elements.MValue;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 
 import java.awt.*;
@@ -37,17 +37,15 @@ import java.util.Collections;
 
 
 public class ValueEditJournal extends MPanel implements ValueEdit<DungeonJournal> {
-    private Parameter parameter;
-
     // scroll pane
     // just create
     // add set
     private final DungeonJournal dungeonSecret;
-
     private final MLabel label;
     private final MValue<OffsetPoint> value;
     private final MTextField preRequisite;
     private final MLabelAndElement preRequisite2;
+    private Parameter parameter;
 
     public ValueEditJournal(final Parameter parameter2) {
         this.parameter = parameter2;
@@ -69,16 +67,16 @@ public class ValueEditJournal extends MPanel implements ValueEdit<DungeonJournal
             }
         };
         preRequisite.setText(TextUtils.join(dungeonSecret.getPreRequisite(), ","));
-        preRequisite2 = new MLabelAndElement("Req.",preRequisite);
-        preRequisite2.setBounds(new Rectangle(0,40,getBounds().width,20));
+        preRequisite2 = new MLabelAndElement("Req.", preRequisite);
+        preRequisite2.setBounds(new Rectangle(0, 40, getBounds().width, 20));
         add(preRequisite2);
     }
 
     @Override
     public void onBoundsUpdate() {
-        label.setBounds(new Rectangle(0,0,getBounds().width, 20));
-        value.setBounds(new Rectangle(0,20,getBounds().width, 20));
-        preRequisite2.setBounds(new Rectangle(0,40,getBounds().width,20));
+        label.setBounds(new Rectangle(0, 0, getBounds().width, 20));
+        value.setBounds(new Rectangle(0, 20, getBounds().width, 20));
+        preRequisite2.setBounds(new Rectangle(0, 40, getBounds().width, 20));
     }
 
     @Override
@@ -88,12 +86,12 @@ public class ValueEditJournal extends MPanel implements ValueEdit<DungeonJournal
 
     @Override
     public void renderWorld(float partialTicks) {
-        dungeonSecret.highlight(new Color(0,255,0,50), parameter.getName(), EditingContext.getEditingContext().getRoom(), partialTicks);
+        dungeonSecret.highlight(new Color(0, 255, 0, 50), parameter.getName(), EditingContext.getEditingContext().getRoom(), partialTicks);
     }
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,0,parentWidth, parentHeight));
+        this.setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
     }
 
     public static class Generator implements ValueEditCreator<ValueEditJournal> {
@@ -111,7 +109,7 @@ public class ValueEditJournal extends MPanel implements ValueEdit<DungeonJournal
         @Override
         public Object cloneObj(Object object) {
             try {
-                return ((DungeonJournal)object).clone();
+                return ((DungeonJournal) object).clone();
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }

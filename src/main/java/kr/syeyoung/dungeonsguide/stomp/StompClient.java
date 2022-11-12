@@ -18,6 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.stomp;
 
+import kr.syeyoung.dungeonsguide.events.impl.StompDiedEvent;
 import lombok.Getter;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;

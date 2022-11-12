@@ -41,8 +41,9 @@ public class OffsetPoint implements Cloneable, Serializable {
     public OffsetPoint(DungeonRoom dungeonRoom, BlockPos pos) {
         setPosInWorld(dungeonRoom, pos);
     }
+
     public OffsetPoint(DungeonRoom dungeonRoom, Vec3 pos) {
-        setPosInWorld(dungeonRoom, new BlockPos((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord));
+        setPosInWorld(dungeonRoom, new BlockPos((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord));
     }
 
 
@@ -59,11 +60,11 @@ public class OffsetPoint implements Cloneable, Serializable {
 
         this.x = (int) vector2d.x;
         this.z = (int) vector2d.y;
-        this.y = pos.getY()-dungeonRoom.getMin().getY();
+        this.y = pos.getY() - dungeonRoom.getMin().getY();
     }
 
     public BlockPos toRotatedRelBlockPos(DungeonRoom dungeonRoom) {
-        Vector2d rot = new Vector2d(x,z);
+        Vector2d rot = new Vector2d(x, z);
         for (int i = 0; i < dungeonRoom.getRoomMatcher().getRotation(); i++) {
             rot = VectorUtils.rotateCounterClockwise(rot);
             if (i % 2 == 0) {
@@ -81,6 +82,7 @@ public class OffsetPoint implements Cloneable, Serializable {
 
         return dungeonRoom.getRelativeBlockAt(relBp.getX(), relBp.getY(), relBp.getZ());
     }
+
     public BlockPos getBlockPos(DungeonRoom dungeonRoom) {
         BlockPos relBp = toRotatedRelBlockPos(dungeonRoom);
         return dungeonRoom.getRelativeBlockPosAt(relBp.getX(), relBp.getY(), relBp.getZ());
@@ -94,7 +96,7 @@ public class OffsetPoint implements Cloneable, Serializable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return new OffsetPoint(x,y,z);
+        return new OffsetPoint(x, y, z);
     }
 
     @Override

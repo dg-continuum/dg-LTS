@@ -6,6 +6,7 @@ import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.guiconfig.NestedCategory;
 import kr.syeyoung.dungeonsguide.cosmetics.data.ActiveCosmetic;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoomInfoRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
@@ -17,17 +18,16 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechan
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoomInfoRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.party.PartyContext;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
+import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import kr.syeyoung.dungeonsguide.utils.*;
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import lombok.val;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -136,9 +136,7 @@ public class CommandDgDebug extends CommandBase {
                 DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
                 sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully loaded roomdatas"));
                 return;
-            } catch (BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
-                     NoSuchAlgorithmException | IOException | IllegalBlockSizeException |
-                     NoSuchPaddingException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cAn error has occurred while loading roomdata"));
@@ -164,7 +162,7 @@ public class CommandDgDebug extends CommandBase {
 
                 DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
                 GeneralRoomProcessor grp = (GeneralRoomProcessor) dungeonRoom.getRoomProcessor();
-                grp.pathfind("COMMAND", args[1], args[2], FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
+                grp.getSecretGuider().addAction("COMMAND", args[1], args[2], FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -255,13 +253,15 @@ public class CommandDgDebug extends CommandBase {
         } else if ("reloaddungeon".equals(arg)) {
             try {
                 MinecraftForge.EVENT_BUS.post(new DungeonLeftEvent());
-                DungeonContext.started = -1;
-
                 DungeonsGuide.getDungeonsGuide().getDungeonFacade().setContext(null);
                 MapUtils.clearMap();
             } catch (Throwable t) {
                 t.printStackTrace();
             }
+        } else if ("sayhikotlin".equals(arg)) {
+            HEY a = new HEY();
+            a.doFunStuff();
+
         } else if ("partyid".equals(arg)) {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fInternal Party id: " + Optional.ofNullable(PartyManager.INSTANCE.getPartyContext()).map(PartyContext::getPartyID).orElse(null)));
         } else if ("loc".equals(arg)) {
@@ -340,7 +340,7 @@ public class CommandDgDebug extends CommandBase {
                 }
 
                 @Override
-                public boolean isTrapSpawn(String dungeonName) {
+                public boolean hasTrapRoom(String dungeonName) {
                     return false;
                 }
 
@@ -360,7 +360,6 @@ public class CommandDgDebug extends CommandBase {
             DungeonsGuide.getDungeonsGuide().getSkyblockStatus().setForceIsOnDungeon(true);
             MapProcessor mapProcessor = fakeContext.getMapProcessor();
             mapProcessor.setUnitRoomDimension(new Dimension(16, 16));
-            mapProcessor.setBugged(false);
             mapProcessor.setDoorDimensions(new Dimension(4, 4));
             mapProcessor.setTopLeftMapPoint(new Point(0, 0));
             fakeContext.setDungeonMin(new BlockPos(0, 70, 0));

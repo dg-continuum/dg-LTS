@@ -24,12 +24,12 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MList;
 import kr.syeyoung.dungeonsguide.gui.elements.MPanelScaledGUI;
 import kr.syeyoung.dungeonsguide.gui.elements.MScrollablePanel;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -41,14 +41,18 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class PanelMechanicBrowser extends MPanelScaledGUI {
     private FeatureMechanicBrowse feature;
     private MScrollablePanel scrollablePanel;
     private MList mList;
     private MechanicBrowserTooltip mechanicBrowserTooltip;
+    private UUID lastRoomUID = null;
+    private int latestTooltipDY;
+    @Getter
+    private String selectedID = null;
 
     public PanelMechanicBrowser(FeatureMechanicBrowse mechanicBrowse) {
         this.feature = mechanicBrowse;
@@ -58,14 +62,15 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         mList = new MList() {
             @Override
             public void resize(int parentWidth, int parentHeight) {
-                setBounds(new Rectangle(0,0,parentWidth,parentHeight));
+                setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
                 Dimension prefSize = getPreferredSize();
                 int hei = prefSize.height;
-                setBounds(new Rectangle(0,0,parentWidth,hei));
+                setBounds(new Rectangle(0, 0, parentWidth, hei));
                 realignChildren();
             }
         };
-        mList.setDrawLine(false); mList.setGap(0);
+        mList.setDrawLine(false);
+        mList.setGap(0);
         scrollablePanel.add(mList);
     }
 
@@ -73,11 +78,11 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
     public void render(int absMousex, int absMousey, int relMousex0, int relMousey0, float partialTicks, Rectangle scissor) {
         toggleTooltip(openGUI());
 
-        if(Minecraft.getMinecraft().thePlayer == null) return;
+        if (Minecraft.getMinecraft().thePlayer == null) return;
 
 
         Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a->a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
                 .map(a -> {
 
                     return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
@@ -101,22 +106,21 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        fr.drawString("Selected: ", 2,2, 0xFFAAAAAA);
-        if (grp.getPath("MECH-BROWSER") == null)
-            fr.drawString("Nothing", fr.getStringWidth("Selected: ") + 2,2, 0xFFAA0000);
+        fr.drawString("Selected: ", 2, 2, 0xFFAAAAAA);
+        if (grp.getSecretGuider().getPath("MECH-BROWSER") == null)
+            fr.drawString("Nothing", fr.getStringWidth("Selected: ") + 2, 2, 0xFFAA0000);
         else {
-            ActionRoute route = grp.getPath("MECH-BROWSER");
-            fr.drawString(route.getMechanic()+" -> "+route.getState(), fr.getStringWidth("Selected: ") + 2,2, 0xFFFFFF00);
+            ActionRoute route = grp.getSecretGuider().getPath("MECH-BROWSER");
+            fr.drawString(route.getMechanic() + " -> " + route.getState(), fr.getStringWidth("Selected: ") + 2, 2, 0xFFFFFF00);
         }
         fr.drawString("Open Chat to Select Secrets", 2, fr.FONT_HEIGHT + 5, 0xFFAAAAAA);
 
         if (!openGUI()) return;
 
         Gui.drawRect(0, fr.FONT_HEIGHT + 4, effectiveDim.width, effectiveDim.height, 0xFF444444);
-        Gui.drawRect(1, fr.FONT_HEIGHT + 5, effectiveDim.width - 1,effectiveDim.height - 1, 0xFF262626);
+        Gui.drawRect(1, fr.FONT_HEIGHT + 5, effectiveDim.width - 1, effectiveDim.height - 1, 0xFF262626);
     }
 
-    private UUID lastRoomUID = null;
     public void renderTick(DungeonRoom dungeonRoom) {
         if (dungeonRoom == null && lastRoomUID != null) {
             lastRoomUID = null;
@@ -148,10 +152,10 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                         mList.add(new MechanicBrowserElement(() -> "Fairy Soul", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
             found = false;
@@ -161,10 +165,10 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                         mList.add(new MechanicBrowserElement(() -> "Secrets", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
             found = false;
@@ -174,10 +178,10 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                         mList.add(new MechanicBrowserElement(() -> "Crypts", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
             found = false;
@@ -187,10 +191,10 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                         mList.add(new MechanicBrowserElement(() -> "NPC", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
             found = false;
@@ -200,37 +204,37 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                         mList.add(new MechanicBrowserElement(() -> "Journals", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
             found = false;
             for (Map.Entry<String, DungeonMechanic> value : dungeonRoom.getMechanics().entrySet()) {
-                if (value.getValue() instanceof DungeonRoomDoor){
+                if (value.getValue() instanceof DungeonRoomDoor) {
                     if (!found) {
                         mList.add(new MechanicBrowserElement(() -> "Gates", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
             found = false;
             for (Map.Entry<String, DungeonMechanic> value : dungeonRoom.getMechanics().entrySet()) {
                 if (value.getValue() instanceof DungeonDoor || value.getValue() instanceof DungeonBreakableWall || value.getValue() instanceof DungeonLever
-                || value.getValue() instanceof DungeonOnewayDoor || value.getValue() instanceof DungeonOnewayLever || value.getValue() instanceof DungeonPressurePlate) {
+                        || value.getValue() instanceof DungeonOnewayDoor || value.getValue() instanceof DungeonOnewayLever || value.getValue() instanceof DungeonPressurePlate) {
                     if (!found) {
                         mList.add(new MechanicBrowserElement(() -> "ETC", true, null));
                         found = true;
                     }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey()+" §7("+ value.getValue().getCurrentState(dungeonRoom) +", "+
+                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
                                     String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
-                            +"m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
 
@@ -239,13 +243,10 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         }
     }
 
-    private int latestTooltipDY;
-    @Getter
-    private String selectedID = null;
     public void onElementClick(String id, DungeonMechanic dungeonMechanic, Point pt, MechanicBrowserElement mechanicBrowserElement) {
 
         Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a->a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
                 .map(a -> {
 
                     return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
@@ -268,8 +269,13 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         mechanicBrowserTooltip = new MechanicBrowserTooltip();
         for (String state : states) {
             mechanicBrowserTooltip.getMList().add(new MechanicBrowserElement(() -> state, false, (m2, pt2) -> {
-                if (dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)
-                    ((GeneralRoomProcessor)dungeonRoom.getRoomProcessor()).pathfind("MECH-BROWSER", id, state, FeatureRegistry.SECRET_LINE_PROPERTIES_SECRET_BROWSER.getRouteProperties());
+                if (dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor) {
+                    ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor())
+                            .getSecretGuider().addAction("MECH-BROWSER",
+                                    id,
+                                    state,
+                                    FeatureRegistry.SECRET_LINE_PROPERTIES_SECRET_BROWSER.getRouteProperties());
+                }
 //                mechanicBrowserTooltip.close();
 //                mechanicBrowserTooltip = null;
             }));
@@ -277,14 +283,14 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         mechanicBrowserTooltip.setScale(getScale());
         Dimension prefSize = mechanicBrowserTooltip.getPreferredSize();
         mechanicBrowserTooltip.setBounds(new Rectangle(bounds.x +
-                (bounds.x > Minecraft.getMinecraft().displayWidth/2 ? -prefSize.width : bounds.width), latestTooltipDY + bounds.y, prefSize.width, prefSize.height));
+                (bounds.x > Minecraft.getMinecraft().displayWidth / 2 ? -prefSize.width : bounds.width), latestTooltipDY + bounds.y, prefSize.width, prefSize.height));
         mechanicBrowserTooltip.open(this);
     }
 
     public void cancel(MechanicBrowserElement mechanicBrowserElement) {
 
         Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a->a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
                 .map(a -> {
 
                     return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
@@ -293,7 +299,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         if (!dungeonRoomOpt.isPresent()) return;
         DungeonRoom dungeonRoom = dungeonRoomOpt.get();
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
-        ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).cancel("MECH-BROWSER");
+        ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getSecretGuider().cancel("MECH-BROWSER");
     }
 
     public void toggleTooltip(boolean open) {
@@ -311,12 +317,12 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         super.setBounds(bounds);
         Dimension dimension = getEffectiveDimension();
         int y = Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 4;
-        scrollablePanel.setBounds(new Rectangle(1,y + 1, dimension.width - 2, dimension.height - y - 2));
+        scrollablePanel.setBounds(new Rectangle(1, y + 1, dimension.width - 2, dimension.height - y - 2));
         scrollablePanel.evalulateContentArea();
         if (mechanicBrowserTooltip != null) {
             Dimension prefSize = mechanicBrowserTooltip.getPreferredSize();
             mechanicBrowserTooltip.setScale(getScale());
-            mechanicBrowserTooltip.setBounds(new Rectangle(bounds.x + (bounds.x > Minecraft.getMinecraft().displayWidth/2 ? -prefSize.width: bounds.width), latestTooltipDY + bounds.y, prefSize.width, prefSize.height));
+            mechanicBrowserTooltip.setBounds(new Rectangle(bounds.x + (bounds.x > Minecraft.getMinecraft().displayWidth / 2 ? -prefSize.width : bounds.width), latestTooltipDY + bounds.y, prefSize.width, prefSize.height));
         }
     }
 

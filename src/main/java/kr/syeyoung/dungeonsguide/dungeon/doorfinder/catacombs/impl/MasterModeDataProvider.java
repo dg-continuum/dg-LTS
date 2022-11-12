@@ -20,8 +20,8 @@ package kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.impl;
 
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.CatacombsDataProvider;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bossfight.BossfightProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bossfight.BossfightProcessorLivid;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorLivid;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -31,7 +31,7 @@ public class MasterModeDataProvider extends CatacombsDataProvider {
     @Override
     public BossfightProcessor createBossfightProcessor(World w, String dungeonName) {
         String floor = dungeonName.substring(14).trim();
-        ChatTransmitter.sendDebugChat(new ChatComponentText("Floor: Master mode "+floor+ " Building bossfight processor"));
+        ChatTransmitter.sendDebugChat(new ChatComponentText("Floor: Master mode " + floor + " Building bossfight processor"));
         if (floor.equals("M5")) {
             return new BossfightProcessorLivid(true);
         }
@@ -39,7 +39,7 @@ public class MasterModeDataProvider extends CatacombsDataProvider {
     }
 
     @Override
-    public boolean isTrapSpawn(String dungeonName) {
+    public boolean hasTrapRoom(String dungeonName) {
         String floor = dungeonName.substring(14).trim();
         switch (floor) {
             case "M3":

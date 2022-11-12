@@ -1,13 +1,9 @@
-package kr.syeyoung.dungeonsguide.whosonline.api.messages.client;
+package kr.syeyoung.dungeonsguide.whosonline.api.messages.client
 
-import lombok.Data;
+import lombok.Data
 
 @Data
-public class C00Connect {
-    public final String t = "/connect";
+class C00Connect(val c :String?) {
+    val t = "/connect"
 
-    /**
-     * Clients player uuid
-     */
-    public final String c;
 }

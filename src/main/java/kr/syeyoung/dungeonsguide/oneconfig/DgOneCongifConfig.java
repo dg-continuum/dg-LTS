@@ -26,85 +26,6 @@ import java.util.function.Supplier;
 
 public class DgOneCongifConfig extends Config {
 
-    @Switch(
-            name = "Debug mode",
-            category = "Debug"
-    )
-    public static boolean DEBUG_MODE = false;
-    @Switch(
-            name = "Debuggable Map",
-            category = "Debug"
-    )
-    public static boolean DEBUGABLE_MAP = false;
-    @Switch(
-            name = "Block Caching",
-            category = "Debug",
-            description = "Cache all world.getBlockState calls"
-    )
-    public static boolean DEBUG_BLOCKCACHING = true;
-
-    @Switch(
-            description = "Display Coordinate Relative to the Dungeon Room and room's rotation",
-            name = "Enabled",
-            size = OptionSize.DUAL,
-            category = "Debug",
-            subcategory = "Dungeon cords"
-    )
-    public static boolean DEBUG_DUNGEON_CORDS = false;
-    @Color(
-            name = "Color",
-            category = "Debug",
-            subcategory = "Dungeon cords"
-    )
-    public static OneColor DUNGEON_CORDS_COLOR = new OneColor(255, 191, 0);
-
-
-    @Switch(
-            name = "Enabled",
-            description = "Display Coordinate Relative to the Dungeon Room and room's rotation",
-            category = "Debug",
-            subcategory = "Dungeon Room Info"
-    )
-    public static boolean DEBUG_ROOM_INFO = false;
-    @Color(
-            name = "Color",
-            category = "Debug",
-            subcategory = "Dungeon Room Info"
-    )
-    public static OneColor DUNGEON_ROOMINFO_COLOR = new OneColor(255, 255, 255);
-
-
-    @Switch(
-            name = "Enabled",
-            category = "Debug",
-            subcategory = "Test People"
-    )
-    public static boolean DEBUG_TEST_PEPOLE = false;
-
-    @Slider(
-            name = "Scale",
-            min = 1F,
-            max = 500F,
-            category = "Debug",
-            subcategory = "Test People"
-    )
-    public static float DEBUG_TEST_PEPOLE_SCALE = 2F;
-
-
-    @Switch(
-            name = "Enabled",
-            category = "Debug",
-            description = "Allow editing dungeon rooms\n\nWarning: using this feature can break or freeze your Minecraft\nThis is only for advanced users only",
-            subcategory = "Room Edit"
-    )
-    public static boolean DEBUG_ROOM_EDIT = false;
-
-    @KeyBind(
-            category = "Debug",
-            name = "Gui keybind",
-            subcategory = "Room Edit"
-    )
-    public static OneKeyBind DEBUG_ROOMEDIT_KEYBIND = new OneKeyBind(UKeyboard.KEY_R);
 
 
 
@@ -838,11 +759,6 @@ public class DgOneCongifConfig extends Config {
     )
     private static CurrentBossPhasePage cbp = new CurrentBossPhasePage();
 
-    @HUD(
-            name = "Debug Map",
-            category = "Debug"
-    )
-    public static TestMap f = new TestMap();
 
 
 
@@ -861,7 +777,7 @@ public class DgOneCongifConfig extends Config {
     public static boolean renderSecretDestText = true;
 
 
-//    THETA_STAR("The default pathfinding algorithm. It will generate sub-optimal path quickly."),
+    //    THETA_STAR("The default pathfinding algorithm. It will generate sub-optimal path quickly."),
 //    A_STAR_DIAGONAL("New pathfinding algorithm. It will generate path that looks like the one JPS generates"),
 //    A_STAR_FINE_GRID("New pathfinding algorithm. It will generate path that kind of looks like stair"),
 //    JPS_LEGACY("The improved pathfinding algorithm. Not suggested for usage. It will have problems on diagonal movements, thus giving wrong routes"),
@@ -934,13 +850,12 @@ public class DgOneCongifConfig extends Config {
     public AutoPathfindPage app = new AutoPathfindPage();
 
 
-
-
     void addDependences(Supplier<Boolean> condition, String... deps){
         for (String dep : deps) {
             addDependency(dep, condition);
         }
     }
+
     void hideMultipleIf(Supplier<Boolean> condition, String... deps){
         for (String dep : deps) {
             hideIf(dep, condition);
@@ -951,12 +866,11 @@ public class DgOneCongifConfig extends Config {
         return new AColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
     }
 
-
     public DgOneCongifConfig() {
         super(new Mod("DG-LTS", ModType.SKYBLOCK, "/gdlogox512.png"), "dgconfig.json");
         initialize();
 
-        hideMultipleIf(() -> !DEBUG_MODE,  "DEBUGABLE_MAP", "DEBUG_BLOCKCACHING", "DEBUG_DUNGEON_CORDS", "DUNGEON_CORDS_COLOR", "DEBUG_ROOM_INFO", "DUNGEON_ROOMINFO_COLOR", "DEBUG_TEST_PEPOLE", "DEBUG_TEST_PEPOLE_SCALE", "DEBUG_ROOMEDIT_KEYBIND", "DEBUG_ROOM_EDIT");
+        hideMultipleIf(() -> !DEBUG_MODE,  "DEBUGABLE_MAP", "DEBUG_BLOCKCACHING", "DEBUG_DUNGEON_CORDS", "DUNGEON_CORDS_COLOR", "DEBUG_ROOM_INFO", "DUNGEON_ROOMINFO_COLOR", "DEBUG_TEST_PEPOLE", "DEBUG_TEST_PEPOLE_SCALE", "DEBUG_ROOMEDIT_KEYBIND", "DEBUG_ROOM_EDIT", "TEST_MAP");
 
         hideMultipleIf(() -> !FeatureDungeonMap.centerMapOnPlayer, "shouldRotateWithPlayer");
 
@@ -983,4 +897,97 @@ public class DgOneCongifConfig extends Config {
 
 
 
+
+
+    @Switch(
+            name = "Debug mode",
+            category = "Debug"
+    )
+    public static boolean DEBUG_MODE = false;
+    @HUD(
+            name = "Debug Map",
+            category = "Debug"
+    )
+    public static TestMap TEST_MAP = new TestMap();
+    @Switch(
+            name = "Debuggable Map",
+            category = "Debug"
+    )
+    public static boolean DEBUGABLE_MAP = false;
+    @Switch(
+            name = "Block Caching",
+            category = "Debug",
+            description = "Cache all world.getBlockState calls"
+    )
+    public static boolean DEBUG_BLOCKCACHING = true;
+
+    @Checkbox(
+            name = "Experimental autopathfind",
+            category = "Debug",
+            description = "Use pathfinding to calculate secret cost"
+    )
+    public static boolean usePathfindCostCacls = false;
+
+    @Switch(
+            description = "Display Coordinate Relative to the Dungeon Room and room's rotation",
+            name = "Enabled",
+            size = OptionSize.DUAL,
+            category = "Debug",
+            subcategory = "Dungeon cords"
+    )
+    public static boolean DEBUG_DUNGEON_CORDS = false;
+    @Color(
+            name = "Color",
+            category = "Debug",
+            subcategory = "Dungeon cords"
+    )
+    public static OneColor DUNGEON_CORDS_COLOR = new OneColor(255, 191, 0);
+
+
+    @Switch(
+            name = "Enabled",
+            description = "Display Coordinate Relative to the Dungeon Room and room's rotation",
+            category = "Debug",
+            subcategory = "Dungeon Room Info"
+    )
+    public static boolean DEBUG_ROOM_INFO = false;
+    @Color(
+            name = "Color",
+            category = "Debug",
+            subcategory = "Dungeon Room Info"
+    )
+    public static OneColor DUNGEON_ROOMINFO_COLOR = new OneColor(255, 255, 255);
+
+
+    @Switch(
+            name = "Enabled",
+            category = "Debug",
+            subcategory = "Test People"
+    )
+    public static boolean DEBUG_TEST_PEPOLE = false;
+
+    @Slider(
+            name = "Scale",
+            min = 1F,
+            max = 500F,
+            category = "Debug",
+            subcategory = "Test People"
+    )
+    public static float DEBUG_TEST_PEPOLE_SCALE = 2F;
+
+
+    @Switch(
+            name = "Enabled",
+            category = "Debug",
+            description = "Allow editing dungeon rooms\n\nWarning: using this feature can break or freeze your Minecraft\nThis is only for advanced users only",
+            subcategory = "Room Edit"
+    )
+    public static boolean DEBUG_ROOM_EDIT = false;
+
+    @KeyBind(
+            category = "Debug",
+            name = "Gui keybind",
+            subcategory = "Room Edit"
+    )
+    public static OneKeyBind DEBUG_ROOMEDIT_KEYBIND = new OneKeyBind(UKeyboard.KEY_R);
 }

@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionChangeState extends AbstractAction {
     @EqualsAndHashCode.Exclude
     private Set<AbstractAction> preRequisite2 = new HashSet<AbstractAction>();
@@ -46,13 +46,14 @@ public class ActionChangeState extends AbstractAction {
     public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
         Set<AbstractAction> set = new HashSet<>(preRequisite2);
         DungeonMechanic mechanic = dungeonRoom.getMechanics().get(mechanicName);
-        if (mechanic!= null)
+        if (mechanic != null)
             set.addAll(mechanic.getAction(state, dungeonRoom));
         return set;
     }
+
     @Override
     public String toString() {
-        return "ChangeState\n- target: "+mechanicName+"\n- state: "+state;
+        return "ChangeState\n- target: " + mechanicName + "\n- state: " + state;
     }
 
     @Override

@@ -31,7 +31,7 @@ import kr.syeyoung.dungeonsguide.config.Config;
 import kr.syeyoung.dungeonsguide.cosmetics.CosmeticsManager;
 import kr.syeyoung.dungeonsguide.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
-import kr.syeyoung.dungeonsguide.events.listener.PacketListener;
+import kr.syeyoung.dungeonsguide.events.PacketListener;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistryV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
@@ -61,7 +61,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-public class DungeonsGuide implements IDungeonGuide {
+public class DungeonsGuide {
 
     public static DgOneCongifConfig config;
     @Getter
@@ -73,7 +73,11 @@ public class DungeonsGuide implements IDungeonGuide {
 
     @Getter
     private CosmeticsManager cosmeticsManager;
-    @Getter
+
+    public DungeonFacade getDungeonFacade() {
+        return dungeonFacade;
+    }
+
     private DungeonFacade dungeonFacade;
 
     @Getter

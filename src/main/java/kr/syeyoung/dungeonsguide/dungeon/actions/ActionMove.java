@@ -19,8 +19,8 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions;
 
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
-import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
+import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
@@ -38,13 +38,47 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionMove extends AbstractAction {
     private Set<AbstractAction> preRequisite = new HashSet<>();
+
+    public OffsetPoint getTarget() {
+        return target;
+    }
+
     private OffsetPoint target;
+    private int tick = -1;
+    private List<Vec3> poses;
+    private Future<List<Vec3>> latestFuture;
 
     public ActionMove(OffsetPoint target) {
         this.target = target;
+    }
+
+    static void draw(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag, OffsetPoint target, List<Vec3> poses) {
+        BlockPos pos = target.getBlockPos(dungeonRoom);
+
+        float distance = MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()));
+        float multiplier = distance / 120f; //mobs only render ~120 blocks away
+        if (flag) multiplier *= 2.0f;
+        float scale = 0.45f * multiplier;
+        scale *= 25.0 / 6.0;
+        if (actionRouteProperties.isBeacon()) {
+            if (DgOneCongifConfig.renderSecretBeacons) {
+                RenderUtils.renderBeaconBeam(pos.getX(), pos.getY(), pos.getZ(), actionRouteProperties.getBeaconBeamColor(), partialTicks);
+            }
+            RenderUtils.highlightBlock(pos, actionRouteProperties.getBeaconColor(), partialTicks);
+        }
+        if (DgOneCongifConfig.renderSecretDestText) {
+            RenderUtils.drawTextAtWorld("Destination", pos.getX() + 0.5f, pos.getY() + 0.5f + scale, pos.getZ() + 0.5f, 0xFF00FF00, flag ? 2f : 1f, true, false, partialTicks);
+        }
+        RenderUtils.drawTextAtWorld(String.format("%.2f", MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) + "m", pos.getX() + 0.5f, pos.getY() + 0.5f - scale, pos.getZ() + 0.5f, 0xFFFFFF00, flag ? 2f : 1f, true, false, partialTicks);
+
+        if ((DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().get(0) != UKeyboard.KEY_NONE) || !DgOneCongifConfig.togglePathfindStatus) {
+            if (poses != null) {
+                RenderUtils.drawLinesVec3(poses, actionRouteProperties.getLineColor(), actionRouteProperties.getLineWidth(), partialTicks, true);
+            }
+        }
     }
 
     @Override
@@ -62,39 +96,9 @@ public class ActionMove extends AbstractAction {
         draw(dungeonRoom, partialTicks, actionRouteProperties, flag, target, poses);
     }
 
-    static void draw(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag, OffsetPoint target, List<Vec3> poses) {
-        BlockPos pos = target.getBlockPos(dungeonRoom);
-
-        float distance = MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()));
-        float multiplier = distance / 120f; //mobs only render ~120 blocks away
-        if (flag) multiplier *= 2.0f;
-        float scale = 0.45f * multiplier;
-        scale *= 25.0 / 6.0;
-        if (actionRouteProperties.isBeacon()) {
-            if(DgOneCongifConfig.renderSecretBeacons){
-                RenderUtils.renderBeaconBeam(pos.getX(), pos.getY(), pos.getZ(), actionRouteProperties.getBeaconBeamColor(), partialTicks);
-            }
-            RenderUtils.highlightBlock(pos, actionRouteProperties.getBeaconColor(), partialTicks);
-        }
-        if(DgOneCongifConfig.renderSecretDestText){
-            RenderUtils.drawTextAtWorld("Destination", pos.getX() + 0.5f, pos.getY() + 0.5f + scale, pos.getZ() + 0.5f, 0xFF00FF00, flag ? 2f : 1f, true, false, partialTicks);
-        }
-        RenderUtils.drawTextAtWorld(String.format("%.2f",MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition())))+"m", pos.getX() + 0.5f, pos.getY() + 0.5f - scale, pos.getZ() + 0.5f, 0xFFFFFF00, flag ? 2f : 1f, true, false, partialTicks);
-
-        if ((DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().get(0) != UKeyboard.KEY_NONE) || !DgOneCongifConfig.togglePathfindStatus) {
-            if (poses != null){
-                RenderUtils.drawLinesVec3(poses, actionRouteProperties.getLineColor(), actionRouteProperties.getLineWidth(), partialTicks,  true);
-            }
-        }
-    }
-
-    private int tick = -1;
-    private List<Vec3> poses;
-    private Future<List<Vec3>> latestFuture;
-
     @Override
     public void onTick(DungeonRoom dungeonRoom, ActionRouteProperties actionRouteProperties) {
-        tick = (tick+1) % Math.max(1, actionRouteProperties.getLineRefreshRate());
+        tick = (tick + 1) % Math.max(1, actionRouteProperties.getLineRefreshRate());
         if (latestFuture != null && latestFuture.isDone()) {
             try {
                 poses = latestFuture.get();
@@ -116,8 +120,9 @@ public class ActionMove extends AbstractAction {
             latestFuture = dungeonRoom.createEntityPathTo(dungeonRoom.getContext().getWorld(), Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom), Integer.MAX_VALUE, 10000);
         }
     }
+
     @Override
     public String toString() {
-        return "Move\n- target: "+target.toString();
+        return "Move\n- target: " + target.toString();
     }
 }

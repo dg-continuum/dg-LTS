@@ -5,7 +5,24 @@ import lombok.Data;
 
 @Data
 public class ActionRouteProperties {
+    public boolean isPathfind() {
+        return pathfind;
+    }
+
+    public void setPathfind(boolean pathfind) {
+        this.pathfind = pathfind;
+    }
+
     private boolean pathfind;
+
+    public int getLineRefreshRate() {
+        return lineRefreshRate;
+    }
+
+    public void setLineRefreshRate(int lineRefreshRate) {
+        this.lineRefreshRate = lineRefreshRate;
+    }
+
     private int lineRefreshRate;
     private AColor lineColor;
     private float lineWidth;

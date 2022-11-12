@@ -18,10 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.gui;
 
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.panes.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.gui.elements.MTabbedPane;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.panes.*;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
@@ -55,6 +55,7 @@ public class GuiDungeonRoomEdit extends MGui {
     public boolean isEditingSelected() {
         return "Secrets".equals(tabbedPane.getSelectedKey());
     }
+
     public void endEditing() {
         tabbedPane.setSelectedKey("General");
     }
@@ -63,6 +64,6 @@ public class GuiDungeonRoomEdit extends MGui {
     public void initGui() {
         super.initGui();
         // update bounds
-        getMainPanel().setBounds(new Rectangle(Math.min((Minecraft.getMinecraft().displayWidth - 500) / 2, Minecraft.getMinecraft().displayWidth), Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight),500,300));
+        getMainPanel().setBounds(new Rectangle(Math.min((Minecraft.getMinecraft().displayWidth - 500) / 2, Minecraft.getMinecraft().displayWidth), Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight), 500, 300));
     }
 }

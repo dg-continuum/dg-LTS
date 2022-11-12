@@ -21,12 +21,12 @@ import java.util.Set;
 public class DungeonMapData {
     private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 1), new Vector2d(0, -1), new Vector2d(1, 0), new Vector2d(-1, 0));
     private static final Set<Vector2d> door_dirs = Sets.newHashSet(new Vector2d(0, 0.5), new Vector2d(0, -0.5), new Vector2d(0.5, 0), new Vector2d(-0.5, 0));
+    private final DungeonContext context;
+    private final Minecraft mc;
     public Dimension unitRoomDimension;
     public boolean bugged;
     public Dimension doorDimensions;
     public Point topLeftMapPoint;
-    private final DungeonContext context;
-    private final Minecraft mc;
     public boolean initialized;
 
     public DungeonMapData(DungeonContext context, Minecraft mc) {
@@ -35,8 +35,12 @@ public class DungeonMapData {
     }
 
 
-    public void eat(final byte[] mapData){
+    public void eat(final byte[] mapData) {
         final Point firstRoom = MapUtils.findFirstColorWithIn(mapData, (byte) 30, new Rectangle(0, 0, 128, 128));
+        // Null check for bc the map might not always be clear
+        if(firstRoom == null) {
+            return;
+        }
         // Determine room dimension
         int width = MapUtils.getWidthOfColorAt(mapData, (byte) 30, firstRoom);
         int height = MapUtils.getHeightOfColorAt(mapData, (byte) 30, firstRoom);
@@ -114,8 +118,8 @@ public class DungeonMapData {
         context.createEvent(new DungeonNodataEvent("MAP_PROCESSOR_INIT"));
         initialized = true;
         MinecraftForge.EVENT_BUS.post(new DungeonContextInitializationEvent());
-        
-        
+
+
     }
 
 }

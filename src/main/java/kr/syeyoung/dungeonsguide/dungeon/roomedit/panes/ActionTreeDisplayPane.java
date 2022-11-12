@@ -31,19 +31,21 @@ import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ActionTreeDisplayPane extends MPanel {
 
-    private int offsetX = 0;
-    private int offsetY = 0;
-
-    private float scale;
-
     private final DungeonRoom dungeonRoom;
     private final ActionTree tree;
+    private int offsetX = 0;
+    private int offsetY = 0;
+    private float scale;
     private List<AbstractAction> linearified;
+    private int lastX;
+    private int lastY;
+
     public ActionTreeDisplayPane(DungeonRoom dungeonRoom, ActionTree tree) {
         this.dungeonRoom = dungeonRoom;
         this.tree = tree;
@@ -64,7 +66,7 @@ public class ActionTreeDisplayPane extends MPanel {
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(offsetX, offsetY, 0);
-        GlStateManager.scale(scale,scale,1);
+        GlStateManager.scale(scale, scale, 1);
         int x = renderTree(tree, 5, 5, Minecraft.getMinecraft().fontRendererObj, null, new HashMap<ActionTree, Point>());
         renderLinearified(linearified, x, 5, fr);
         GlStateManager.popMatrix();
@@ -124,7 +126,7 @@ public class ActionTreeDisplayPane extends MPanel {
 
         drawmPoints.put(actionTree, new Point(x + dim.width / 2, y + dim.height / 2));
         int xOff = 0;
-        for (ActionTree tree:actionTree.getChildren()) {
+        for (ActionTree tree : actionTree.getChildren()) {
             xOff += renderTree(tree, x + xOff, y + dim.height + 10, fr, pt, drawmPoints) + 10;
         }
         return Math.max(xOff, dim.width);
@@ -168,15 +170,15 @@ public class ActionTreeDisplayPane extends MPanel {
         String[] lines = action.toString().split("\n");
         int maxWidth = 0;
         for (String line : lines) {
-            if (fr.getStringWidth(line) > maxWidth) maxWidth= fr.getStringWidth(line);
+            if (fr.getStringWidth(line) > maxWidth) maxWidth = fr.getStringWidth(line);
         }
         int offset = 2;
         int height = (fr.FONT_HEIGHT + offset) * lines.length;
 
-        Gui.drawRect(x,y,x + maxWidth +10, y + height + 10, 0xff000000);
-        Gui.drawRect(x+1,y+1,x + maxWidth +8, y + height + 8, 0xff4d4d4d);
+        Gui.drawRect(x, y, x + maxWidth + 10, y + height + 10, 0xff000000);
+        Gui.drawRect(x + 1, y + 1, x + maxWidth + 8, y + height + 8, 0xff4d4d4d);
         for (int i = 0; i < lines.length; i++) {
-            fr.drawString(lines[i], x + 5, y + 5 + i*(fr.FONT_HEIGHT + offset), 0xffffffff);
+            fr.drawString(lines[i], x + 5, y + 5 + i * (fr.FONT_HEIGHT + offset), 0xffffffff);
         }
 
         return new Dimension(maxWidth + 10, height + 10);
@@ -184,12 +186,9 @@ public class ActionTreeDisplayPane extends MPanel {
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,25,parentWidth,parentHeight-25));
+        this.setBounds(new Rectangle(0, 25, parentWidth, parentHeight - 25));
     }
 
-
-    private int lastX;
-    private int lastY;
     @Override
     public void mouseClicked(int absMouseX, int absMouseY, int relMouseX, int relMouseY, int mouseButton) {
         lastX = absMouseX;

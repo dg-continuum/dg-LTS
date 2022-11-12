@@ -35,15 +35,28 @@ public class ActionRoute {
     @Getter
     private final String state;
 
-    @Getter
-    private int current;
-    @Getter
-    private final List<AbstractAction> actions;
+    public List<AbstractAction> getActions() {
+        return actions;
+    }
 
+    private final List<AbstractAction> actions;
     private final DungeonRoom dungeonRoom;
 
-    @Getter
+    public ActionRouteProperties getActionRouteProperties() {
+        return actionRouteProperties;
+    }
+
+    public void setCurrent(int current) {
+        this.current = current;
+    }
+
     private final ActionRouteProperties actionRouteProperties;
+
+    public int getCurrent() {
+        return current;
+    }
+
+    private int current;
 
     public ActionRoute(DungeonRoom dungeonRoom, String mechanic, String state, ActionRouteProperties actionRouteProperties) {
         this.mechanic = mechanic;
@@ -52,7 +65,7 @@ public class ActionRoute {
 
         System.out.println("Creating Action Route with mechanic:" + mechanic + " State:" + state);
         ActionChangeState actionChangeState = new ActionChangeState(mechanic, state);
-        ActionTree tree= ActionTree.buildActionTree(actionChangeState, dungeonRoom);
+        ActionTree tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom);
         actions = ActionTreeUtil.linearifyActionTree(tree);
         actions.add(new ActionComplete());
         ChatTransmitter.sendDebugChat("Created ActionRoute with " + actions.size() + " steps");
@@ -68,7 +81,7 @@ public class ActionRoute {
     }
 
     public AbstractAction next() {
-        current ++;
+        current++;
         if (current >= actions.size()) {
             current = actions.size() - 1;
         }
@@ -76,7 +89,7 @@ public class ActionRoute {
     }
 
     public AbstractAction prev() {
-        current --;
+        current--;
         if (current < 0) {
             current = 0;
         }
@@ -88,20 +101,21 @@ public class ActionRoute {
     }
 
 
-
     public void onPlayerInteract(PlayerInteractEvent event) {
-        getCurrentAction().onPlayerInteract(dungeonRoom, event, actionRouteProperties );
+        getCurrentAction().onPlayerInteract(dungeonRoom, event, actionRouteProperties);
     }
+
     public void onLivingDeath(LivingDeathEvent event) {
-        getCurrentAction().onLivingDeath(dungeonRoom, event, actionRouteProperties );
+        getCurrentAction().onLivingDeath(dungeonRoom, event, actionRouteProperties);
     }
+
     public void onRenderWorld(float partialTicks, boolean flag) {
 
-        if (current -1 >= 0) {
+        if (current - 1 >= 0) {
             AbstractAction abstractAction = actions.get(current - 1);
-            if(((abstractAction instanceof ActionMove && ((ActionMove) abstractAction).getTarget().getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) >= 25)
-                            || (abstractAction instanceof ActionMoveNearestAir  && ((ActionMoveNearestAir) abstractAction).getTarget().getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) >= 25))){
-                abstractAction.onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag );
+            if (((abstractAction instanceof ActionMove && ((ActionMove) abstractAction).getTarget().getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) >= 25)
+                    || (abstractAction instanceof ActionMoveNearestAir && ((ActionMoveNearestAir) abstractAction).getTarget().getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) >= 25))) {
+                abstractAction.onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
             }
         }
         getCurrentAction().onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
@@ -118,7 +132,8 @@ public class ActionRoute {
         AbstractAction currentAction = getCurrentAction();
 
         currentAction.onTick(dungeonRoom, actionRouteProperties);
-        if (this.current -1 >= 0 && (actions.get(this.current-1) instanceof ActionMove || actions.get(this.current-1) instanceof ActionMoveNearestAir)) actions.get(this.current-1).onTick(dungeonRoom, actionRouteProperties );
+        if (this.current - 1 >= 0 && (actions.get(this.current - 1) instanceof ActionMove || actions.get(this.current - 1) instanceof ActionMoveNearestAir))
+            actions.get(this.current - 1).onTick(dungeonRoom, actionRouteProperties);
 
         if (dungeonRoom.getMechanics().get(mechanic).getCurrentState(dungeonRoom).equals(state)) {
             this.current = actions.size() - 1;
@@ -130,7 +145,7 @@ public class ActionRoute {
     }
 
     public void onLivingInteract(PlayerInteractEntityEvent event) {
-        getCurrentAction().onLivingInteract(dungeonRoom, event, actionRouteProperties );
+        getCurrentAction().onLivingInteract(dungeonRoom, event, actionRouteProperties);
     }
 
 }

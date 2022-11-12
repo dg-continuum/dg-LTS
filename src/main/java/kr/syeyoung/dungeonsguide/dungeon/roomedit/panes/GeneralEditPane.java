@@ -21,10 +21,9 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoomInfoRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoomInfoRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.*;
 import net.minecraft.block.Block;
@@ -38,7 +37,6 @@ import net.minecraft.util.ChatComponentText;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
@@ -52,12 +50,11 @@ public class GeneralEditPane extends MPanel {
     private final MLabelAndElement shape;
     private final MLabelAndElement rotation;
     private final MLabelAndElement shape2;
-
-    private MButton save;
     private final MButton end;
     private final MButton schematic;
+    private MButton save;
 
-    private final MLabelAndElement roomProcessor;
+//    private final MLabelAndElement roomProcessor;
 
     public GeneralEditPane(final DungeonRoom dungeonRoom) {
         this.dungeonRoom = dungeonRoom;
@@ -65,7 +62,7 @@ public class GeneralEditPane extends MPanel {
             MLabel la;
             uuid = new MLabelAndElement("Room UUID: ", la = new MLabel());
             la.setText(dungeonRoom.getDungeonRoomInfo().getUuid().toString());
-            uuid.setBounds(new Rectangle(0,0,getBounds().width, 20));
+            uuid.setBounds(new Rectangle(0, 0, getBounds().width, 20));
             add(uuid);
         }
         {
@@ -77,7 +74,7 @@ public class GeneralEditPane extends MPanel {
             };
             name = new MLabelAndElement("Room Name: ", la);
             la.setText(dungeonRoom.getDungeonRoomInfo().getName());
-            name.setBounds(new Rectangle(0,20,getBounds().width, 20));
+            name.setBounds(new Rectangle(0, 20, getBounds().width, 20));
             add(name);
         }
         {
@@ -89,46 +86,46 @@ public class GeneralEditPane extends MPanel {
                 }
             });
             secrets = new MLabelAndElement("Room Secrets: ", la);
-            secrets.setBounds(new Rectangle(0,40,getBounds().width, 20));
+            secrets.setBounds(new Rectangle(0, 40, getBounds().width, 20));
             add(secrets);
         }
 
         {
             MLabel la;
             shape = new MLabelAndElement("Room Shape: ", la = new MLabel());
-            la.setText(dungeonRoom.getDungeonRoomInfo().getShape()+"");
-            shape.setBounds(new Rectangle(0,60,getBounds().width, 20));
+            la.setText(dungeonRoom.getDungeonRoomInfo().getShape() + "");
+            shape.setBounds(new Rectangle(0, 60, getBounds().width, 20));
             add(shape);
         }
 
         {
             MLabel la;
             rotation = new MLabelAndElement("Found Room Rotation: ", la = new MLabel());
-            la.setText(dungeonRoom.getRoomMatcher().getRotation()+"");
-            rotation.setBounds(new Rectangle(0,80,getBounds().width, 20));
+            la.setText(dungeonRoom.getRoomMatcher().getRotation() + "");
+            rotation.setBounds(new Rectangle(0, 80, getBounds().width, 20));
             add(rotation);
         }
         {
             MLabel la;
             shape2 = new MLabelAndElement("Found Room Shape: ", la = new MLabel());
-            la.setText(dungeonRoom.getShape()+"");
-            shape2.setBounds(new Rectangle(0,100,getBounds().width, 20));
+            la.setText(dungeonRoom.getShape() + "");
+            shape2.setBounds(new Rectangle(0, 100, getBounds().width, 20));
             add(shape2);
         }
-        {
-            final MStringSelectionButton mStringSelectionButton = new MStringSelectionButton(new ArrayList<String>(ProcessorFactory.getProcessors()), dungeonRoom.getDungeonRoomInfo().getProcessorId());
-            roomProcessor = new MLabelAndElement("Room Processor: ", mStringSelectionButton);
-            roomProcessor.setBounds(new Rectangle(0,120,getBounds().width, 20));
-            add(roomProcessor);
-
-            mStringSelectionButton.setOnUpdate(new Runnable() {
-                @Override
-                public void run() {
-                    dungeonRoom.getDungeonRoomInfo().setProcessorId(mStringSelectionButton.getSelected());
-                    dungeonRoom.updateRoomProcessor();
-                }
-            });
-        }
+//        {
+//            final MStringSelectionButton mStringSelectionButton = new MStringSelectionButton(new ArrayList<String>(ProcessorFactory.getProcessors()), dungeonRoom.getDungeonRoomInfo().getProcessorId());
+//            roomProcessor = new MLabelAndElement("Room Processor: ", mStringSelectionButton);
+//            roomProcessor.setBounds(new Rectangle(0,120,getBounds().width, 20));
+//            add(roomProcessor);
+//
+//            mStringSelectionButton.setOnUpdate(new Runnable() {
+//                @Override
+//                public void run() {
+//                    dungeonRoom.getDungeonRoomInfo().setProcessorId(mStringSelectionButton.getSelected());
+//                    dungeonRoom.updateRoomProcessor();
+//                }
+//            });
+//        }
         {
             end = new MButton();
             end.setText("End Editing Session");
@@ -139,7 +136,7 @@ public class GeneralEditPane extends MPanel {
                 }
             });
             end.setBackgroundColor(Color.green);
-            end.setBounds(new Rectangle(0,140,getBounds().width, 20));
+            end.setBounds(new Rectangle(0, 140, getBounds().width, 20));
             add(end);
         }
         {
@@ -151,8 +148,8 @@ public class GeneralEditPane extends MPanel {
                     try {
                         NBTTagCompound nbtTagCompound2 = createNBT();
 
-                        File f=new File(Main.getConfigDir(), "schematics/"+
-                                dungeonRoom.getDungeonRoomInfo().getName()+"-"+dungeonRoom.getDungeonRoomInfo().getUuid().toString()+"-"+ UUID.randomUUID()+".schematic");
+                        File f = new File(Main.getConfigDir(), "schematics/" +
+                                dungeonRoom.getDungeonRoomInfo().getName() + "-" + dungeonRoom.getDungeonRoomInfo().getUuid().toString() + "-" + UUID.randomUUID() + ".schematic");
 
                         Method method = null;
                         try {
@@ -165,18 +162,15 @@ public class GeneralEditPane extends MPanel {
                         FileOutputStream fos = new FileOutputStream(f);
                         DataOutputStream dataoutputstream = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(fos)));
 
-                        try
-                        {
+                        try {
                             dataoutputstream.writeByte(nbtTagCompound2.getId());
 
                             dataoutputstream.writeUTF("Schematic");
                             method.invoke(nbtTagCompound2, dataoutputstream);
-                        }
-                        finally
-                        {
+                        } finally {
                             dataoutputstream.close();
                         }
-                        ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §fSaved to "+f.getName()));
+                        ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §fSaved to " + f.getName()));
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
@@ -184,7 +178,7 @@ public class GeneralEditPane extends MPanel {
                 }
             });
             schematic.setBackgroundColor(Color.orange);
-            schematic.setBounds(new Rectangle(0,180,getBounds().width, 20));
+            schematic.setBounds(new Rectangle(0, 180, getBounds().width, 20));
             add(schematic);
         }
         {
@@ -199,23 +193,23 @@ public class GeneralEditPane extends MPanel {
                 }
             });
             save.setBackgroundColor(Color.green);
-            save.setBounds(new Rectangle(0,10,getBounds().width, 20));
+            save.setBounds(new Rectangle(0, 10, getBounds().width, 20));
             add(save);
         }
     }
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(5,5,parentWidth-10,parentHeight-10));
+        this.setBounds(new Rectangle(5, 5, parentWidth - 10, parentHeight - 10));
     }
 
     @Override
     public void onBoundsUpdate() {
         if (save != null)
-            save.setBounds(new Rectangle(0,160,getBounds().width, 20));
-        end.setBounds(new Rectangle(1,140,getBounds().width-2, 20));
+            save.setBounds(new Rectangle(0, 160, getBounds().width, 20));
+        end.setBounds(new Rectangle(1, 140, getBounds().width - 2, 20));
         if (schematic != null)
-        schematic.setBounds(new Rectangle(0,180,getBounds().width, 20));
+            schematic.setBounds(new Rectangle(0, 180, getBounds().width, 20));
     }
 
     private NBTTagCompound createNBT() {
@@ -223,7 +217,7 @@ public class GeneralEditPane extends MPanel {
         compound.setShort("Width", (short) (dungeonRoom.getMax().getX() - dungeonRoom.getMin().getX() + 1));
         compound.setShort("Height", (short) 255);
         compound.setShort("Length", (short) (dungeonRoom.getMax().getZ() - dungeonRoom.getMin().getZ() + 1));
-        int size =compound.getShort("Width") * compound.getShort("Height") * compound.getShort("Length");
+        int size = compound.getShort("Width") * compound.getShort("Height") * compound.getShort("Length");
 
         byte[] blocks = new byte[size];
         byte[] meta = new byte[size];
@@ -233,12 +227,12 @@ public class GeneralEditPane extends MPanel {
         boolean extraEx = false;
         NBTTagList tileEntitiesList = new NBTTagList();
         for (int x = 0; x < compound.getShort("Width"); x++) {
-            for (int y = 0; y <  compound.getShort("Height"); y++) {
+            for (int y = 0; y < compound.getShort("Height"); y++) {
                 for (int z = 0; z < compound.getShort("Length"); z++) {
                     int index = x + (y * compound.getShort("Length") + z) * compound.getShort("Width");
-                    BlockPos pos = dungeonRoom.getRelativeBlockPosAt(x,y - 70,z);
+                    BlockPos pos = dungeonRoom.getRelativeBlockPosAt(x, y - 70, z);
                     IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
-                    boolean acc = dungeonRoom.canAccessRelative(x,z);
+                    boolean acc = dungeonRoom.canAccessRelative(x, z);
                     int id = Block.getIdFromBlock(blockState.getBlock());
                     blocks[index] = acc ? (byte) id : 0;
                     meta[index] = acc ? (byte) blockState.getBlock().getMetaFromState(blockState) : 0;
@@ -265,9 +259,9 @@ public class GeneralEditPane extends MPanel {
         }
         for (int i = 0; i < extranibble.length; i++) {
             if (i * 2 + 1 < extra.length) {
-                extranibble[i] = (byte) ((extra[i * 2 + 0] << 4) | extra[i * 2 + 1]);
+                extranibble[i] = (byte) ((extra[i * 2] << 4) | extra[i * 2 + 1]);
             } else {
-                extranibble[i] = (byte) (extra[i * 2 + 0] << 4);
+                extranibble[i] = (byte) (extra[i * 2] << 4);
             }
         }
 

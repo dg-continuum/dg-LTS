@@ -24,7 +24,8 @@ import net.minecraft.util.BlockPos;
 
 import java.io.Serializable;
 
-@Data @AllArgsConstructor
+@Data
+@AllArgsConstructor
 public class SerializableBlockPos implements Serializable {
     private int x;
     private int y;

@@ -20,55 +20,30 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionChangeState;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionInteract;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.predicates.PredicateArmorStand;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
+
+import static kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonFairySoul.getAbstractActions;
 
 @Data
 public class DungeonNPC implements DungeonMechanic {
     private static final long serialVersionUID = -89487601113028763L;
     private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
-    private List<String> preRequisite = new ArrayList<String>();
+    private List<String> preRequisite = new ArrayList<>();
 
 
     @Override
     public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
-        if (!"navigate".equalsIgnoreCase(state))
-            throw new IllegalArgumentException(state + " is not valid state for secret");
-
-        Set<AbstractAction> base = new HashSet<>();
-        ActionInteract actionClick = new ActionInteract(secretPoint);
-        actionClick.setPredicate((Predicate<Entity>) PredicateArmorStand.INSTANCE);
-        actionClick.setRadius(3);
-        base.add(actionClick);
-
-        base = actionClick.getPreRequisite();
-        ActionMove actionMove = new ActionMove(secretPoint);
-        base.add(actionMove);
-        base = actionMove.getPreRequisite();
-
-        for (String str : preRequisite) {
-            if (!str.isEmpty()) {
-                String[] split = str.split(":");
-                base.add(new ActionChangeState(split[0], split[1]));
-            }
-        }
-        return base;
+        return getAbstractActions(state, secretPoint, preRequisite);
     }
 
     @Override
@@ -83,7 +58,7 @@ public class DungeonNPC implements DungeonMechanic {
     public DungeonNPC clone() throws CloneNotSupportedException {
         DungeonNPC dungeonSecret = new DungeonNPC();
         dungeonSecret.secretPoint = (OffsetPoint) secretPoint.clone();
-        dungeonSecret.preRequisite = new ArrayList<String>(preRequisite);
+        dungeonSecret.preRequisite = new ArrayList<>(preRequisite);
         return dungeonSecret;
     }
 

@@ -1,12 +1,5 @@
-package kr.syeyoung.dungeonsguide.whosonline.api.messages.server;
+package kr.syeyoung.dungeonsguide.whosonline.api.messages.server
 
-import kr.syeyoung.dungeonsguide.whosonline.api.messages.AbstractMessage;
-import lombok.Data;
+import kr.syeyoung.dungeonsguide.whosonline.api.messages.AbstractMessage
 
-import java.util.Map;
-
-@Data
-public class S02areOnlineAck implements AbstractMessage {
-    public final Map<String, Boolean> users;
-    public final String nonce;
-}
+class S02areOnlineAck(val users: Map<String, Boolean>,val nonce: String) : AbstractMessage {}

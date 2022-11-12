@@ -38,13 +38,14 @@ import java.util.Set;
 @Data
 public class DungeonJournal implements DungeonMechanic {
     private static final long serialVersionUID = 4117372070037496743L;
-    private OffsetPoint secretPoint = new OffsetPoint(0,0,0);
+    private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
     private List<String> preRequisite = new ArrayList<String>();
 
 
     @Override
     public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
-        if (!"navigate".equalsIgnoreCase(state)) throw new IllegalArgumentException(state+" is not valid state for secret");
+        if (!"navigate".equalsIgnoreCase(state))
+            throw new IllegalArgumentException(state + " is not valid state for secret");
         Set<AbstractAction> base;
         Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
         {
@@ -65,9 +66,9 @@ public class DungeonJournal implements DungeonMechanic {
     @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
         BlockPos pos = getSecretPoint().getBlockPos(dungeonRoom);
-        RenderUtils.highlightBlock(pos, color,partialTicks);
-        RenderUtils.drawTextAtWorld("J-"+name, pos.getX() +0.5f, pos.getY()+0.375f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() +0.5f, pos.getY()+0f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.highlightBlock(pos, color, partialTicks);
+        RenderUtils.drawTextAtWorld("J-" + name, pos.getX() + 0.5f, pos.getY() + 0.375f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
 
@@ -88,10 +89,12 @@ public class DungeonJournal implements DungeonMechanic {
     public Set<String> getPossibleStates(DungeonRoom dungeonRoom) {
         return Sets.newHashSet("navigate");
     }
+
     @Override
     public Set<String> getTotalPossibleStates(DungeonRoom dungeonRoom) {
-        return Sets.newHashSet("no-state","navigate");
+        return Sets.newHashSet("no-state", "navigate");
     }
+
     @Override
     public OffsetPoint getRepresentingPoint(DungeonRoom dungeonRoom) {
         return secretPoint;

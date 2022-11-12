@@ -21,8 +21,8 @@ public class ChatTransmitter {
     }
 
     static Queue<ChatComponentText> receiveQueue = new ConcurrentLinkedQueue<>();
-
     public static void addToQueue(String chat, boolean noDupe) {
+        chat = chat.replace("@", "§");
         addToQueue(new ChatComponentText(chat), noDupe);
     }
 

@@ -18,14 +18,16 @@
 
 package kr.syeyoung.dungeonsguide.cosmetics;
 
-import kr.syeyoung.dungeonsguide.cosmetics.replacers.chat.ChatReplacer;
 import kr.syeyoung.dungeonsguide.cosmetics.data.ActiveCosmetic;
 import kr.syeyoung.dungeonsguide.cosmetics.data.CosmeticData;
+import kr.syeyoung.dungeonsguide.cosmetics.replacers.chat.ChatReplacer;
 import kr.syeyoung.dungeonsguide.cosmetics.replacers.playername.PlayerNameReplacer;
 import kr.syeyoung.dungeonsguide.cosmetics.replacers.tab.TabReplacer;
 import kr.syeyoung.dungeonsguide.events.impl.PlayerListItemPacketEvent;
 import kr.syeyoung.dungeonsguide.events.impl.StompConnectedEvent;
-import kr.syeyoung.dungeonsguide.stomp.*;
+import kr.syeyoung.dungeonsguide.stomp.StompHeader;
+import kr.syeyoung.dungeonsguide.stomp.StompManager;
+import kr.syeyoung.dungeonsguide.stomp.StompPayload;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -202,6 +204,7 @@ public class CosmeticsManager {
 
 
         e.getStompInterface().subscribe("/user/queue/reply/cosmetic.activelist", (stompClient, payload) -> {
+
             activeCosmeticMap = new HashMap<>();
             JSONArray object = new JSONArray(payload);
             for (Object o : object) {

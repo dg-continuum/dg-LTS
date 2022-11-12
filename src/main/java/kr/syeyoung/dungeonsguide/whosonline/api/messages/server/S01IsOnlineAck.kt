@@ -1,12 +1,20 @@
-package kr.syeyoung.dungeonsguide.whosonline.api.messages.server;
+package kr.syeyoung.dungeonsguide.whosonline.api.messages.server
 
-import kr.syeyoung.dungeonsguide.whosonline.api.messages.AbstractMessage;
-import lombok.Data;
+import kr.syeyoung.dungeonsguide.whosonline.api.messages.AbstractMessage
+import lombok.Data
 
 @Data
-public class S01IsOnlineAck implements AbstractMessage {
-    public final boolean is_online;
-    public final String uuid;
-    public final String nonce;
+class S01IsOnlineAck : AbstractMessage {
+    @JvmField
+    val is_online: Boolean
+    @JvmField
+    val uuid: String
+    @JvmField
+    val nonce: String
 
+    constructor(is_online: Boolean, uuid: String, nonce: String) {
+        this.is_online = is_online
+        this.uuid = uuid
+        this.nonce = nonce
+    }
 }

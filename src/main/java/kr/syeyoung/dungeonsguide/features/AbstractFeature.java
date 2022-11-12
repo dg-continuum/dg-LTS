@@ -59,7 +59,10 @@ public abstract class AbstractFeature {
         this.key = key;
     }
 
-    @Getter
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     @Setter
     private boolean enabled = true;
 

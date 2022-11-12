@@ -20,7 +20,7 @@ package kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.impl;
 
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.CatacombsDataProvider;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bossfight.*;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.*;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -30,7 +30,7 @@ public class NormalModeDataProvider extends CatacombsDataProvider {
     @Override
     public BossfightProcessor createBossfightProcessor(World w, String dungeonName) {
         String floor = dungeonName.substring(14).trim();
-        ChatTransmitter.sendDebugChat(new ChatComponentText("Floor: "+floor+ " Building bossfight processor"));
+        ChatTransmitter.sendDebugChat(new ChatComponentText("Floor: " + floor + " Building bossfight processor"));
         switch (floor) {
             case "F1":
                 return new BossfightProcessorBonzo();
@@ -52,7 +52,7 @@ public class NormalModeDataProvider extends CatacombsDataProvider {
     }
 
     @Override
-    public boolean isTrapSpawn(String dungeonName) {
+    public boolean hasTrapRoom(String dungeonName) {
         String floor = dungeonName.substring(14).trim();
         switch (floor) {
             case "F3":

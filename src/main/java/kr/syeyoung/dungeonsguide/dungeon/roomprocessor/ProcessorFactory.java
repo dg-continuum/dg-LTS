@@ -18,48 +18,51 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bombdefuse.RoomProcessorBombDefuseSolver;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.boxpuzzle.RoomProcessorBoxSolver;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.icefill.RoomProcessorIcePath2;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.waterpuzzle.RoomProcessorWaterPuzzle;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.*;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bombdefuse.RoomProcessorBombDefuseSolver;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.boxpuzzle.RoomProcessorBoxSolver;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.icefill.RoomProcessorIcePath2;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.waterpuzzle.RoomProcessorWaterPuzzle;
 
 public class ProcessorFactory {
-    private static final Map<String, RoomProcessorGenerator> map = new HashMap<>();
 
-    public static RoomProcessorGenerator getRoomProcessorGenerator(String processorId) {
-        return map.get(processorId);
+    public static RoomProcessor createRoomProcessor(String id, DungeonRoom room) {
+        switch (id) {
+            case "default":
+                return new GeneralRoomProcessor(room);
+
+            case "button_5":
+                return new RoomProcessorButtonSolver(room);
+            case "bossroom":
+                return new RoomProcessorRedRoom(room);
+
+            case "puzzle_water_solver":
+                return new RoomProcessorWaterPuzzle(room);
+            case "puzzle_teleport_solver":
+                return new RoomProcessorTeleportMazeSolver(room);
+            case "puzzle_riddle_solver":
+                return new RoomProcessorRiddle(room);
+            case "puzzle_creeper_solver":
+                return new RoomProcessorCreeperSolver(room);
+            case "puzzle_tictactoe_solver":
+                return new RoomProcessorTicTacToeSolver(room);
+            case "puzzle_blaze_solver":
+                return new RoomProcessorBlazeSolver(room);
+            case "puzzle_silverfish":
+                return new RoomProcessorIcePath(room);
+            case "puzzle_icefill":
+                return new RoomProcessorIcePath2(room);
+            case "puzzle_box":
+                return new RoomProcessorBoxSolver(room);
+            case "puzzle_trivia":
+                return new RoomProcessorTrivia(room);
+            case "puzzle_bombdefuse":
+                return new RoomProcessorBombDefuseSolver(room);
+            default:
+                return null;
+        }
     }
 
-    public static void registerRoomProcessor(String processorId, RoomProcessorGenerator generator) {
-        map.put(processorId, generator);
-    }
-
-    public static Set<String> getProcessors() {
-        return map.keySet();
-    }
-
-    static {
-        registerRoomProcessor("default", new GeneralRoomProcessor.Generator());
-        registerRoomProcessor("button_5", new RoomProcessorButtonSolver.Generator());
-        registerRoomProcessor("puzzle_water_solver", new RoomProcessorWaterPuzzle.Generator());
-        registerRoomProcessor("puzzle_teleport_solver", new RoomProcessorTeleportMazeSolver.Generator());
-        registerRoomProcessor("puzzle_riddle_solver", new RoomProcessorRiddle.Generator());
-        registerRoomProcessor("puzzle_creeper_solver", new RoomProcessorCreeperSolver.Generator());
-        registerRoomProcessor("puzzle_tictactoe_solver", new RoomProcessorTicTacToeSolver.Generator());
-
-        registerRoomProcessor("puzzle_blaze_solver", new RoomProcessorBlazeSolver.Generator());
-
-
-        registerRoomProcessor("puzzle_silverfish", new RoomProcessorIcePath.Generator()); // done
-        registerRoomProcessor("puzzle_icefill", new RoomProcessorIcePath2.Generator());
-        registerRoomProcessor("puzzle_box", new RoomProcessorBoxSolver.Generator());
-        registerRoomProcessor("puzzle_trivia", new RoomProcessorTrivia.Generator());
-        registerRoomProcessor("puzzle_bombdefuse", new RoomProcessorBombDefuseSolver.Generator());
-
-        registerRoomProcessor("bossroom", new RoomProcessorRedRoom.Generator());
-    }
 }

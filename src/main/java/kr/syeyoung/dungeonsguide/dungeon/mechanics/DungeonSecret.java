@@ -20,7 +20,6 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonActionContext;
 import kr.syeyoung.dungeonsguide.dungeon.actions.*;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
@@ -49,8 +48,18 @@ public class DungeonSecret implements DungeonMechanic {
     private static final long serialVersionUID = 8784808599222706537L;
 
     private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
+
+    public SecretType getSecretType() {
+        return secretType;
+    }
+
     private SecretType secretType = SecretType.CHEST;
-    private List<String> preRequisite = new ArrayList<String>();
+
+    public List<String> getPreRequisite() {
+        return preRequisite;
+    }
+
+    private List<String> preRequisite = new ArrayList<>();
 
     public void tick(DungeonRoom dungeonRoom) {
         if (secretType == SecretType.CHEST) {
@@ -58,11 +67,11 @@ public class DungeonSecret implements DungeonMechanic {
             IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
             if (blockState.getBlock() == Blocks.chest || blockState.getBlock() == Blocks.trapped_chest) {
                 TileEntityChest chest = (TileEntityChest) dungeonRoom.getContext().getWorld().getTileEntity(pos);
-                if(chest != null){
+                if (chest != null) {
                     if (chest.numPlayersUsing > 0) {
-                        dungeonRoom.getRoomContext().put("c-" + pos.toString(), 2);
+                        dungeonRoom.getRoomContext().put("c-" + pos, 2);
                     } else {
-                        dungeonRoom.getRoomContext().put("c-" + pos.toString(), 1);
+                        dungeonRoom.getRoomContext().put("c-" + pos, 1);
                     }
                 } else {
                     System.out.println("Expected TileEntityChest at " + pos + " to not be null");
@@ -72,7 +81,7 @@ public class DungeonSecret implements DungeonMechanic {
             BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
             IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
             if (blockState.getBlock() == Blocks.skull) {
-                dungeonRoom.getRoomContext().put("e-" + pos.toString(), true);
+                dungeonRoom.getRoomContext().put("e-" + pos, true);
             }
         } else if (secretType == SecretType.ITEM_DROP) {
             Vec3 pos = new Vec3(secretPoint.getBlockPos(dungeonRoom));
@@ -95,8 +104,8 @@ public class DungeonSecret implements DungeonMechanic {
         if (secretType == SecretType.CHEST) {
             BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
             IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
-            if (dungeonRoom.getRoomContext().containsKey("c-" + pos.toString()))
-                return ((int) dungeonRoom.getRoomContext().get("c-" + pos.toString()) == 2 || blockState.getBlock() == Blocks.air) ? SecretStatus.FOUND : SecretStatus.CREATED;
+            if (dungeonRoom.getRoomContext().containsKey("c-" + pos))
+                return ((int) dungeonRoom.getRoomContext().get("c-" + pos) == 2 || blockState.getBlock() == Blocks.air) ? SecretStatus.FOUND : SecretStatus.CREATED;
 
             if (blockState.getBlock() == Blocks.air) {
                 return SecretStatus.DEFINITELY_NOT;
@@ -114,18 +123,18 @@ public class DungeonSecret implements DungeonMechanic {
             BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
             IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
             if (blockState.getBlock() == Blocks.skull) {
-                dungeonRoom.getRoomContext().put("e-" + pos.toString(), true);
+                dungeonRoom.getRoomContext().put("e-" + pos, true);
                 return SecretStatus.DEFINITELY_NOT;
             } else {
-                if (dungeonRoom.getRoomContext().containsKey("e-" + pos.toString()))
+                if (dungeonRoom.getRoomContext().containsKey("e-" + pos))
                     return SecretStatus.FOUND;
                 return SecretStatus.NOT_SURE;
             }
         } else if (secretType == SecretType.BAT) {
             Vec3 spawn = new Vec3(secretPoint.getBlockPos(dungeonRoom));
-            for (Integer killed : DungeonActionContext.getKilleds()) {
-                if (DungeonActionContext.getSpawnLocation().get(killed) == null) continue;
-                if (DungeonActionContext.getSpawnLocation().get(killed).squareDistanceTo(spawn) < 100) {
+            for (int killed : DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getKilledBats()) {
+                if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().get(killed) == null) continue;
+                if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().get(killed).squareDistanceTo(spawn) < 100) {
                     return SecretStatus.FOUND;
                 }
             }
@@ -154,25 +163,28 @@ public class DungeonSecret implements DungeonMechanic {
     public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
         if (state.equalsIgnoreCase("navigate")) {
             Set<AbstractAction> base;
-            Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
+            Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
             preRequisites = actionMove.getPreRequisite();
             for (String str : preRequisite) {
-                if (str.isEmpty()) continue;
-                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
-                preRequisites.add(actionChangeState);
+                if (!str.isEmpty()) {
+                    String[] split = str.split(":");
+                    ActionChangeState actionChangeState = new ActionChangeState(split[0], split[1]);
+                    preRequisites.add(actionChangeState);
+                }
             }
             return base;
         }
-        if (!"found".equalsIgnoreCase(state))
+        if (!"found".equalsIgnoreCase(state)) {
             throw new IllegalArgumentException(state + " is not valid state for secret");
+        }
         if (state.equals("found") && getSecretStatus(dungeonRoom) == SecretStatus.FOUND) return new HashSet<>();
         Set<AbstractAction> base;
-        Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
+        Set<AbstractAction> preRequisites = base = new HashSet<>();
         if (secretType == SecretType.CHEST || secretType == SecretType.ESSENCE) {
-            ActionClick actionClick;
-            preRequisites.add(actionClick = new ActionClick(secretPoint));
+            ActionClick actionClick = new ActionClick(secretPoint);
+            preRequisites.add(actionClick);
             preRequisites = actionClick.getPreRequisite();
         } else if (secretType == SecretType.BAT) {
             ActionKill actionKill = new ActionKill(secretPoint);
@@ -204,26 +216,13 @@ public class DungeonSecret implements DungeonMechanic {
         RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
-    public enum SecretType {
-        BAT, CHEST, ITEM_DROP, ESSENCE
-    }
-
-    @AllArgsConstructor
-    @Getter
-    public enum SecretStatus {
-        DEFINITELY_NOT("definitely_not"), NOT_SURE("not_sure"), CREATED("created"), FOUND("found"), ERROR("error");
-
-        private final String stateName;
-    }
-
     public DungeonSecret clone() throws CloneNotSupportedException {
         DungeonSecret dungeonSecret = new DungeonSecret();
         dungeonSecret.secretPoint = (OffsetPoint) secretPoint.clone();
         dungeonSecret.secretType = secretType;
-        dungeonSecret.preRequisite = new ArrayList<String>(preRequisite);
+        dungeonSecret.preRequisite = new ArrayList<>(preRequisite);
         return dungeonSecret;
     }
-
 
     @Override
     public String getCurrentState(DungeonRoom dungeonRoom) {
@@ -245,5 +244,17 @@ public class DungeonSecret implements DungeonMechanic {
     @Override
     public OffsetPoint getRepresentingPoint(DungeonRoom dungeonRoom) {
         return secretPoint;
+    }
+
+    public enum SecretType {
+        BAT, CHEST, ITEM_DROP, ESSENCE
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum SecretStatus {
+        DEFINITELY_NOT("definitely_not"), NOT_SURE("not_sure"), CREATED("created"), FOUND("found"), ERROR("error");
+
+        private final String stateName;
     }
 }

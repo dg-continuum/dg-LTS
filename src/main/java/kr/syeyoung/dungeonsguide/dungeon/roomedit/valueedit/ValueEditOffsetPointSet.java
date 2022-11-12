@@ -21,11 +21,11 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
+import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonAddSet;
+import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MValue;
-import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonAddSet;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -36,31 +36,16 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetPointSet> {
-    private Parameter parameter;
+    private final MPanel scroll;
 
     // scroll pane
     // just create
     // add set
-
-    private final MPanel scroll;
     @Getter
     private final List<MPanel> MParameters = new ArrayList<MPanel>();
-
     private final MButton add;
     private final MButton addSet;
-
-    public void delete(OffsetPoint offsetPoint) {
-        ((OffsetPointSet)parameter.getNewData()).getOffsetPointList().remove(offsetPoint);
-        Iterator<MPanel> iterator = MParameters.iterator();
-        while (iterator.hasNext()) {
-            MValue panel = (MValue) iterator.next();
-            if (panel.getData() == offsetPoint) {
-                iterator.remove();
-                break;
-            }
-        }
-
-    }
+    private Parameter parameter;
 
     public ValueEditOffsetPointSet(final Parameter parameter2) {
         this.parameter = parameter2;
@@ -76,7 +61,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
                 @Override
                 public void render(int absMousex, int absMousey, int relMousex0, int relMousey0, float partialTicks, Rectangle scissor) {
                     int heights = 0;
-                    for (MPanel panel:getChildComponents()) {
+                    for (MPanel panel : getChildComponents()) {
                         panel.setPosition(new Point(0, -offsetY + heights));
                         heights += panel.getBounds().height;
                     }
@@ -93,7 +78,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
 
                     boolean noClip = true;
                     boolean focusedOverall = false;
-                    for (MPanel childComponent  : getChildComponents()) {
+                    for (MPanel childComponent : getChildComponents()) {
                         if (childComponent.mouseClicked0(absMouseX, absMouseY, relMousex, relMousey, mouseButton)) {
                             noClip = false;
                             focusedOverall = true;
@@ -113,25 +98,26 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
 
                 @Override
                 public void onBoundsUpdate() {
-                    for (MPanel panel :getChildComponents()){
+                    for (MPanel panel : getChildComponents()) {
                         panel.setSize(new Dimension(getBounds().width, 20));
                     }
                 }
+
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    this.setBounds(new Rectangle(5,5,parentWidth-10,parentHeight-10));
+                    this.setBounds(new Rectangle(5, 5, parentWidth - 10, parentHeight - 10));
                 }
 
                 @Override
                 public void mouseScrolled(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0, int scrollAmount) {
-                    if (new Rectangle(new Point(0,0), getSize()).contains(relMouseX0, relMouseY0)) {
-                        if (scrollAmount >0) offsetY += 20;
+                    if (new Rectangle(new Point(0, 0), getSize()).contains(relMouseX0, relMouseY0)) {
+                        if (scrollAmount > 0) offsetY += 20;
                         else if (scrollAmount < 0) offsetY -= 20;
-                        if (offsetY <0) offsetY = 0;
+                        if (offsetY < 0) offsetY = 0;
                     }
                 }
             };
-            scroll.setBounds(new Rectangle(0,0,getBounds().width, getBounds().height-20));
+            scroll.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height - 20));
             add(scroll);
         }
 
@@ -139,7 +125,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
             add = new MButton() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0,parentHeight - 20, parentWidth / 2, 20));
+                    setBounds(new Rectangle(0, parentHeight - 20, parentWidth / 2, 20));
                 }
             };
             add.setText("Add");
@@ -150,15 +136,15 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
                     OffsetPoint offsetPoint = new OffsetPoint(EditingContext.getEditingContext().getRoom(), Minecraft.getMinecraft().thePlayer.getPosition());
                     MValue mValue;
                     MParameters.add(mValue = new MValue(offsetPoint, buildAddonsFor(offsetPoint)));
-                    ((OffsetPointSet)parameter.getNewData()).getOffsetPointList().add(offsetPoint);
+                    ((OffsetPointSet) parameter.getNewData()).getOffsetPointList().add(offsetPoint);
                     mValue.setSize(new Dimension(getBounds().width, 20));
                 }
             });
 
-            addSet = new MButton(){
+            addSet = new MButton() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(parentWidth / 2,parentHeight - 20, parentWidth / 2, 20));
+                    setBounds(new Rectangle(parentWidth / 2, parentHeight - 20, parentWidth / 2, 20));
                 }
             };
             addSet.setText("Add Set");
@@ -172,9 +158,22 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
             add(add);
             add(addSet);
         }
-        for (OffsetPoint offsetPoint : ((OffsetPointSet)parameter.getNewData()).getOffsetPointList()) {
+        for (OffsetPoint offsetPoint : ((OffsetPointSet) parameter.getNewData()).getOffsetPointList()) {
             MParameters.add(new MValue(offsetPoint, buildAddonsFor(offsetPoint)));
         }
+    }
+
+    public void delete(OffsetPoint offsetPoint) {
+        ((OffsetPointSet) parameter.getNewData()).getOffsetPointList().remove(offsetPoint);
+        Iterator<MPanel> iterator = MParameters.iterator();
+        while (iterator.hasNext()) {
+            MValue panel = (MValue) iterator.next();
+            if (panel.getData() == offsetPoint) {
+                iterator.remove();
+                break;
+            }
+        }
+
     }
 
     public List<MPanel> buildAddonsFor(final OffsetPoint offsetPoint) {
@@ -195,9 +194,9 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
 
     @Override
     public void onBoundsUpdate() {
-        scroll.setBounds(new Rectangle(0,0,getBounds().width, getBounds().height-20));
-        add.setBounds(new Rectangle(0,getBounds().height-20,getBounds().width / 2, 20));
-        addSet.setBounds(new Rectangle(getBounds().width / 2,getBounds().height-20,getBounds().width / 2, 20));
+        scroll.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height - 20));
+        add.setBounds(new Rectangle(0, getBounds().height - 20, getBounds().width / 2, 20));
+        addSet.setBounds(new Rectangle(getBounds().width / 2, getBounds().height - 20, getBounds().width / 2, 20));
     }
 
     @Override
@@ -207,18 +206,18 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
 
     @Override
     public void renderWorld(float partialTicks) {
-        for (OffsetPoint offsetPoint :((OffsetPointSet)parameter.getNewData()).getOffsetPointList()) {
-            RenderUtils.highlightBlock(offsetPoint.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0,255,255,50), partialTicks);
+        for (OffsetPoint offsetPoint : ((OffsetPointSet) parameter.getNewData()).getOffsetPointList()) {
+            RenderUtils.highlightBlock(offsetPoint.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 255, 50), partialTicks);
         }
     }
 
     @Override
     public void resize(int parentWidth, int parentHeight) {
-        this.setBounds(new Rectangle(0,0,parentWidth, parentHeight));
+        this.setBounds(new Rectangle(0, 0, parentWidth, parentHeight));
     }
 
     public void addAll(List<OffsetPoint> blockPoses) {
-        ((OffsetPointSet)parameter.getNewData()).getOffsetPointList().addAll(blockPoses);
+        ((OffsetPointSet) parameter.getNewData()).getOffsetPointList().addAll(blockPoses);
         for (OffsetPoint blockPose : blockPoses) {
             MParameters.add(new MValue(blockPose, buildAddonsFor(blockPose)));
         }
@@ -239,7 +238,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
         @Override
         public Object cloneObj(Object object) {
             try {
-                return ((OffsetPointSet)object).clone();
+                return ((OffsetPointSet) object).clone();
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }

@@ -1,95 +1,87 @@
-package kr.syeyoung.dungeonsguide.whosonline;
+package kr.syeyoung.dungeonsguide.whosonline
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.Gson;
-import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineApi;
-import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineCache;
-import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineRest;
-import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineWebSocket;
-import lombok.Getter;
-import lombok.val;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.google.common.util.concurrent.ThreadFactoryBuilder
+import com.google.gson.Gson
+import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineApi
+import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineCache
+import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineRest
+import kr.syeyoung.dungeonsguide.whosonline.api.WhosOnlineWebSocket
+import lombok.Getter
+import net.minecraft.client.Minecraft
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.eventhandler.Event
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.logging.log4j.LogManager
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
-import java.util.concurrent.*;
+class WhosOnlineManager(val remoteHost: String) {
+    private val ex: ExecutorService
+    private val se: ScheduledExecutorService
 
-public class WhosOnlineManager {
+    fun getWebsocketClient(): WhosOnlineApi? {
+        return websocketClient
+    }
 
-    public static final Gson gson = new Gson();
+    private var webSocket: WhosOnlineWebSocket? = null
 
-    static final Logger logger = LogManager.getLogger("WhosOnlineManager");
-
-    private final ExecutorService ex;
-    private final ScheduledExecutorService se;
-
-    final String remoteHost;
     @Getter
-    private WhosOnlineWebSocket webSocket;
-    @Getter
-    private WhosOnlineApi websocketClient;
-    @Getter
-    private WhosOnlineCache cache;
-    private WhosOnlineRest restClient;
+    private var websocketClient: WhosOnlineApi? = null
 
-    boolean useDebugServers = false;
+    @Getter
+    private var cache: WhosOnlineCache? = null
+    private var restClient: WhosOnlineRest? = null
+    var useDebugServers = false
+    fun init() {
+        cache = WhosOnlineCache()
+        val websocketUri = if (useDebugServers) "ws://$remoteHost/ws" else "wss://$remoteHost/ws"
+        val restUri = if (useDebugServers) "http://$remoteHost" else "https://$remoteHost"
+        webSocket = WhosOnlineWebSocket(websocketUri, se, cache, Minecraft.getMinecraft().session.playerID)
+        restClient = WhosOnlineRest(cache, ex, restUri)
+        webSocket!!.connect()
+        websocketClient = WhosOnlineApi(webSocket!!, cache!!, ex)
 
-    public WhosOnlineManager(String host) {
-        remoteHost = host;
-        if(host.startsWith("localhost")){
-            useDebugServers = true;
+    }
+
+    var closed = false
+
+    init {
+        if (remoteHost.startsWith("localhost")) {
+            useDebugServers = true
         }
-        MinecraftForge.EVENT_BUS.register(this);
-
-        val namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg WhosOnline pool").build();
-
-        ex = Executors.newCachedThreadPool(namedThreadFactory);
-        se = Executors.newScheduledThreadPool(2, namedThreadFactory);
+        MinecraftForge.EVENT_BUS.register(this)
+        val namedThreadFactory = ThreadFactoryBuilder().setNameFormat("Dg WhosOnline pool").build()
+        ex = Executors.newCachedThreadPool(namedThreadFactory)
+        se = Executors.newScheduledThreadPool(2, namedThreadFactory)
     }
 
-    public void init() {
-        this.cache = new WhosOnlineCache();
-
-        val websocketUri = useDebugServers ? "ws://" + remoteHost + "/ws" : "wss://" + remoteHost + "/ws";
-        val restUri = useDebugServers ? "http://" + remoteHost : "https://" + remoteHost;
-
-        this.webSocket = new WhosOnlineWebSocket(websocketUri, se, cache, Minecraft.getMinecraft().getSession().getPlayerID());
-        this.restClient = new WhosOnlineRest(cache, ex, restUri);
-
-
-        webSocket.connect();
-        this.websocketClient = new WhosOnlineApi(webSocket, cache, ex);
-
-    }
-
-    boolean closed = false;
-
-    public void close(){
-        closed = true;
+    fun close() {
+        closed = true
         try {
-            this.webSocket.close();
-            this.webSocket = null;
-            this.websocketClient = null;
-            this.restClient = null;
-            ex.awaitTermination(1,TimeUnit.SECONDS);
-            se.awaitTermination(1,TimeUnit.SECONDS);
-        } catch (Exception e) {
-            e.printStackTrace();
+            webSocket?.close()
+            webSocket = null
+            websocketClient = null
+            restClient = null
+            ex.awaitTermination(1, TimeUnit.SECONDS)
+            se.awaitTermination(1, TimeUnit.SECONDS)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     @SubscribeEvent
-    public void websocketdied(WhosOnlineDied e){
-        if(closed) return;
-        logger.info("Who'sOnline websocket died, trying again in 4 seconds");
-        se.schedule(this::init, 4, TimeUnit.SECONDS);
+    fun websocketdied(e: WhosOnlineDied?) {
+        if (closed) return
+        logger.info("Who'sOnline websocket died, trying again in 4 seconds")
+        se.schedule({ init() }, 4, TimeUnit.SECONDS)
     }
 
-    public static class WhosOnlineDied extends Event {
-
+    class WhosOnlineDied : Event()
+    companion object {
+        @JvmField
+        val gson = Gson()
+        val logger = LogManager.getLogger("WhosOnlineManager")
     }
-
 }

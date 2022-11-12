@@ -18,70 +18,71 @@
 
 package kr.syeyoung.dungeonsguide.dungeon;
 
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.events.DungeonEvent;
 import kr.syeyoung.dungeonsguide.dungeon.events.DungeonEventData;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonCryptBrokenEvent;
 import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonNodataEvent;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonPuzzleFailureEvent;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonSecretCountChangeEvent;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.bossfight.BossfightProcessor;
-import kr.syeyoung.dungeonsguide.events.impl.BossroomEnterEvent;
-import kr.syeyoung.dungeonsguide.utils.DungeonUtil;
-import kr.syeyoung.dungeonsguide.utils.TabListUtil;
-import kr.syeyoung.dungeonsguide.utils.TextUtils;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.common.MinecraftForge;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.util.List;
 import java.util.*;
 
 public class DungeonContext {
+
+    private final Map<Integer, Vec3> batSpawnedLocations = new HashMap<>();
+
+    private final List<Integer> killedBats = new ArrayList<>();
     /**
-     * This is static because its used in the constructor,
+     * This is static because it's used in the constructor,
      * it means we cannot set the name without having an object,
      * and we cannot create an object without the name
      * so its static
      */
-    @Getter @Setter
-    private static String dungeonName;
-    public static long started = -1;
     @Getter
     @Setter
-    public int percentage;
+    private static String dungeonName;
     @Getter
     private final World world;
     @Getter
     private final MapProcessor mapProcessor;
-
-    @Getter
-    @Setter
-    private BlockPos dungeonMin;
-
     @Getter
     private final Map<Point, DungeonRoom> roomMapper = new HashMap<>();
     @Getter
     private final List<DungeonRoom> dungeonRoomList = new ArrayList<>();
-
     @Getter
     private final List<RoomProcessor> globalRoomProcessors = new ArrayList<>();
-
     @Getter
     private final Map<String, Integer> deaths = new HashMap<>();
     @Getter
     private final List<String[]> milestoneReached = new ArrayList<>();
+    @Getter
+    private final Set<String> players = new HashSet<>();
+    @Getter
+    private final List<DungeonEvent> events = new ArrayList<>();
+    static public final Rectangle roomBoundary = new Rectangle(-10, -10, 138, 138);
+    @Getter
+    @Setter
+    public int percentage;
+    @Getter
+    @Setter
+    private long started = -1;
+    @Getter
+    @Setter
+    private BlockPos dungeonMin;
     @Getter
     @Setter
     private long BossRoomEnterSeconds = -1;
@@ -91,25 +92,61 @@ public class DungeonContext {
     @Getter
     @Setter
     private BlockPos bossroomSpawnPos = null;
-
     @Getter
     @Setter
-    private boolean trapRoomGen = false;
-
+    private boolean hasTrapRoom = false;
     @Getter
     private boolean gotMimic = false;
-
+    @Getter @Setter
     private int latestSecretCnt = 0;
+    @Getter @Setter
     private int latestTotalSecret = 0;
+    @Getter @Setter
     private int latestCrypts = 0;
-
     @Getter
     private int maxSpeed = 600;
     @Getter
     private double secretPercentage = 1.0;
+    @Getter
+    @Setter
+    private BossfightProcessor bossfightProcessor;
+    @Getter @Setter
+    private boolean ended = false;
+    @Getter @Setter
+    private boolean defeated = false;
+
+    @Getter
+    final DungeonSpecificDataProvider dataProvider;
+
+    public DungeonContext(World world) {
+        this.world = world;
+        createEvent(new DungeonNodataEvent("DUNGEON_CONTEXT_CREATION"));
+        mapProcessor = new MapProcessor(this);
+
+        dataProvider = DungeonSpecificDataProviderRegistry.getDoorFinder(getDungeonName());
+        if (dataProvider != null) {
+            hasTrapRoom = dataProvider.hasTrapRoom(getDungeonName());
+            secretPercentage = dataProvider.secretPercentage(getDungeonName());
+            maxSpeed = dataProvider.speedSecond(getDungeonName());
+        } else {
+            ChatTransmitter.addToQueue(ChatTransmitter.PREFIX + "Failed To create Dungeon Data provider (new dungeon?), report this in discord");
+        }
+        init = System.currentTimeMillis();
+    }
 
     public static long getTimeElapsed() {
-        return System.currentTimeMillis() - started;
+        DungeonContext ctx = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if (ctx == null) return -1;
+
+        return System.currentTimeMillis() - ctx.started;
+    }
+
+    public Map<Integer, Vec3> getBatSpawnedLocations() {
+        return batSpawnedLocations;
+    }
+
+    public List<Integer> getKilledBats() {
+        return killedBats;
     }
 
     public void setGotMimic(boolean gotMimic) {
@@ -117,107 +154,11 @@ public class DungeonContext {
         createEvent(new DungeonNodataEvent("MIMIC_KILLED"));
     }
 
-    @Getter
-    @Setter
-    private BossfightProcessor bossfightProcessor;
-
-    @Getter
-    private final Set<String> players = new HashSet<>();
-
-    @Getter
-    private final List<DungeonEvent> events = new ArrayList<>();
-
-    public DungeonContext(World world) {
-        this.world = world;
-        createEvent(new DungeonNodataEvent("DUNGEON_CONTEXT_CREATION"));
-        mapProcessor = new MapProcessor(this);
-        DungeonSpecificDataProvider doorFinder = DungeonSpecificDataProviderRegistry.getDoorFinder(getDungeonName());
-        if (doorFinder != null) {
-            trapRoomGen = doorFinder.isTrapSpawn(getDungeonName());
-
-            secretPercentage = doorFinder.secretPercentage(getDungeonName());
-            maxSpeed = doorFinder.speedSecond(getDungeonName());
-        } else {
-            mapProcessor.setBugged(true);
-        }
-        init = System.currentTimeMillis();
-    }
+    static final Logger logger = LogManager.getLogger("DungeonContext");
 
     public void createEvent(DungeonEventData eventData) {
+        if(DgOneCongifConfig.DEBUG_MODE) logger.info(eventData.getEventName(), eventData.toString());
 //        events.add(new DungeonEvent(eventData));
     }
 
-
-    private final Rectangle roomBoundary = new Rectangle(-10, -10, 138, 138);
-
-    public void tick() {
-
-
-        if (mapProcessor.isInitialized() && BossRoomEnterSeconds == -1 && !roomBoundary.contains(mapProcessor.worldPointToMapPoint(Minecraft.getMinecraft().thePlayer.getPositionVector()))) {
-            BossRoomEnterSeconds = DungeonUtil.getTimeElapsed() / 1000;
-            bossroomSpawnPos = Minecraft.getMinecraft().thePlayer.getPosition();
-            MinecraftForge.EVENT_BUS.post(new BossroomEnterEvent());
-            createEvent(new DungeonNodataEvent("BOSSROOM_ENTER"));
-            DungeonSpecificDataProvider doorFinder = DungeonSpecificDataProviderRegistry.getDoorFinder(getDungeonName());
-            if (doorFinder != null) {
-                bossfightProcessor = doorFinder.createBossfightProcessor(world, getDungeonName());
-            } else {
-                ChatTransmitter.sendDebugChat(new ChatComponentText("Error:: Null Data Providier"));
-            }
-        }
-
-        players.clear();
-        players.addAll(TabListUtil.getPlayersInDungeon());
-
-
-        if (latestSecretCnt != DungeonUtil.getSecretsFound()) {
-            int newSecretCnt = DungeonUtil.getSecretsFound();
-            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, newSecretCnt, latestTotalSecret, DungeonUtil.sureOfTotalSecrets()));
-            latestSecretCnt = newSecretCnt;
-        }
-        if (latestTotalSecret != DungeonUtil.getTotalSecretsInt()) {
-            latestTotalSecret = DungeonUtil.getTotalSecretsInt();
-            createEvent(new DungeonSecretCountChangeEvent(latestSecretCnt, latestSecretCnt, latestTotalSecret, DungeonUtil.sureOfTotalSecrets()));
-        }
-        if (latestCrypts != DungeonUtil.getTombsFound()) {
-            int newlatestCrypts = DungeonUtil.getTombsFound();
-            createEvent(new DungeonCryptBrokenEvent(latestCrypts, newlatestCrypts));
-            this.latestCrypts = newlatestCrypts;
-        }
-    }
-
-    @Getter
-    private boolean ended = false;
-    @Getter
-    private boolean defeated = false;
-
-    public void onChat(ClientChatReceivedEvent event) {
-        IChatComponent component = event.message;
-        String formatted = component.getFormattedText();
-        if (formatted.contains("$DG-Comm")) {
-            event.setCanceled(true);
-            String data = component.getFormattedText().substring(component.getFormattedText().indexOf("$DG-Comm"));
-            String actual = TextUtils.stripColor(data);
-            String coords = actual.split(" ")[1];
-            String secrets = actual.split(" ")[2];
-            int x = Integer.parseInt(coords.split("/")[0]);
-            int z = Integer.parseInt(coords.split("/")[1]);
-            int secrets2 = Integer.parseInt(secrets);
-            Point roomPt = mapProcessor.worldPointToRoomPoint(new BlockPos(x, 70, z));
-            ChatTransmitter.sendDebugChat(new ChatComponentText("Message from Other dungeons guide :: " + roomPt.x + " / " + roomPt.y + " total secrets " + secrets2));
-            DungeonRoom dr = roomMapper.get(roomPt);
-            if (dr != null) {
-                dr.setTotalSecrets(secrets2);
-            }
-        } else if (formatted.contains("$DG-Mimic")) {
-            setGotMimic(true);
-        } else if (formatted.startsWith("§r§c§lPUZZLE FAIL! ") && formatted.endsWith(" §r§4Y§r§ci§r§6k§r§ee§r§as§r§2!§r")) {
-            createEvent(new DungeonPuzzleFailureEvent(TextUtils.stripColor(formatted.split(" ")[2]), formatted));
-        } else if (formatted.contains("§6> §e§lEXTRA STATS §6<")) {
-            createEvent(new DungeonNodataEvent("DUNGEON_END"));
-            ended = true;
-        } else if (formatted.contains("§r§c☠ §r§eDefeated ")) {
-            defeated = true;
-        }
-    }
 }

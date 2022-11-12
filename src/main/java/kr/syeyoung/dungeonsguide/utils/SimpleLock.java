@@ -1,25 +1,32 @@
 package kr.syeyoung.dungeonsguide.utils;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class SimpleLock {
-    private boolean lockStatus = true;
+    private final AtomicBoolean status = new AtomicBoolean();
 
     public SimpleLock(){
+        status.set(false);
     }
 
     public SimpleLock(boolean lockStatus) {
-        this.lockStatus = lockStatus;
+        status.set(lockStatus);
     }
 
     public void lock(){
-        lockStatus = true;
+        status.set(true);
     }
 
     public void unLock(){
-        lockStatus = false;
+        status.set(false);
     }
 
     public boolean isLocked(){
-        return lockStatus;
+        return status.get();
+    }
+
+    public boolean isUnlocked(){
+        return !status.get();
     }
 
 

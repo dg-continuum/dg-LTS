@@ -19,11 +19,14 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
-import kr.syeyoung.dungeonsguide.dungeon.actions.*;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionBreakWithSuperBoom;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionChangeState;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMoveNearestAir;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
@@ -32,8 +35,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 @Data
 public class DungeonTomb implements DungeonMechanic, RouteBlocker {
@@ -84,14 +87,15 @@ public class DungeonTomb implements DungeonMechanic, RouteBlocker {
 
     @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
-        if (secretPoint.getOffsetPointList().isEmpty()) return;
-        OffsetPoint firstpt = secretPoint.getOffsetPointList().get(0);
-        BlockPos pos = firstpt.getBlockPos(dungeonRoom);
-        RenderUtils.drawTextAtWorld(name, pos.getX() + 0.5f, pos.getY() + 0.75f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0.25f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        if (!secretPoint.getOffsetPointList().isEmpty()) {
+            OffsetPoint firstpt = secretPoint.getOffsetPointList().get(0);
+            BlockPos pos = firstpt.getBlockPos(dungeonRoom);
+            RenderUtils.drawTextAtWorld(name, pos.getX() + 0.5f, pos.getY() + 0.75f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+            RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0.25f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
 
-        for (OffsetPoint offsetPoint : secretPoint.getOffsetPointList()) {
-            RenderUtils.highlightBlock(offsetPoint.getBlockPos(dungeonRoom), color, partialTicks);
+            for (OffsetPoint offsetPoint : secretPoint.getOffsetPointList()) {
+                RenderUtils.highlightBlock(offsetPoint.getBlockPos(dungeonRoom), color, partialTicks);
+            }
         }
     }
 

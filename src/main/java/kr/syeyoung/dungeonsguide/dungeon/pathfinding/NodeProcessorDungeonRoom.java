@@ -35,12 +35,23 @@ import net.minecraft.world.pathfinder.NodeProcessor;
 import java.util.Set;
 
 public class NodeProcessorDungeonRoom extends NodeProcessor {
+    public static final Set<Block> allowed = Sets.newHashSet(Blocks.air, Blocks.water, Blocks.lava, Blocks.flowing_water, Blocks.flowing_lava, Blocks.vine, Blocks.ladder
+            , Blocks.standing_sign, Blocks.wall_sign, Blocks.trapdoor, Blocks.iron_trapdoor, Blocks.wooden_button, Blocks.stone_button, Blocks.fire,
+            Blocks.torch, Blocks.rail, Blocks.golden_rail, Blocks.activator_rail, Blocks.detector_rail, Blocks.carpet, Blocks.redstone_torch);
+    public static final IBlockState preBuilt = Blocks.stone.getStateFromMeta(2);
+    private static final EnumFacing[] values2 = new EnumFacing[]{
+            EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST, EnumFacing.UP
+    };
     private final DungeonRoom dungeonRoom;
     private final BlockPos sub;
 
     public NodeProcessorDungeonRoom(DungeonRoom dungeonRoom) {
         this.dungeonRoom = dungeonRoom;
         sub = dungeonRoom.getMax().subtract(dungeonRoom.getMin());
+    }
+
+    public static boolean isValidBlock(IBlockState state) {
+        return state.equals(preBuilt) || allowed.contains(state.getBlock());
     }
 
     @Override
@@ -54,12 +65,6 @@ public class NodeProcessorDungeonRoom extends NodeProcessor {
         return openPoint((int) x - dungeonRoom.getMin().getX(), (int) y - dungeonRoom.getMin().getY(),
                 (int) z - dungeonRoom.getMin().getZ());
     }
-
-    private static final EnumFacing[] values2 = new EnumFacing[] {
-        EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST, EnumFacing.UP
-    };
-
-
 
     @Override
     public int findPathOptions(PathPoint[] pathOptions, Entity entityIn, PathPoint currentPoint, PathPoint targetPoint, float maxDistance) {
@@ -131,14 +136,5 @@ public class NodeProcessorDungeonRoom extends NodeProcessor {
             }
         }
         return i;
-    }
-
-    public static final Set<Block> allowed = Sets.newHashSet(Blocks.air, Blocks.water, Blocks.lava, Blocks.flowing_water, Blocks.flowing_lava, Blocks.vine, Blocks.ladder
-            , Blocks.standing_sign, Blocks.wall_sign, Blocks.trapdoor, Blocks.iron_trapdoor, Blocks.wooden_button, Blocks.stone_button, Blocks.fire,
-            Blocks.torch, Blocks.rail, Blocks.golden_rail, Blocks.activator_rail, Blocks.detector_rail, Blocks.carpet, Blocks.redstone_torch);
-    public static final IBlockState preBuilt = Blocks.stone.getStateFromMeta(2);
-
-    public static boolean isValidBlock(IBlockState state) {
-        return state.equals(preBuilt) || allowed.contains(state.getBlock());
     }
 }

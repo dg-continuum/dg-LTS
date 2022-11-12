@@ -35,11 +35,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ActionClickSet extends AbstractAction {
     private Set<AbstractAction> preRequisite = new HashSet<>();
     private OffsetPointSet target;
     private Predicate<ItemStack> predicate = stack -> true;
+    private boolean clicked = false;
 
     public ActionClickSet(OffsetPointSet target) {
         this.target = target;
@@ -52,14 +53,13 @@ public class ActionClickSet extends AbstractAction {
 
     @Override
     public String toString() {
-        return "ClickSet\n- targets size: "+target.getOffsetPointList().size()+"\n- predicate: "+predicate.getClass().getSimpleName();
+        return "ClickSet\n- targets size: " + target.getOffsetPointList().size() + "\n- predicate: " + predicate.getClass().getSimpleName();
     }
 
-    private boolean clicked = false;
     @Override
     public void onPlayerInteract(DungeonRoom dungeonRoom, PlayerInteractEvent event, ActionRouteProperties actionRouteProperties) {
         if (clicked) return;
-        for (OffsetPoint pt2: target.getOffsetPointList()) {
+        for (OffsetPoint pt2 : target.getOffsetPointList()) {
             if (pt2.getBlockPos(dungeonRoom).equals(event.pos) && predicate.test(event.entityLiving.getHeldItem())) {
                 clicked = true;
             }
@@ -76,13 +76,14 @@ public class ActionClickSet extends AbstractAction {
         for (OffsetPoint offsetPoint : target.getOffsetPointList()) {
             BlockPos pos = offsetPoint.getBlockPos(dungeonRoom);
             xAcc += pos.getX() + 0.5f;
-            yAcc += pos.getY()+ 0.5f;
-            zAcc += pos.getZ()+ 0.5f;
-            RenderUtils.highlightBlock(offsetPoint.getBlockPos(dungeonRoom), new Color(0, 255,255,50),partialTicks, true);
+            yAcc += pos.getY() + 0.5f;
+            zAcc += pos.getZ() + 0.5f;
+            RenderUtils.highlightBlock(offsetPoint.getBlockPos(dungeonRoom), new Color(0, 255, 255, 50), partialTicks, true);
         }
 
         RenderUtils.drawTextAtWorld("Click", xAcc / size, yAcc / size, zAcc / size, 0xFFFFFF00, 0.02f, false, false, partialTicks);
     }
+
     @Override
     public boolean isComplete(DungeonRoom dungeonRoom) {
         return clicked;

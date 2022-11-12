@@ -1,10 +1,5 @@
-package kr.syeyoung.dungeonsguide.whosonline.api.messages.client;
+package kr.syeyoung.dungeonsguide.whosonline.api.messages.client
 
-public class C03Ping {
-    public String t = "/ping";
-    public String c;
-
-    public C03Ping(String c) {
-        this.c = c;
-    }
+class C03Ping(var c: String) {
+    var t = "/ping"
 }

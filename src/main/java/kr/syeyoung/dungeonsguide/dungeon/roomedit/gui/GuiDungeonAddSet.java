@@ -19,10 +19,11 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.gui;
 
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.gui.elements.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditOffsetPointSet;
+import kr.syeyoung.dungeonsguide.gui.MGui;
+import kr.syeyoung.dungeonsguide.gui.elements.MButton;
+import kr.syeyoung.dungeonsguide.gui.elements.MValue;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -45,37 +46,6 @@ public class GuiDungeonAddSet extends MGui {
     @Getter
     private final OffsetPoint end;
 
-    public void onWorldRender(float partialTicks) {
-        for (OffsetPoint pos:getBlockPoses()) {
-            RenderUtils.highlightBlock(pos.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0,255,255,50), partialTicks);
-        }
-        RenderUtils.highlightBlock(start.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(255,0,0,100), partialTicks);
-        RenderUtils.highlightBlock(end.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0,255,0,100), partialTicks);
-    }
-
-    public List<OffsetPoint> getBlockPoses() {
-        int minX = Math.min(start.getX(), end.getX());
-        int minY = Math.min(start.getY(), end.getY());
-        int minZ = Math.min(start.getZ(), end.getZ());
-        int maxX = Math.max(start.getX(), end.getX());
-        int maxY = Math.max(start.getY(), end.getY());
-        int maxZ = Math.max(start.getZ(), end.getZ());
-
-        List<OffsetPoint> offsetPoints = new ArrayList<OffsetPoint>();
-        for (int z = minZ; z <= maxZ; z++) {
-            for (int x = minX; x <=maxX; x++) {
-                for (int y = maxY; y >= minY; y --) {
-                    offsetPoints.add(new OffsetPoint(x,y,z));
-                }
-            }
-        }
-        return offsetPoints;
-    }
-
-    public void add() {
-        valueEditOffsetPointSet.addAll(getBlockPoses());
-    }
-
     public GuiDungeonAddSet(final ValueEditOffsetPointSet processorParameterEditPane) {
         this.valueEditOffsetPointSet = processorParameterEditPane;
         getMainPanel().setBackgroundColor(new Color(17, 17, 17, 179));
@@ -85,17 +55,17 @@ public class GuiDungeonAddSet extends MGui {
         }
         {
             MValue mValue = new MValue(start, Collections.emptyList());
-            mValue.setBounds(new Rectangle(0,0,150,20));
+            mValue.setBounds(new Rectangle(0, 0, 150, 20));
             getMainPanel().add(mValue);
-            MValue mValue2 = new MValue(end,Collections.emptyList());
-            mValue2.setBounds(new Rectangle(0,20,150,20));
+            MValue mValue2 = new MValue(end, Collections.emptyList());
+            mValue2.setBounds(new Rectangle(0, 20, 150, 20));
             getMainPanel().add(mValue2);
         }
         {
             add = new MButton() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(0,parentHeight - 20, parentWidth / 2, 20));
+                    setBounds(new Rectangle(0, parentHeight - 20, parentWidth / 2, 20));
                 }
             };
             add.setText("Add");
@@ -108,10 +78,10 @@ public class GuiDungeonAddSet extends MGui {
                 }
             });
 
-            back = new MButton(){
+            back = new MButton() {
                 @Override
                 public void resize(int parentWidth, int parentHeight) {
-                    setBounds(new Rectangle(parentWidth / 2,parentHeight - 20, parentWidth / 2, 20));
+                    setBounds(new Rectangle(parentWidth / 2, parentHeight - 20, parentWidth / 2, 20));
                 }
             };
             back.setText("Go back");
@@ -127,10 +97,41 @@ public class GuiDungeonAddSet extends MGui {
         }
     }
 
+    public void onWorldRender(float partialTicks) {
+        for (OffsetPoint pos : getBlockPoses()) {
+            RenderUtils.highlightBlock(pos.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 255, 50), partialTicks);
+        }
+        RenderUtils.highlightBlock(start.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(255, 0, 0, 100), partialTicks);
+        RenderUtils.highlightBlock(end.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 0, 100), partialTicks);
+    }
+
+    public List<OffsetPoint> getBlockPoses() {
+        int minX = Math.min(start.getX(), end.getX());
+        int minY = Math.min(start.getY(), end.getY());
+        int minZ = Math.min(start.getZ(), end.getZ());
+        int maxX = Math.max(start.getX(), end.getX());
+        int maxY = Math.max(start.getY(), end.getY());
+        int maxZ = Math.max(start.getZ(), end.getZ());
+
+        List<OffsetPoint> offsetPoints = new ArrayList<OffsetPoint>();
+        for (int z = minZ; z <= maxZ; z++) {
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = maxY; y >= minY; y--) {
+                    offsetPoints.add(new OffsetPoint(x, y, z));
+                }
+            }
+        }
+        return offsetPoints;
+    }
+
+    public void add() {
+        valueEditOffsetPointSet.addAll(getBlockPoses());
+    }
+
     @Override
     public void initGui() {
         super.initGui();
         // update bounds
-        getMainPanel().setBounds(new Rectangle(10, Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight),200,300));
+        getMainPanel().setBounds(new Rectangle(10, Math.min((Minecraft.getMinecraft().displayHeight - 300) / 2, Minecraft.getMinecraft().displayHeight), 200, 300));
     }
 }
