@@ -1,7 +1,5 @@
 package kr.syeyoung.dungeonsguide.events.impl
 
-import kr.syeyoung.dungeonsguide.discord.gamesdk.jna.datastruct.DiscordUser
-import kr.syeyoung.dungeonsguide.discord.rpc.JDiscordRelation
 import kr.syeyoung.dungeonsguide.stomp.StompClient
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
@@ -21,8 +19,6 @@ class DungeonLeftEvent : Event()
 class HypixelJoinedEvent : Event()
 class SkyblockJoinedEvent : Event()
 class SkyblockLeftEvent : Event()
-class DiscordUserJoinRequestEvent(val discordUser: DiscordUser?, val isInvite: Boolean = false ) : Event()
-class DiscordUserUpdateEvent(val prev: JDiscordRelation?, val current: JDiscordRelation?) : Event()
 class DungeonContextInitializationEvent : Event()
 class KeyBindPressedEvent(val key: Int) : Event()
 class PlayerListItemPacketEvent(val packetPlayerListItem: S38PacketPlayerListItem?) : Event()

@@ -29,7 +29,6 @@ import kr.syeyoung.dungeonsguide.commands.CommandDungeonsGuide;
 import kr.syeyoung.dungeonsguide.commands.CommandReparty;
 import kr.syeyoung.dungeonsguide.config.Config;
 import kr.syeyoung.dungeonsguide.cosmetics.CosmeticsManager;
-import kr.syeyoung.dungeonsguide.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.events.PacketListener;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
@@ -188,7 +187,6 @@ public class DungeonsGuide {
             System.setProperty("dg.safe", "true");
         }
 
-        MinecraftForge.EVENT_BUS.register(RichPresenceManager.INSTANCE);
         TimeScoreUtil.init();
 
         Main.finishUpProgressBar(progressbar);

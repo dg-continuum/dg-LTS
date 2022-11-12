@@ -18,12 +18,12 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.partyfinder.customgui;
 
-import kr.syeyoung.dungeonsguide.discord.rpc.RichPresenceManager;
 import kr.syeyoung.dungeonsguide.events.impl.WindowUpdateEvent;
-import kr.syeyoung.dungeonsguide.features.impl.discord.invteTooltip.MTooltipInvite;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
-import kr.syeyoung.dungeonsguide.gui.elements.*;
-import kr.syeyoung.dungeonsguide.party.PartyManager;
+import kr.syeyoung.dungeonsguide.gui.elements.MButton;
+import kr.syeyoung.dungeonsguide.gui.elements.MList;
+import kr.syeyoung.dungeonsguide.gui.elements.MPanelScaledGUI;
+import kr.syeyoung.dungeonsguide.gui.elements.MScrollablePanel;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -104,25 +104,6 @@ public class PanelPartyFinder extends MPanel {
             Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+3, 0, 0, Minecraft.getMinecraft().thePlayer);
         });
         add(goBack);
-        discordInvite = new MButton();
-        discordInvite.setText("Invite Discord Friends");
-        discordInvite.setOnActionPerformed(() -> {
-            if (RichPresenceManager.INSTANCE.getLastSetupCode() == -9999) {
-                MModalMessage mTooltipInvite = new MModalMessage("Error", "Discord GameSDK has been disabled, or it failed to load", () -> {});
-                mTooltipInvite.setScale( new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor());
-                mTooltipInvite.open(this);
-            } else if (PartyManager.INSTANCE.getAskToJoinSecret() != null) {
-                MTooltipInvite mTooltipInvite = new MTooltipInvite();
-                mTooltipInvite.setScale( new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor());
-                mTooltipInvite.open(this);
-            } else {
-                MModalMessage mTooltipInvite = new MModalMessage("Error", "You need to have Ask To Join Enabled to use this feature. Run /dg atj to enable ask to join", () -> {});
-                mTooltipInvite.setScale( new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor());
-                mTooltipInvite.open(this);
-            }
-        });
-        discordInvite.setBackground(RenderUtils.blendAlpha(0xFF141414, 0.05f));
-        add(discordInvite);
         navigation = new MPanelScaledGUI() {
             @Override
             public void onBoundsUpdate() {

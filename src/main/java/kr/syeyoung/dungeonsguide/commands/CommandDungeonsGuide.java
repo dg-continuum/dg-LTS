@@ -22,16 +22,13 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.guiconfig.GuiConfigV2;
 import kr.syeyoung.dungeonsguide.cosmetics.CosmeticsManager;
-import kr.syeyoung.dungeonsguide.discord.rpc.RichPresenceManager;
-import kr.syeyoung.dungeonsguide.features.impl.discord.PartyInviteViewer;
 import kr.syeyoung.dungeonsguide.features.impl.misc.playerpreview.FeatureViewPlayerStatsOnJoin;
 import kr.syeyoung.dungeonsguide.features.impl.misc.playerpreview.api.ApiFetcher;
-import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
+import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import kr.syeyoung.dungeonsguide.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.stomp.StompPayload;
 import kr.syeyoung.dungeonsguide.utils.SimpleLock;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -82,24 +79,6 @@ public class CommandDungeonsGuide extends CommandBase {
                 }
                 FeatureViewPlayerStatsOnJoin.processPartyMembers(context);
             });
-        } else if (args[0].equalsIgnoreCase("asktojoin") || args[0].equalsIgnoreCase("atj")) {
-            if (RichPresenceManager.INSTANCE.getLastSetupCode() == -9999) {
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cDiscord GameSDK has been disabled, or it failed to load!"));
-                return;
-            }
-            if (!PartyManager.INSTANCE.canInvite()) {
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cYou don't have perms in the party to invite people!"));
-            } else {
-                PartyManager.INSTANCE.toggleAllowAskToJoin();
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fToggled Ask to join to " + (PartyManager.INSTANCE.getAskToJoinSecret() != null ? "§eon" : "§coff")));
-            }
-
-            if (!DgOneCongifConfig.useDiscordRP) {
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cDiscord Rich Presence is disabled! Enable at /dg -> Discord "));
-            }
-            if (!DgOneCongifConfig.disocrdPartyInvite) {
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cDiscord Invite Viewer is disabled! Enable at /dg -> Discord ")); // how
-            }
         } else if (args[0].equals("pv")) {
             try {
                 ApiFetcher.fetchUUIDAsync(args[1])
@@ -116,8 +95,6 @@ public class CommandDungeonsGuide extends CommandBase {
             cosmeticsManager.requestCosmeticsList();
             cosmeticsManager.requestActiveCosmetics();
             StaticResourceCache.INSTANCE.purgeCache();
-            PartyInviteViewer.imageMap.clear();
-            PartyInviteViewer.futureMap.clear();
 
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully purged API Cache!"));
         } else if (args[0].equals("pbroadcast")) {
