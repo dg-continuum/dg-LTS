@@ -25,7 +25,6 @@ import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MValue;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
@@ -41,9 +40,16 @@ public class GuiDungeonAddSet extends MGui {
     private final MButton back;
 
 
-    @Getter
+    public OffsetPoint getStart() {
+        return start;
+    }
+
     private final OffsetPoint start;
-    @Getter
+
+    public OffsetPoint getEnd() {
+        return end;
+    }
+
     private final OffsetPoint end;
 
     public GuiDungeonAddSet(final ValueEditOffsetPointSet processorParameterEditPane) {

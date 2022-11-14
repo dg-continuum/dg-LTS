@@ -37,7 +37,7 @@ public class DGTexturePack implements IResourcePack {
 
 
     @Override
-    public InputStream getInputStream(ResourceLocation location) throws IOException {
+    public InputStream getInputStream(ResourceLocation location) {
         InputStream inputStream = this.getClass().getResourceAsStream("/assets/dg/"+location.getResourcePath());
         if (inputStream != null) return inputStream;
         return new ByteArrayInputStream(ResourceManager.getInstance().getResources().get("assets/dg/"+location.getResourcePath()));

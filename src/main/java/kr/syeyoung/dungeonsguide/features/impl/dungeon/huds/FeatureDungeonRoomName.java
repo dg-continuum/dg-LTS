@@ -50,6 +50,7 @@ public class FeatureDungeonRoomName extends SingleTextHud {
         if(roomPt == null) return "";
 
         val dungeonRoom = context.getRoomMapper().get(roomPt);
+        if(dungeonRoom == null) return "";
         return dungeonRoom.getDungeonRoomInfo().getName();
     }
 }

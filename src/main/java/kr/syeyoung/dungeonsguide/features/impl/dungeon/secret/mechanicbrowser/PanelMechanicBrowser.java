@@ -24,7 +24,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MList;
@@ -107,10 +107,10 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         fr.drawString("Selected: ", 2, 2, 0xFFAAAAAA);
-        if (grp.getSecretGuider().getPath("MECH-BROWSER") == null)
+        if (grp.getStrategy().getPath("MECH-BROWSER") == null)
             fr.drawString("Nothing", fr.getStringWidth("Selected: ") + 2, 2, 0xFFAA0000);
         else {
-            ActionRoute route = grp.getSecretGuider().getPath("MECH-BROWSER");
+            ActionRoute route = grp.getStrategy().getPath("MECH-BROWSER");
             fr.drawString(route.getMechanic() + " -> " + route.getState(), fr.getStringWidth("Selected: ") + 2, 2, 0xFFFFFF00);
         }
         fr.drawString("Open Chat to Select Secrets", 2, fr.FONT_HEIGHT + 5, 0xFFAAAAAA);
@@ -271,7 +271,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
             mechanicBrowserTooltip.getMList().add(new MechanicBrowserElement(() -> state, false, (m2, pt2) -> {
                 if (dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor) {
                     ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor())
-                            .getSecretGuider().addAction("MECH-BROWSER",
+                            .getStrategy().addAction("MECH-BROWSER",
                                     id,
                                     state,
                                     FeatureRegistry.SECRET_LINE_PROPERTIES_SECRET_BROWSER.getRouteProperties());
@@ -299,7 +299,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         if (!dungeonRoomOpt.isPresent()) return;
         DungeonRoom dungeonRoom = dungeonRoomOpt.get();
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
-        ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getSecretGuider().cancel("MECH-BROWSER");
+        ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getStrategy().cancel("MECH-BROWSER");
     }
 
     public void toggleTooltip(boolean open) {

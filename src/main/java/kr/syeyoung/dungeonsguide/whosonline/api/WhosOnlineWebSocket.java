@@ -13,6 +13,7 @@ import kr.syeyoung.dungeonsguide.whosonline.api.messages.server.S02areOnlineAck;
 import kr.syeyoung.dungeonsguide.whosonline.api.messages.server.S04Pong;
 import lombok.Getter;
 import lombok.val;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
@@ -24,12 +25,13 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 public class WhosOnlineWebSocket extends WebSocketClient {
 
     private final Logger logger = LogManager.getLogger("WhosOnlineWebSocket");
-    private final String playerUuid;
+    private final UUID playerUuid;
     private final ConcurrentHashMap<String, Tuple<Long, CountDownLatch>> sentMessages;
     private final ScheduledExecutorService se;
     private final SimpleFuse timeoutFuse;
@@ -50,7 +52,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     public WhosOnlineWebSocket(@NotNull final String remote,
                                @NotNull final ScheduledExecutorService se,
                                WhosOnlineCache cache,
-                               @NotNull final String playerUuid) {
+                               @NotNull final UUID playerUuid) {
         super(URI.create(remote));
         this.cache = cache;
         setConnectionLostTimeout(0);
@@ -102,9 +104,9 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     public void onOpen(ServerHandshake handshakedata) {
         logger.info("WebSocket opened");
 
-        logger.info("sending welcome message: {}", WhosOnlineManager.gson.toJson(new C00Connect(playerUuid)));
+        logger.info("sending welcome message: {}", WhosOnlineManager.gson.toJson(new C00Connect(new C00Connect.OBJ("blah", Minecraft.getMinecraft().getSession().getUsername()))));
 
-        send(WhosOnlineManager.gson.toJson(new C00Connect(playerUuid)));
+        send(WhosOnlineManager.gson.toJson(new C00Connect(new C00Connect.OBJ("blah", Minecraft.getMinecraft().getSession().getUsername()))));
 
         update = se.scheduleAtFixedRate(this::update, 5, 20, TimeUnit.MILLISECONDS);
 

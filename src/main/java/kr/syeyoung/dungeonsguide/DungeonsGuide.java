@@ -18,10 +18,8 @@
 
 package kr.syeyoung.dungeonsguide;
 
-import cc.polyfrost.oneconfig.events.event.InitializationEvent;
 import cc.polyfrost.oneconfig.events.event.LocrawEvent;
 import cc.polyfrost.oneconfig.libs.eventbus.Subscribe;
-import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.commands.CommandDgDebug;
@@ -38,34 +36,28 @@ import kr.syeyoung.dungeonsguide.party.PartyManager;
 import kr.syeyoung.dungeonsguide.utils.*;
 import kr.syeyoung.dungeonsguide.utils.cursor.GLCursors;
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourcePack;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public class DungeonsGuide {
 
     public static DgOneCongifConfig config;
     @Getter
     private static boolean firstTimeUsingDG = false;
-    Logger logger = LogManager.getLogger("DungeonsGuide");
 
     public boolean verbose = false;
     private SkyblockStatus skyblockStatus;
@@ -80,7 +72,7 @@ public class DungeonsGuide {
     private DungeonFacade dungeonFacade;
 
     @Getter
-    private BlockCache blockCache;
+    private final BlockCache blockCache = new BlockCache();
     @Getter @Setter
     private WhosOnlineManager whosOnlineManager;
 
@@ -103,13 +95,11 @@ public class DungeonsGuide {
 
     }
 
-
-
-
-
     public void init() {
         ProgressManager.ProgressBar progressbar = ProgressManager.push("DungeonsGuide", 4);
-        MinecraftForge.EVENT_BUS.register(this);
+        config = new DgOneCongifConfig();
+        this.dungeonFacade = new DungeonFacade();
+        dungeonFacade.init();
 
         progressbar.step("Registering Events & Commands");
 
@@ -123,25 +113,9 @@ public class DungeonsGuide {
         this.whosOnlineManager = new WhosOnlineManager("virginity.kokoniara.software");
 //        this.whosOnlineManager = new WhosOnlineManager("localhost:3000");
 
-        this.whosOnlineManager.init();
+//        this.whosOnlineManager.init();
 
         new ChatTransmitter();
-
-        try {
-            Set<String> invalid = ReflectionHelper.getPrivateValue(LaunchClassLoader.class, (LaunchClassLoader) Main.class.getClassLoader(), "invalidClasses");
-            ((LaunchClassLoader) Main.class.getClassLoader()).clearNegativeEntries(Sets.newHashSet("org.slf4j.LoggerFactory"));
-            invalid.clear();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        this.blockCache = new BlockCache();
-
-        this.dungeonFacade = new DungeonFacade();
-        dungeonFacade.init();
-
-
 
         TitleRender.getInstance();
 
@@ -162,7 +136,7 @@ public class DungeonsGuide {
 
         MinecraftForge.EVENT_BUS.register(PartyManager.INSTANCE);
         MinecraftForge.EVENT_BUS.register(ChatProcessor.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(StaticResourceCache.INSTANCE);
+//        MinecraftForge.EVENT_BUS.register(StaticResourceCache.INSTANCE);
 
         MinecraftForge.EVENT_BUS.register(new AhUtils());
 
@@ -195,12 +169,6 @@ public class DungeonsGuide {
 
         ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(resourceManager -> GLCursors.setupCursors());
     }
-
-    @Subscribe
-    public void onInit(InitializationEvent event) {
-        config = new DgOneCongifConfig();
-    }
-
 
     private boolean showedStartUpGuide;
     @SubscribeEvent
@@ -276,8 +244,5 @@ public class DungeonsGuide {
     public SkyblockStatus getSkyblockStatus() {
         return skyblockStatus;
     }
-
-
-
 
 }

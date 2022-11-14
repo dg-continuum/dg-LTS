@@ -22,7 +22,6 @@ import kr.syeyoung.dungeonsguide.dungeon.roomedit.panes.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.gui.elements.MTabbedPane;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
@@ -32,7 +31,11 @@ public class GuiDungeonRoomEdit extends MGui {
     private final DungeonRoom room;
 
     private final MTabbedPane tabbedPane;
-    @Getter
+
+    public SecretEditPane getSep() {
+        return sep;
+    }
+
     private final SecretEditPane sep;
 
     public GuiDungeonRoomEdit(DungeonRoom room) {

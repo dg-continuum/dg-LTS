@@ -27,7 +27,7 @@ import kr.syeyoung.dungeonsguide.dungeon.events.DungeonEventData;
 import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonNodataEvent;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,7 +57,11 @@ public class DungeonContext {
     private static String dungeonName;
     @Getter
     private final World world;
-    @Getter
+
+    public MapProcessor getMapProcessor() {
+        return mapProcessor;
+    }
+
     private final MapProcessor mapProcessor;
     @Getter
     private final Map<Point, DungeonRoom> roomMapper = new HashMap<>();
@@ -95,7 +99,11 @@ public class DungeonContext {
     @Getter
     @Setter
     private boolean hasTrapRoom = false;
-    @Getter
+
+    public boolean isGotMimic() {
+        return gotMimic;
+    }
+
     private boolean gotMimic = false;
     @Getter @Setter
     private int latestSecretCnt = 0;

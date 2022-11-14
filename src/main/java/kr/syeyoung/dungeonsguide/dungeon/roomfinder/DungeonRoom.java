@@ -36,7 +36,6 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -60,9 +59,19 @@ public class DungeonRoom {
     private final List<Point> unitPoints;
     private final short shape;
     private final byte color;
+
+    public BlockPos getMin() {
+        return min;
+    }
+
     private final BlockPos min;
     private final BlockPos max;
     private final Point minRoomPt;
+
+    public DungeonContext getContext() {
+        return context;
+    }
+
     private final DungeonContext context;
     private final List<DungeonDoor> doors = new ArrayList<>();
     private final int unitWidth; // X
@@ -72,7 +81,11 @@ public class DungeonRoom {
     private final Map<BlockPos, ThetaStar> activeThetaStar = new HashMap<>();
     @Getter
     private final NodeProcessorDungeonRoom nodeProcessorDungeonRoom;
-    @Getter
+
+    public Map<String, Object> getRoomContext() {
+        return roomContext;
+    }
+
     private final Map<String, Object> roomContext = new HashMap<>();
     // These values are doubled
     private final int minx;
@@ -91,7 +104,15 @@ public class DungeonRoom {
     }
 
     private DungeonRoomInfo dungeonRoomInfo;
-    @Setter
+
+    public int getTotalSecrets() {
+        return totalSecrets;
+    }
+
+    public void setTotalSecrets(int totalSecrets) {
+        this.totalSecrets = totalSecrets;
+    }
+
     private int totalSecrets = -1;
 
     public RoomState getCurrentState() {
@@ -158,7 +179,7 @@ public class DungeonRoom {
 
         switch (DgOneCongifConfig.secretPathfindStrategy){
             case 0:
-                return DungeonFacade.ex.submit(() -> {
+                return DungeonFacade.INSTANCE.ex.submit(() -> {
                     ThetaStar pathFinder =
                             activeThetaStar.computeIfAbsent(targetPos, pos -> new ThetaStar(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
                     pathFinder.pathfind(entityIn.getPositionVector(), timeout);
@@ -166,7 +187,7 @@ public class DungeonRoom {
                 });
 
             case 1:
-                return DungeonFacade.ex.submit(() -> {
+                return DungeonFacade.INSTANCE.ex.submit(() -> {
                     AStarCornerCut pathFinder =
                             activeBetterAStarCornerCut.computeIfAbsent(targetPos, pos -> new AStarCornerCut(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
                     pathFinder.pathfind(entityIn.getPositionVector(), timeout);
@@ -174,7 +195,7 @@ public class DungeonRoom {
                 });
 
             case 2:
-                return DungeonFacade.ex.submit(() -> {
+                return DungeonFacade.INSTANCE.ex.submit(() -> {
                     AStarFineGrid pathFinder =
                             activeBetterAStar.computeIfAbsent(targetPos, pos -> new AStarFineGrid(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
                     pathFinder.pathfind(entityIn.getPositionVector(), timeout);
@@ -182,7 +203,7 @@ public class DungeonRoom {
                 });
             case 3:
 
-                return DungeonFacade.ex.submit(() -> {
+                return DungeonFacade.INSTANCE.ex.submit(() -> {
                     JPSPathfinder pathFinder = new JPSPathfinder(this);
                     pathFinder.pathfind(entityIn.getPositionVector(), new Vec3(targetPos).addVector(0.5, 0.5, 0.5), 1.5f, timeout);
                     return pathFinder.getRoute();
@@ -191,7 +212,7 @@ public class DungeonRoom {
 
 
             default:
-                return DungeonFacade.ex.submit(() -> {
+                return DungeonFacade.INSTANCE.ex.submit(() -> {
                     PathFinder pathFinder = new PathFinder(nodeProcessorDungeonRoom);
                     PathEntity latest = pathFinder.createEntityPathTo(blockaccess, entityIn, targetPos, dist);
                     if (latest != null) {

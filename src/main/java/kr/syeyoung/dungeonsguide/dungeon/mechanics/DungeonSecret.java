@@ -47,10 +47,23 @@ import java.util.Set;
 public class DungeonSecret implements DungeonMechanic {
     private static final long serialVersionUID = 8784808599222706537L;
 
+
+    public OffsetPoint getSecretPoint() {
+        return secretPoint;
+    }
+
+    public void setSecretPoint(OffsetPoint secretPoint) {
+        this.secretPoint = secretPoint;
+    }
+
     private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
 
     public SecretType getSecretType() {
         return secretType;
+    }
+
+    public void setSecretType(SecretType secretType) {
+        this.secretType = secretType;
     }
 
     private SecretType secretType = SecretType.CHEST;

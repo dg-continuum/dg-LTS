@@ -9,7 +9,6 @@ import kr.syeyoung.dungeonsguide.auth.authprovider.DgAuth.DgAuth;
 import kr.syeyoung.dungeonsguide.auth.authprovider.DgAuth.DgAuthUtil;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.events.impl.AuthChangedEvent;
-import kr.syeyoung.dungeonsguide.stomp.StompManager;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
@@ -131,9 +130,7 @@ public class AuthManager {
                 ChatTransmitter.addToQueue("§eDungeons Guide §7:: §r§cDG auth failed, trying again in ten seconds", true);
                 logger.info("DG auth failed, trying again in a second");
             } else {
-                // RE-AUTHed SUCCESSFULLY HOORAY
-                // for some reason the forge events don't work in pre init, so I call the callback directly
-                StompManager.getInstance().init();
+//                StompManager.getInstance().init();
                 MinecraftForge.EVENT_BUS.post(new AuthChangedEvent());
             }
         } catch (NoSuchAlgorithmException | AuthenticationException | IOException e) {

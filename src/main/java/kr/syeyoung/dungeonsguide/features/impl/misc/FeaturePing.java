@@ -2,6 +2,7 @@ package kr.syeyoung.dungeonsguide.features.impl.misc;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import kr.syeyoung.dungeonsguide.utils.SimpleLock;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.events.PacketListener;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
@@ -46,7 +47,6 @@ public class FeaturePing extends SingleTextHud {
     boolean shouldShowAverage = false;
     ArrayList<Long> averagePingStore = new ArrayList<>();
     Long averagePing = 0L;
-    private boolean sendPingLock;
     private long whenWasPingLocked;
 
     static final int TIMEOUT_THRESHOLD = 330;
@@ -96,7 +96,8 @@ public class FeaturePing extends SingleTextHud {
         if(DgOneCongifConfig.DEBUG_MODE) logger.info("Updating ping: {}", ping);
     }
 
-    Logger logger = LogManager.getLogger("FeaturePing");
+    static Logger logger = LogManager.getLogger("FeaturePing");
+    final SimpleLock pingLock = new SimpleLock();
 
     public void setup(){
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg Ping pool").build();
@@ -105,9 +106,9 @@ public class FeaturePing extends SingleTextHud {
         scheduler.scheduleAtFixedRate(() -> {
             if(!isEnabled()) return;
             if(!SkyblockStatus.isOnSkyblock()) return;
-            if(sendPingLock) {
+            if(pingLock.isLocked()) {
                 if(whenWasPingLocked + 400 < Minecraft.getSystemTime()){
-                    sendPingLock = false;
+                    pingLock.unLock();
                 } else {
                     return;
                 }
@@ -115,7 +116,7 @@ public class FeaturePing extends SingleTextHud {
 
             try {
                 whenWasPingLocked = Minecraft.getSystemTime();
-                sendPingLock = true;
+                pingLock.lock();
                 ping("mc.hypixel.net:25565");
 
             } catch (UnknownHostException e) {
@@ -152,7 +153,7 @@ public class FeaturePing extends SingleTextHud {
 
             @Override
             public void handlePong(S01PacketPong packetIn) {
-                sendPingLock = false;
+                pingLock.unLock();
                 setPing(Minecraft.getSystemTime() - pingStart);
                 networkmanager.closeChannel(new ChatComponentText("Finished"));
             }

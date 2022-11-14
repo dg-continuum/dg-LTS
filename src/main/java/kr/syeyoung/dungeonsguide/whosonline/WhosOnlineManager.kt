@@ -38,7 +38,18 @@ class WhosOnlineManager(val remoteHost: String) {
         cache = WhosOnlineCache()
         val websocketUri = if (useDebugServers) "ws://$remoteHost/ws" else "wss://$remoteHost/ws"
         val restUri = if (useDebugServers) "http://$remoteHost" else "https://$remoteHost"
-        webSocket = WhosOnlineWebSocket(websocketUri, se, cache, Minecraft.getMinecraft().session.playerID)
+
+//        var playerUuid = Minecraft.getMinecraft().session.playerID
+//
+//        if(!playerUuid.contains("-")){
+//            playerUuid = playerUuid.replaceFirst(
+//                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
+//            )
+//        }
+
+
+
+        webSocket = WhosOnlineWebSocket(websocketUri, se, cache, Minecraft.getMinecraft().session.profile.id)
         restClient = WhosOnlineRest(cache, ex, restUri)
         webSocket!!.connect()
         websocketClient = WhosOnlineApi(webSocket!!, cache!!, ex)

@@ -6,6 +6,7 @@ import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.*;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
 import kr.syeyoung.dungeonsguide.features.impl.dungeon.huds.FeatureDungeonMap;
@@ -867,10 +868,21 @@ public class DgOneCongifConfig extends Config {
     }
 
     public DgOneCongifConfig() {
-        super(new Mod("DG-LTS", ModType.SKYBLOCK, "/gdlogox512.png"), "dgconfig.json");
+        super(new Mod(Main.NAME, ModType.SKYBLOCK, "/dglts_logo_lightx512.png"), Main.MOD_ID+".json");
         initialize();
 
-        hideMultipleIf(() -> !DEBUG_MODE,  "DEBUGABLE_MAP", "DEBUG_BLOCKCACHING", "DEBUG_DUNGEON_CORDS", "DUNGEON_CORDS_COLOR", "DEBUG_ROOM_INFO", "DUNGEON_ROOMINFO_COLOR", "DEBUG_TEST_PEPOLE", "DEBUG_TEST_PEPOLE_SCALE", "DEBUG_ROOMEDIT_KEYBIND", "DEBUG_ROOM_EDIT", "TEST_MAP");
+//        hideMultipleIf(() -> !DEBUG_MODE,
+//                "DEBUGABLE_MAP",
+//                "DEBUG_BLOCKCACHING",
+//                "DEBUG_DUNGEON_CORDS",
+//                "DEBUG_ROOMEDIT_KEYBIND",
+//                "DEBUG_ROOM_EDIT",
+//                "DEBUG_ROOM_INFO",
+//                "DEBUG_TEST_PEPOLE",
+//                "DEBUG_TEST_PEPOLE_SCALE",
+//                "DUNGEON_CORDS_COLOR",
+//                "DUNGEON_ROOMINFO_COLOR",
+//                "TEST_MAP");
 
         hideMultipleIf(() -> !FeatureDungeonMap.centerMapOnPlayer, "shouldRotateWithPlayer");
 
@@ -936,6 +948,7 @@ public class DgOneCongifConfig extends Config {
             subcategory = "Dungeon cords"
     )
     public static boolean DEBUG_DUNGEON_CORDS = false;
+
     @Color(
             name = "Color",
             category = "Debug",

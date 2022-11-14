@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f4;
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorThorn;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessorThorn;
 import kr.syeyoung.dungeonsguide.events.impl.TitleEvent;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;

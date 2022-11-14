@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.ThetaStar;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import net.minecraft.util.BlockPos;
@@ -23,17 +22,27 @@ import java.util.concurrent.Future;
 
 public class DungeonFacade {
 
-    public static final ExecutorService ex = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setNameFormat("Dg-AsyncPathFinder-%d").build());
+    public final ExecutorService ex;
 
-    @Getter
+    public static DungeonFacade INSTANCE;
+
+    public DungeonContext getContext() {
+        return context;
+    }
+
     @Setter
     private DungeonContext context;
+
+    public DungeonFacade() {
+        INSTANCE = this;
+        ex = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder().setNameFormat("Dg-AsyncPathFinder-%d").build()
+        );
+    }
 
     public void init() {
         DungeonListener dgEventListener = new DungeonListener();
         MinecraftForge.EVENT_BUS.register(dgEventListener);
-        ex.shutdownNow();
         try {
             DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
         } catch (IOException e) {
@@ -69,7 +78,7 @@ public class DungeonFacade {
 
 
     Future<List<Vec3>> genPathfind(Vec3 from, Vec3 to, DungeonRoom room){
-        return DungeonFacade.ex.submit(() -> {
+        return ex.submit(() -> {
             BlockPos poss = new BlockPos(from);
             ThetaStar pathFinder =
                     activeThetaStar.computeIfAbsent(from, pos -> new ThetaStar(room,new Vec3(poss.getX(), poss.getY(), poss.getZ())

@@ -44,6 +44,7 @@ public class DgAuthUtil {
 
     public static void checkSessionAuthenticity(String tempToken) throws NoSuchAlgorithmException, AuthenticationException {
         JsonObject d = getJwtPayload(tempToken);
+        System.out.println("DG AUTH: sharedSecret \"" + d.get("sharedSecret").getAsString() + "\" pubkey: \"" + d.get("publicKey").getAsString() + "\"" );
         byte[] sharedSecret = Base64.decodeBase64(d.get("sharedSecret").getAsString());
         byte[] publicKey =Base64.decodeBase64(d.get("publicKey").getAsString());
         String hash = calculateServerHash(sharedSecret, publicKey);

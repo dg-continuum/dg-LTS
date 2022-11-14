@@ -21,8 +21,9 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret;
 import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import lombok.val;
 import lombok.var;
@@ -74,7 +75,7 @@ public class FeatureActions extends TextHud {
         val dungeonRoom = context.getRoomMapper().get(roomPt);
         if(!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
 
-        for (val path : ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getSecretGuider().getActionPath().values()) {
+        for (final ActionRoute path : ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getStrategy().getActionPath().values()) {
             lines.add("Pathfinding " + path.getMechanic() + " -> " + path.getState());
 
             for (var i = Math.max(0,path.getCurrent()-2); i < path.getActions().size(); i++) {

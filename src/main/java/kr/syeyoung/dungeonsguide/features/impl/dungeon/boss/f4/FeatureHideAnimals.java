@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f4;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorThorn;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessorThorn;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.dungeon.HideAnimalPage;
 import net.minecraft.entity.passive.*;

@@ -19,36 +19,45 @@ import dev.architectury.pack200.java.Pack200Adapter
  */
 
 plugins {
-    id "idea"
-    id "java"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "dev.architectury.architectury-pack200" version "0.1.3"
-    id "gg.essential.loom" version "0.10.0.+"
-    id "org.jetbrains.kotlin.jvm" version "1.7.21"
+    id 'idea'
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'dev.architectury.architectury-pack200' version '0.1.3'
+    id 'gg.essential.loom' version '0.10.0.+'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'net.kyori.blossom' version '1.3.0'
 }
 
 tasks.wrapper {
-    gradleVersion = "7.4"
+    gradleVersion = '7.4'
     // You can either download the binary-only version of Gradle (BIN) or
     // the full version (with sources and documentation) of Gradle (ALL)
     distributionType = Wrapper.DistributionType.ALL
 }
-version = "3.8.0"
-group = "kr.syeyoung.dungeonsguide"
-archivesBaseName = "dungeonsguide"
+version = '3.8.0'
+group = 'kr.syeyoung.dungeonsguide'
+archivesBaseName = 'dungeonsguide-lts'
+var mod_name = 'DG-LTS'
+var mod_id = 'dg-lts'
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
 
+blossom {
+    replaceToken("@VER@", version)
+    replaceToken("@NAME@", mod_name)
+    replaceToken("@ID@", mod_id)
+}
+
 loom {
     launchConfigs {
         client {
-            arg("--tweakClass", "cc.polyfrost.oneconfigwrapper.OneConfigWrapper")
+            arg('--tweakClass', 'cc.polyfrost.oneconfigwrapper.OneConfigWrapper')
         }
     }
     runs {
-        "client" {
+        'client' {
             property('devauth.enabled','true')
             client()
         }
@@ -60,15 +69,15 @@ loom {
 
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/java/main"))
+    output.setResourcesDir(file('$buildDir/classes/java/main'))
 }
 
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.polyfrost.cc/releases" }
-    maven { url "https://jitpack.io" }
-    maven {url "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"}
+    maven { url 'https://repo.polyfrost.cc/releases' }
+    maven { url 'https://jitpack.io' }
+    maven {url 'https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1'}
 }
 
 configurations {
@@ -77,49 +86,43 @@ configurations {
 
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
-    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
+    minecraft('com.mojang:minecraft:1.8.9')
+    mappings('de.oceanlabs.mcp:mcp_stable:22-1.8.9')
+    forge('net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9')
 
 
     implementation 'org.jetbrains:annotations-java5:23.0.0'
     implementation 'org.java-websocket:Java-WebSocket:1.5.3'
-    implementation "org.json:json:20220924"
-    implementation 'com.twelvemonkeys.imageio:imageio-bmp:3.8.3'
+    implementation 'org.json:json:20220924'
+    implementation 'com.twelvemonkeys.imageio:imageio-bmp:3.9.3'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    compileOnly files("jars/Hychat-1.12.1-BETA.jar")
 
-
-    testCompileOnly "org.projectlombok:lombok:1.18.24"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.24"
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
-
-
-    modRuntimeOnly "cc.polyfrost:oneconfig-1.8.9-forge:0.1.0-alpha+"
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    modRuntimeOnly('me.djtheredstoner:DevAuth-forge-legacy:1.1.0')
 
     compileOnly 'cc.polyfrost:oneconfig-1.8.9-forge:0.1.0-alpha+' // Should not be included in jar
     implementation 'cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-alpha+' // Should be included in jar
 }
 
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+    options.encoding = 'UTF-8'
 }
 
 tasks.withType(Jar) {
-    archivesBaseName = "dungeonsguide"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archivesBaseName = 'dungeonsguide-lts'
     manifest {
-        attributes["ModSide"] = "CLIENT"
-        attributes["TweakOrder"] = "0"
-        attributes["ForceLoadAsMod"] = "true"
-        attributes["TweakClass"] = "cc.polyfrost.oneconfigwrapper.OneConfigWrapper"
-//        attributes["FMLCorePluginContainsFMLMod"] = "true"
-
-        // If you don't want mixins, remove these lines
-//        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
-//        this["MixinConfigs"] = "mixins.examplemod.json"
+        attributes['ModSide'] = 'CLIENT'
+        attributes['TweakOrder'] = '0'
+        attributes['TweakClass'] = 'cc.polyfrost.oneconfigwrapper.OneConfigWrapper'
+        attributes['ForceLoadAsMod'] = 'true'
+        attributes['FMLCorePluginContainsFMLMod'] = 'true'
+//        this['TweakClass'] = 'org.spongepowered.asm.launch.MixinTweaker'
+//        this['MixinConfigs'] = 'mixins.examplemod.json'
     }
 }
 
@@ -128,20 +131,20 @@ tasks.shadowJar {
 
     archiveFileName = jar.archiveFileName
 
-    relocate "org.java_websocket", "kr.syeyoung.org.java_websocket"
+    relocate 'org.java_websocket', 'kr.syeyoung.org.java_websocket'
 
     dependencies {
-        include(dependency("org.java-websocket:Java-WebSocket:1.5.3"))
-        include(dependency("org.slf4j:slf4j-api:1.7.25"))
-        include(dependency("org.json:json:20220924"))
-        include(dependency("com.twelvemonkeys..*:.*"))
-        include(dependency("cc.polyfrost:oneconfig-wrapper-launchwrapper:..*"))
+        include(dependency('org.java-websocket:Java-WebSocket:1.5.3'))
+        include(dependency('org.slf4j:slf4j-api:1.7.25'))
+        include(dependency('org.json:json:20220924'))
+        include(dependency('com.twelvemonkeys..*:.*'))
+        include(dependency('cc.polyfrost:oneconfig-wrapper-launchwrapper:..*'))
     }
 }
 
 
-tasks.named("remapJar") {
-    archiveClassifier = "all"
+tasks.named('remapJar') {
+    archiveClassifier = 'all'
     from(tasks.shadowJar)
     input = tasks.shadowJar.archiveFile
 }
@@ -151,13 +154,9 @@ tasks.assemble.dependsOn tasks.remapJar
 
 processResources {
     inputs.property 'version', project.version
-
-    // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         duplicatesStrategy = 'include'
         include 'mcmod.info'
-
-        // replace version and mcversion
         expand 'version': project.version
     }
 }

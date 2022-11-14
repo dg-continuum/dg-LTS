@@ -71,7 +71,7 @@ public class MapProcessor {
      * this should be done with render-distance but whateva
      */
     int clossnessDistance = 50;
-    ExecutorService es = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Dg-MapProcessor-%d").build());
+    final ExecutorService es = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Dg-MapProcessor-%d").build());
     @Getter
     @Setter
     private Dimension unitRoomDimension;
@@ -102,8 +102,10 @@ public class MapProcessor {
     }
 
     public void tick() {
-        if (waitDelay.isBlown()) {
+        if (waitDelay.isBlown() && Minecraft.getMinecraft().thePlayer != null) {
+
             ItemStack stack = Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(8);
+
 
             if (stack == null || !(stack.getItem() instanceof ItemMap)) {
                 return;

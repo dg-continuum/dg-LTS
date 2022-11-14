@@ -19,12 +19,11 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor;
 
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.*;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bombdefuse.RoomProcessorBombDefuseSolver;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.boxpuzzle.RoomProcessorBoxSolver;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.icefill.RoomProcessorIcePath2;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.waterpuzzle.RoomProcessorWaterPuzzle;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.RoomProcessorBombDefuseSolver;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.boxpuzzle.RoomProcessorBoxSolver;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.icefill.RoomProcessorIcePath2;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.RoomProcessorWaterPuzzle;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.*;
 
 public class ProcessorFactory {
 

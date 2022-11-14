@@ -18,8 +18,8 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechan
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.general.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
@@ -162,7 +162,7 @@ public class CommandDgDebug extends CommandBase {
 
                 DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
                 GeneralRoomProcessor grp = (GeneralRoomProcessor) dungeonRoom.getRoomProcessor();
-                grp.getSecretGuider().addAction("COMMAND", args[1], args[2], FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
+                grp.getStrategy().addAction("COMMAND", args[1], args[2], FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
             } catch (Throwable t) {
                 t.printStackTrace();
             }

@@ -162,17 +162,20 @@ public class DungeonListener {
             return;
         }
 
-        context.getMapProcessor().tick();
+        if(context.getMapProcessor() != null){
+            context.getMapProcessor().tick();
 
-        if (context.getMapProcessor().isInitialized() && context.getBossRoomEnterSeconds() == -1 && !context.roomBoundary.contains(context.getMapProcessor().worldPointToMapPoint(Minecraft.getMinecraft().thePlayer.getPositionVector()))) {
-            context.setBossRoomEnterSeconds(DungeonUtil.getTimeElapsed() / 1000);
-            context.setBossroomSpawnPos(Minecraft.getMinecraft().thePlayer.getPosition());
-            MinecraftForge.EVENT_BUS.post(new BossroomEnterEvent());
-            context.createEvent(new DungeonNodataEvent("BOSSROOM_ENTER"));
-            if (context.dataProvider != null) {
-                context.setBossfightProcessor(context.dataProvider.createBossfightProcessor(Minecraft.getMinecraft().theWorld, DungeonContext.getDungeonName()));
-            } else {
-                ChatTransmitter.sendDebugChat(new ChatComponentText("Error:: Null Data Providier"));
+            if (context.getMapProcessor().isInitialized() && context.getBossRoomEnterSeconds() == -1
+                    && !context.roomBoundary.contains(context.getMapProcessor().worldPointToMapPoint(Minecraft.getMinecraft().thePlayer.getPositionVector()))) {
+                context.setBossRoomEnterSeconds(DungeonUtil.getTimeElapsed() / 1000);
+                context.setBossroomSpawnPos(Minecraft.getMinecraft().thePlayer.getPosition());
+                MinecraftForge.EVENT_BUS.post(new BossroomEnterEvent());
+                context.createEvent(new DungeonNodataEvent("BOSSROOM_ENTER"));
+                if (context.dataProvider != null) {
+                    context.setBossfightProcessor(context.dataProvider.createBossfightProcessor(Minecraft.getMinecraft().theWorld, DungeonContext.getDungeonName()));
+                } else {
+                    ChatTransmitter.sendDebugChat(new ChatComponentText("Error:: Null Data Providier"));
+                }
             }
         }
 
@@ -534,7 +537,10 @@ public class DungeonListener {
 
     @SubscribeEvent
     public void onEntitySpawn(EntityJoinWorldEvent spawn) {
-        DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().put(spawn.entity.getEntityId(), new Vec3(spawn.entity.posX, spawn.entity.posY, spawn.entity.posZ));
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if(context != null){
+            context.getBatSpawnedLocations().put(spawn.entity.getEntityId(), new Vec3(spawn.entity.posX, spawn.entity.posY, spawn.entity.posZ));
+        }
     }
 
 

@@ -19,11 +19,7 @@
 package kr.syeyoung.dungeonsguide.features.impl.misc.playerpreview;
 
 import com.mojang.authlib.GameProfile;
-import io.github.moulberry.hychat.HyChat;
-import io.github.moulberry.hychat.chat.ChatManager;
-import io.github.moulberry.hychat.gui.GuiChatBox;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.chat.ChatProcessResult;
 import kr.syeyoung.dungeonsguide.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
@@ -45,6 +41,7 @@ import kr.syeyoung.dungeonsguide.features.impl.misc.playerpreview.datarenders.ID
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.party.PartyContext;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,7 +61,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.client.config.GuiUtils;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -532,22 +528,7 @@ public class FeatureViewPlayerStatsOnJoin extends SimpleFeature {
     }
 
     public IChatComponent getHoveredComponent(ScaledResolution scaledResolution) {
-        IChatComponent ichatcomponent = null;
-        if (Loader.isModLoaded("hychat")) {
-            try {
-                ChatManager chatManager = HyChat.getInstance().getChatManager();
-                GuiChatBox guiChatBox = chatManager.getFocusedChat();
-
-                int x = guiChatBox.getX(scaledResolution);
-                int y = guiChatBox.getY(scaledResolution);
-                ichatcomponent = guiChatBox.chatArray.getHoveredComponent(guiChatBox.getSelectedTab().getChatLines(), Mouse.getX(), Mouse.getY(), x, y);
-            } catch (Throwable t) {
-            }
-        }
-        if (ichatcomponent == null) {
-            ichatcomponent = Minecraft.getMinecraft().ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
-        }
-        return ichatcomponent;
+        return Minecraft.getMinecraft().ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
     }
 
     @Override

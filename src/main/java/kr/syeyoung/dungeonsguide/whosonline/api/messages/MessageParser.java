@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Utility class for parsing messages into response objects (gson bad kekw)
@@ -54,6 +55,11 @@ public class MessageParser {
 
             case "/cosmetics/ack":
                 return new S03CosmeticRefresh();
+
+            case "/irc/created":
+                return new S06IrcMessage(m.c.getAsJsonObject().get("message").getAsString(), UUID.fromString(m.c.getAsJsonObject().get("sender").getAsString()), m.c.getAsJsonObject().get("date").getAsDouble() );
+            case "/error":
+                return new S07Error(m.c.getAsJsonObject().get("error").getAsString());
 
             default:
                 return null;
