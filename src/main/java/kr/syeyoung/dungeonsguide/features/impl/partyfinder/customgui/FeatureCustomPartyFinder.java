@@ -18,10 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.partyfinder.customgui;
 
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.events.impl.WindowUpdateEvent;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -54,6 +54,7 @@ public class FeatureCustomPartyFinder extends SimpleFeatureV2 {
     @Getter
     @Setter
     private static String lastClass = "";
+
     public FeatureCustomPartyFinder() {
         super("party.customfinder");
     }

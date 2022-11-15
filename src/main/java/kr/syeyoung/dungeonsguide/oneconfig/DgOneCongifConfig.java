@@ -499,6 +499,8 @@ public class DgOneCongifConfig extends Config {
     )
     public static float closeChestHelperThreschkid = 1000000;
 
+
+
     @Switch(
             name = "enabled",
             size = 2,
@@ -529,6 +531,12 @@ public class DgOneCongifConfig extends Config {
             category = "Misc"
     )
     public static boolean customPartyfinder = true;
+    @Switch(
+            name = "Highlight parties in party viewer",
+            description = "Highlight parties you can't join with red",
+            category = "Misc"
+    )
+    public static boolean featureGoodParties = true;
     @Switch(
             name = "Copy Chat Messages",
             description = "Click on copy to copy",

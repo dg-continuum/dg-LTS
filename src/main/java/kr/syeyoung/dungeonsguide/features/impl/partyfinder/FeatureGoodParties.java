@@ -18,9 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.partyfinder;
 
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.features.SimpleFeature;
+import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f7.FeatureTerminalSolvers;
+import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -37,15 +38,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-public class FeatureGoodParties extends SimpleFeature {
+public class FeatureGoodParties extends SimpleFeatureV2 {
     public FeatureGoodParties() {
-        super("Party Kicker", "Highlight parties in party viewer", "Highlight parties you can't join with red", "partykicker.goodparty",true);
+        super("partykicker.goodparty");
     }
 
     @SubscribeEvent
     public void onGuiRender(GuiScreenEvent.DrawScreenEvent.Post render) {
         if (!SkyblockStatus.isOnSkyblock()) return;
-        if (!isEnabled()) return;
+        if (!DgOneCongifConfig.featureGoodParties) return;
         if (!(Minecraft.getMinecraft().currentScreen instanceof GuiChest)) return;
         GuiChest chest = (GuiChest) Minecraft.getMinecraft().currentScreen;
         ContainerChest cont = (ContainerChest) chest.inventorySlots;
@@ -84,22 +85,26 @@ public class FeatureGoodParties extends SimpleFeature {
                     Gui.drawRect(x, y, x + 16, y + 16, 0x77AA0000);
                 } else {
 
-
                     GlStateManager.enableBlend();
                     GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
                     GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                    if (note.toLowerCase().contains("car")) {
-                        fr.drawStringWithShadow("C", x + 1, y + 1, 0xFFFF0000);
-                    } else if (note.toLowerCase().replace(" ", "").contains("s/s+")) {
-                        fr.drawStringWithShadow("S+", x + 1, y + 1, 0xFFFFFF00);
-                    } else if (note.toLowerCase().contains("s+")) {
-                        fr.drawStringWithShadow("S+", x + 1, y + 1, 0xFF00FF00);
-                    } else if (note.toLowerCase().contains(" s") || note.toLowerCase().contains(" s ")) {
-                        fr.drawStringWithShadow("S", x + 1, y + 1, 0xFFFFFF00);
-                    } else if (note.toLowerCase().contains("rush")) {
-                        fr.drawStringWithShadow("R", x + 1, y + 1, 0xFFFF0000);
+                    String s1 = note.toLowerCase();
+
+                    x += 1;
+                    y += 1;
+
+                    if (s1.contains("car")) {
+                        fr.drawStringWithShadow("C", x, y, 0xFFFF0000);
+                    } else if (s1.replace(" ", "").contains("s/s+")) {
+                        fr.drawStringWithShadow("S+", x, y, 0xFFFFFF00);
+                    } else if (s1.contains("s+")) {
+                        fr.drawStringWithShadow("S+", x, y, 0xFF00FF00);
+                    } else if (s1.contains(" s") || s1.contains(" s ")) {
+                        fr.drawStringWithShadow("S", x, y, 0xFFFFFF00);
+                    } else if (s1.contains("rush")) {
+                        fr.drawStringWithShadow("R", x, y, 0xFFFF0000);
                     }
-                    fr.drawStringWithShadow("§e"+Integer.max(classLvReq, cataLvReq), x + 1, y + fr.FONT_HEIGHT, 0xFFFFFFFF);
+                    fr.drawStringWithShadow("§e" + Integer.max(classLvReq, cataLvReq), x, y + fr.FONT_HEIGHT, 0xFFFFFFFF);
                 }
 
 

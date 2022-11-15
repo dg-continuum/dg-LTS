@@ -41,34 +41,24 @@ import java.util.List;
 import java.util.Set;
 
 public class PanelPartyFinderSettings extends MPanelScaledGUI {
-    private PanelPartyFinder panelPartyFinder;
-
-    private MButton refresh = new MButton();
-    private MButton createNew = new MButton();
-    private MButton settings = new MButton();
-    private MPassiveLabelAndElement filterCantjoin;
-    private MPassiveLabelAndElement filterWhitelistNote;
-    private MPassiveLabelAndElement filterBlacklistNote;
-    private MPassiveLabelAndElement plaeHighlightNote;
-    private MPassiveLabelAndElement cataLv;
-    private MPassiveLabelAndElement blacklistClass; private MToggleButton filterCantjoinButton;
-    private MTextField filterWhitelist;
-    private MTextField filterBlacklist;
-    private MTextField highlightNote;
-    private MTextField blacklistClassTxt;
-    private MIntegerSelectionButton integerSelection;
-
     @Getter
     boolean delistable = false;
-
-    public void setDelistable(boolean delistable) {
-        this.delistable = delistable;
-        updateCreateNew();
-    }
-
-    public void updateCreateNew() {
-        createNew.setText((PartyManager.INSTANCE.getPartyContext() != null && !PartyManager.INSTANCE.isLeader()) ? "Leave Party" : (delistable ? "De-list" : "Create New"));
-    }
+    private final PanelPartyFinder panelPartyFinder;
+    private final MButton refresh = new MButton();
+    private final MButton createNew = new MButton();
+    private final MButton settings = new MButton();
+    private final MPassiveLabelAndElement filterCantjoin;
+    private final MPassiveLabelAndElement filterWhitelistNote;
+    private final MPassiveLabelAndElement filterBlacklistNote;
+    private final MPassiveLabelAndElement plaeHighlightNote;
+    private final MPassiveLabelAndElement cataLv;
+    private final MPassiveLabelAndElement blacklistClass;
+    private final MToggleButton filterCantjoinButton;
+    private final MTextField filterWhitelist;
+    private final MTextField filterBlacklist;
+    private final MTextField highlightNote;
+    private final MTextField blacklistClassTxt;
+    private final MIntegerSelectionButton integerSelection;
 
     public PanelPartyFinderSettings(PanelPartyFinder panelPartyFinder) {
         this.panelPartyFinder = panelPartyFinder;
@@ -87,84 +77,89 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
         settings.setOnActionPerformed(this::settings);
         add(settings);
 
-        {
-            filterCantjoinButton = new MToggleButton();
-            filterCantjoin =  new MPassiveLabelAndElement("Filter Unjoinable", filterCantjoinButton);
-            filterCantjoin.setDivideRatio(0.7);
-            filterCantjoinButton.setOnToggle(() -> panelPartyFinder.onChestUpdate(null));
-            add(filterCantjoin);
-        }
-        {
-            filterWhitelist = new MTextField() {
-                @Override
-                public void edit(String str) {
-                    panelPartyFinder.onChestUpdate(null);
-                    FeatureCustomPartyFinder.setWhitelist(str);
-                }
-            };
-            filterBlacklist = new MTextField() {
-                @Override
-                public void edit(String str) {
-                    FeatureCustomPartyFinder.setBlacklist(str);
-                    panelPartyFinder.onChestUpdate(null);
-                }
-            };
-            highlightNote = new MTextField() {
-                @Override
-                public void edit(String str) {
-                    super.edit(str);
-                    FeatureCustomPartyFinder.setHighlight(str);
-                }
-            };
-            blacklistClassTxt = new MTextField() {
-                @Override
-                public void edit(String str) {
-                    super.edit(str);
-                    FeatureCustomPartyFinder.setBlacklistClass(str);
-                    panelPartyFinder.onChestUpdate(null);
-                }
-            };
-
-            filterWhitelist.setText(FeatureCustomPartyFinder.getWhitelist());
-            filterBlacklist.setText(FeatureCustomPartyFinder.getBlacklist());
-            highlightNote.setText(FeatureCustomPartyFinder.getHighlight());
-            blacklistClassTxt.setText(FeatureCustomPartyFinder.getBlacklistClass());
-
-            filterWhitelistNote = new MPassiveLabelAndElement("Whitelist Note", filterWhitelist);
-            filterBlacklistNote = new MPassiveLabelAndElement("Blacklist Note", filterBlacklist);
-            plaeHighlightNote = new MPassiveLabelAndElement("Highlight Note", highlightNote);
-            blacklistClass = new MPassiveLabelAndElement("Blacklist Class", blacklistClassTxt);
-
-            filterWhitelistNote.setDivideRatio(0.5);
-            filterBlacklistNote.setDivideRatio(0.5);
-            plaeHighlightNote.setDivideRatio(0.5);
-            blacklistClass.setDivideRatio(0.5);
-            add(filterWhitelistNote);
-            add(filterBlacklistNote);
-            add(plaeHighlightNote);
-            add(blacklistClass);
-        }
-        {
-            integerSelection = new MIntegerSelectionButton(FeatureCustomPartyFinder.getMinimumCata());
-            integerSelection.setOnUpdate(() -> {
-                FeatureCustomPartyFinder.setMinimumCata(integerSelection.getData());
+        filterCantjoinButton = new MToggleButton();
+        filterCantjoin = new MPassiveLabelAndElement("Filter Unjoinable", filterCantjoinButton);
+        filterCantjoin.setDivideRatio(0.7);
+        filterCantjoinButton.setOnToggle(() -> panelPartyFinder.onChestUpdate(null));
+        add(filterCantjoin);
+        filterWhitelist = new MTextField() {
+            @Override
+            public void edit(String str) {
                 panelPartyFinder.onChestUpdate(null);
-            });
-            cataLv = new MPassiveLabelAndElement("Minimum Cata Lv", integerSelection);
-            cataLv.setDivideRatio(0.5); add(cataLv);
-        }
+                FeatureCustomPartyFinder.setWhitelist(str);
+            }
+        };
+        filterBlacklist = new MTextField() {
+            @Override
+            public void edit(String str) {
+                FeatureCustomPartyFinder.setBlacklist(str);
+                panelPartyFinder.onChestUpdate(null);
+            }
+        };
+        highlightNote = new MTextField() {
+            @Override
+            public void edit(String str) {
+                super.edit(str);
+                FeatureCustomPartyFinder.setHighlight(str);
+            }
+        };
+        blacklistClassTxt = new MTextField() {
+            @Override
+            public void edit(String str) {
+                super.edit(str);
+                FeatureCustomPartyFinder.setBlacklistClass(str);
+                panelPartyFinder.onChestUpdate(null);
+            }
+        };
+
+        filterWhitelist.setText(FeatureCustomPartyFinder.getWhitelist());
+        filterBlacklist.setText(FeatureCustomPartyFinder.getBlacklist());
+        highlightNote.setText(FeatureCustomPartyFinder.getHighlight());
+        blacklistClassTxt.setText(FeatureCustomPartyFinder.getBlacklistClass());
+
+        filterWhitelistNote = new MPassiveLabelAndElement("Whitelist Note", filterWhitelist);
+        filterBlacklistNote = new MPassiveLabelAndElement("Blacklist Note", filterBlacklist);
+        plaeHighlightNote = new MPassiveLabelAndElement("Highlight Note", highlightNote);
+        blacklistClass = new MPassiveLabelAndElement("Blacklist Class", blacklistClassTxt);
+
+        filterWhitelistNote.setDivideRatio(0.5);
+        filterBlacklistNote.setDivideRatio(0.5);
+        plaeHighlightNote.setDivideRatio(0.5);
+        blacklistClass.setDivideRatio(0.5);
+        add(filterWhitelistNote);
+        add(filterBlacklistNote);
+        add(plaeHighlightNote);
+        add(blacklistClass);
+        integerSelection = new MIntegerSelectionButton(FeatureCustomPartyFinder.getMinimumCata());
+        integerSelection.setOnUpdate(() -> {
+            FeatureCustomPartyFinder.setMinimumCata(integerSelection.getData());
+            panelPartyFinder.onChestUpdate(null);
+        });
+        cataLv = new MPassiveLabelAndElement("Minimum Cata Lv", integerSelection);
+        cataLv.setDivideRatio(0.5);
+        add(cataLv);
+    }
+
+    public void setDelistable(boolean delistable) {
+        this.delistable = delistable;
+        updateCreateNew();
+    }
+
+    public void updateCreateNew() {
+        createNew.setText((PartyManager.INSTANCE.getPartyContext() != null && !PartyManager.INSTANCE.isLeader()) ? "Leave Party" : (delistable ? "De-list" : "Create New"));
     }
 
     private void createNew() {
         if (PartyManager.INSTANCE.getPartyContext() != null && !PartyManager.INSTANCE.isLeader()) {
-            ChatProcessor.INSTANCE.addToChatQueue("/p leave ", () -> {}, true);
+            ChatProcessor.INSTANCE.addToChatQueue("/p leave ", () -> {
+            }, true);
             return;
         }
         GuiChest chest = panelPartyFinder.getGuiCustomPartyFinder().getGuiChest();
         if (delistable)
-            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+7, 0, 0, Minecraft.getMinecraft().thePlayer);
+            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 5 + 7, 0, 0, Minecraft.getMinecraft().thePlayer);
         else
-            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+0, 0, 0, Minecraft.getMinecraft().thePlayer);
+            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 5, 0, 0, Minecraft.getMinecraft().thePlayer);
 
     }
 
@@ -179,11 +174,11 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
 
         GuiCustomPartyFinder guiCustomPartyFinder = panelPartyFinder.getGuiCustomPartyFinder();
         if (guiCustomPartyFinder.getGuiChest() == null) return;
-        Slot s = guiCustomPartyFinder.getGuiChest().inventorySlots.getSlot(9*5+5);
+        Slot s = guiCustomPartyFinder.getGuiChest().inventorySlots.getSlot(9 * 5 + 5);
         ItemStack itemStack = s.getStack();
         if (itemStack == null) return;
 
-        String dungeon="", floor="", text="";
+        String dungeon = "", floor = "", text = "";
         {
             NBTTagCompound stackTagCompound = itemStack.getTagCompound();
             if (stackTagCompound.hasKey("display", 10)) {
@@ -205,13 +200,13 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
                 }
             }
         }
-        fontRenderer.drawString("§aSearching: "+dungeon+" §7- "+floor, 5,155,-1);
-        fontRenderer.drawString("§aSearch text: "+text, 5,155+fontRenderer.FONT_HEIGHT,-1);
+        fontRenderer.drawString("§aSearching: " + dungeon + " §7- " + floor, 5, 155, -1);
+        fontRenderer.drawString("§aSearch text: " + text, 5, 155 + fontRenderer.FONT_HEIGHT, -1);
 
-        Gui.drawRect(0,160+fontRenderer.FONT_HEIGHT*2,getBounds().width, 161+fontRenderer.FONT_HEIGHT*2, -1);
-        GlStateManager.translate(5,165+fontRenderer.FONT_HEIGHT*2,0);
+        Gui.drawRect(0, 160 + fontRenderer.FONT_HEIGHT * 2, getBounds().width, 161 + fontRenderer.FONT_HEIGHT * 2, -1);
+        GlStateManager.translate(5, 165 + fontRenderer.FONT_HEIGHT * 2, 0);
 
-        s = guiCustomPartyFinder.getGuiChest().inventorySlots.getSlot(9*5+8);
+        s = guiCustomPartyFinder.getGuiChest().inventorySlots.getSlot(9 * 5 + 8);
         itemStack = s.getStack();
         if (itemStack == null || itemStack.getItem() != Items.skull) return;
 
@@ -224,31 +219,32 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
             }
         }
         for (int i = 0; i < list.size(); i++) {
-            fontRenderer.drawString(list.get(i), 0, (i)*fontRenderer.FONT_HEIGHT, -1);
+            fontRenderer.drawString(list.get(i), 0, (i) * fontRenderer.FONT_HEIGHT, -1);
         }
     }
 
     public void refresh() {
         GuiChest chest = panelPartyFinder.getGuiCustomPartyFinder().getGuiChest();
-        Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+1, 0, 0, Minecraft.getMinecraft().thePlayer);
+        Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 5 + 1, 0, 0, Minecraft.getMinecraft().thePlayer);
     }
+
     public void settings() {
         GuiChest chest = panelPartyFinder.getGuiCustomPartyFinder().getGuiChest();
-        Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+5, 0, 0, Minecraft.getMinecraft().thePlayer);
+        Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 5 + 5, 0, 0, Minecraft.getMinecraft().thePlayer);
     }
 
     @Override
     public void onBoundsUpdate() {
         Dimension bounds = getEffectiveDimension();
-        refresh.setBounds(new Rectangle(5,5,(bounds.width-10)/2,15));
-        createNew.setBounds(new Rectangle(bounds.width/2,5,(bounds.width-10)/2,15));
-        filterCantjoin.setBounds(new Rectangle(5,22,bounds.width-10,15));
-        filterWhitelistNote.setBounds(new Rectangle(5,39,bounds.width-10,15));
-        filterBlacklistNote.setBounds(new Rectangle(5,56,bounds.width-10,15));
-        plaeHighlightNote.setBounds(new Rectangle(5,73,bounds.width-10,15));
-        cataLv.setBounds(new Rectangle(5,90,bounds.width-10,15));
-        blacklistClass.setBounds(new Rectangle(5,107,bounds.width-10,15));
-        settings.setBounds(new Rectangle(5,124,bounds.width-10,15));
+        refresh.setBounds(new Rectangle(5, 5, (bounds.width - 10) / 2, 15));
+        createNew.setBounds(new Rectangle(bounds.width / 2, 5, (bounds.width - 10) / 2, 15));
+        filterCantjoin.setBounds(new Rectangle(5, 22, bounds.width - 10, 15));
+        filterWhitelistNote.setBounds(new Rectangle(5, 39, bounds.width - 10, 15));
+        filterBlacklistNote.setBounds(new Rectangle(5, 56, bounds.width - 10, 15));
+        plaeHighlightNote.setBounds(new Rectangle(5, 73, bounds.width - 10, 15));
+        cataLv.setBounds(new Rectangle(5, 90, bounds.width - 10, 15));
+        blacklistClass.setBounds(new Rectangle(5, 107, bounds.width - 10, 15));
+        settings.setBounds(new Rectangle(5, 124, bounds.width - 10, 15));
     }
 
     public boolean filter(ItemStack itemStack) {
@@ -272,7 +268,7 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
                         note = str.substring(12);
                     }
                     if (str.startsWith("§7Dungeon Level Required: §b")) {
-                        dLV =  Integer.parseInt(str.substring(28));
+                        dLV = Integer.parseInt(str.substring(28));
                     }
                     if (str.startsWith(" ") && str.contains(":")) {
                         String clazz = TextUtils.stripColor(str).trim().split(" ")[1];
@@ -281,7 +277,7 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
                 }
             }
         }
-        if (integerSelection.getData() >dLV) return false;
+        if (integerSelection.getData() > dLV) return false;
 
         if (!filterBlacklist.getText().isEmpty()) {
             for (String s1 : filterBlacklist.getText().split(",")) {
@@ -292,10 +288,11 @@ public class PanelPartyFinderSettings extends MPanelScaledGUI {
             boolean s = false;
             for (String s1 : filterWhitelist.getText().split(",")) {
                 if (note.toLowerCase().contains(s1.toLowerCase())) {
-                    s = true; break;
+                    s = true;
+                    break;
                 }
             }
-            if (!s) return false;
+            return s;
         }
         return true;
     }

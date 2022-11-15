@@ -46,23 +46,21 @@ import java.util.Map;
 
 public class PanelPartyFinder extends MPanel {
     @Getter
-    private GuiCustomPartyFinder guiCustomPartyFinder;
+    private final GuiCustomPartyFinder guiCustomPartyFinder;
 
-    private PanelPartyFinderSettings panelPartyFinderSettings;
+    private final PanelPartyFinderSettings panelPartyFinderSettings;
 
-    private MScrollablePanel scrollablePanel;
-    private MList list;
+    private final MScrollablePanel scrollablePanel;
+    private final MList list;
 
-    private MButton goBack;
+    private final MButton goBack;
 
-    private MPanelScaledGUI navigation;
+    private final MPanelScaledGUI navigation;
 
-    private MButton previous;
-    private MButton next;
-    private MButton discordInvite;
+    private final MButton previous;
+    private final MButton next;
+    private final Map<Integer, PanelPartyListElement> panelPartyListElementMap = new HashMap<>();
     private int page = 1;
-
-    private Map<Integer, PanelPartyListElement> panelPartyListElementMap = new HashMap<>();
 
     public PanelPartyFinder(GuiCustomPartyFinder guiCustomPartyFinder) {
         this.guiCustomPartyFinder = guiCustomPartyFinder;
@@ -85,23 +83,26 @@ public class PanelPartyFinder extends MPanel {
         add(scrollablePanel);
         add(panelPartyFinderSettings);
 
-        previous = new MButton(); next = new MButton();
-        previous.setText("Prev"); next.setText("Next");
-        previous.setEnabled(false); next.setEnabled(false);
+        previous = new MButton();
+        next = new MButton();
+        previous.setText("Prev");
+        next.setText("Next");
+        previous.setEnabled(false);
+        next.setEnabled(false);
         next.setOnActionPerformed(() -> {
             GuiChest chest = getGuiCustomPartyFinder().getGuiChest();
-            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*2+8, 0, 0, Minecraft.getMinecraft().thePlayer);
+            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 2 + 8, 0, 0, Minecraft.getMinecraft().thePlayer);
         });
         previous.setOnActionPerformed(() -> {
             GuiChest chest = getGuiCustomPartyFinder().getGuiChest();
-            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*2, 0, 0, Minecraft.getMinecraft().thePlayer);
+            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 2, 0, 0, Minecraft.getMinecraft().thePlayer);
         });
         goBack = new MButton();
         goBack.setBackground(RenderUtils.blendAlpha(0xFF141414, 0.05f));
         goBack.setText("<");
         goBack.setOnActionPerformed(() -> {
             GuiChest chest = getGuiCustomPartyFinder().getGuiChest();
-            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9*5+3, 0, 0, Minecraft.getMinecraft().thePlayer);
+            Minecraft.getMinecraft().playerController.windowClick(chest.inventorySlots.windowId, 9 * 5 + 3, 0, 0, Minecraft.getMinecraft().thePlayer);
         });
         add(goBack);
         navigation = new MPanelScaledGUI() {
@@ -109,19 +110,20 @@ public class PanelPartyFinder extends MPanel {
             public void onBoundsUpdate() {
                 super.onBoundsUpdate();
                 Dimension dimension = getEffectiveDimension();
-                previous.setBounds(new Rectangle(0,0,50,dimension.height));
-                next.setBounds(new Rectangle(dimension.width-50,0,50,dimension.height));
+                previous.setBounds(new Rectangle(0, 0, 50, dimension.height));
+                next.setBounds(new Rectangle(dimension.width - 50, 0, 50, dimension.height));
             }
 
             @Override
             public void render(int absMousex, int absMousey, int relMousex0, int relMousey0, float partialTicks, Rectangle scissor) {
                 super.render(absMousex, absMousey, relMousex0, relMousey0, partialTicks, scissor);
                 FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
-                Gui.drawRect(0,0,getEffectiveDimension().width, getEffectiveDimension().height, RenderUtils.blendAlpha(0xFF141414, 0.08f));
-                fr.drawString("Page "+page, (getEffectiveDimension().width-fr.getStringWidth("Page "+page))/2, (getEffectiveDimension().height-fr.FONT_HEIGHT)/2, -1);
+                Gui.drawRect(0, 0, getEffectiveDimension().width, getEffectiveDimension().height, RenderUtils.blendAlpha(0xFF141414, 0.08f));
+                fr.drawString("Page " + page, (getEffectiveDimension().width - fr.getStringWidth("Page " + page)) / 2, (getEffectiveDimension().height - fr.FONT_HEIGHT) / 2, -1);
             }
         };
-        navigation.add(next); navigation.add(previous);
+        navigation.add(next);
+        navigation.add(previous);
         add(navigation);
     }
 
@@ -134,34 +136,33 @@ public class PanelPartyFinder extends MPanel {
         super.setBounds(bounds);
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
-        panelPartyFinderSettings.setBounds(new Rectangle(3*bounds.width/5+1, fr.FONT_HEIGHT*2+21, 2*bounds.width/5 -1, (bounds.height-fr.FONT_HEIGHT*2-21)));
+        panelPartyFinderSettings.setBounds(new Rectangle(3 * bounds.width / 5 + 1, fr.FONT_HEIGHT * 2 + 21, 2 * bounds.width / 5 - 1, (bounds.height - fr.FONT_HEIGHT * 2 - 21)));
         panelPartyFinderSettings.setScale(scaledResolution.getScaleFactor());
 
-        navigation.setBounds(new Rectangle(0,fr.FONT_HEIGHT*2 + 21, 3*bounds.width/5, 20*scaledResolution.getScaleFactor()));
+        navigation.setBounds(new Rectangle(0, fr.FONT_HEIGHT * 2 + 21, 3 * bounds.width / 5, 20 * scaledResolution.getScaleFactor()));
         navigation.setScale(scaledResolution.getScaleFactor());
-        scrollablePanel.setBounds(new Rectangle(0, navigation.getBounds().y+navigation.getBounds().height, 3*bounds.width/5, bounds.height - (navigation.getBounds().y+navigation.getBounds().height)));
-        goBack.setBounds(new Rectangle(0,0, fr.FONT_HEIGHT*2+20, fr.FONT_HEIGHT*2+20));
-        discordInvite.setBounds(new Rectangle(bounds.width-275, 0, 200, fr.FONT_HEIGHT*2+20));
+        scrollablePanel.setBounds(new Rectangle(0, navigation.getBounds().y + navigation.getBounds().height, 3 * bounds.width / 5, bounds.height - (navigation.getBounds().y + navigation.getBounds().height)));
+        goBack.setBounds(new Rectangle(0, 0, fr.FONT_HEIGHT * 2 + 20, fr.FONT_HEIGHT * 2 + 20));
     }
 
     @Override
     public void render(int absMousex, int absMousey, int relMousex0, int relMousey0, float partialTicks, Rectangle scissor) {
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         // background
-        Gui.drawRect(0,0,getBounds().width, getBounds().height, RenderUtils.blendAlpha(0xFF141414, 0.0f));
+        Gui.drawRect(0, 0, getBounds().width, getBounds().height, RenderUtils.blendAlpha(0xFF141414, 0.0f));
         // top bar
-        Gui.drawRect(0,0,getBounds().width, fr.FONT_HEIGHT*2+21, RenderUtils.blendAlpha(0xFF141414, 0.05f));
+        Gui.drawRect(0, 0, getBounds().width, fr.FONT_HEIGHT * 2 + 21, RenderUtils.blendAlpha(0xFF141414, 0.05f));
         // lines
-        Gui.drawRect(0,fr.FONT_HEIGHT*2+20,getBounds().width, fr.FONT_HEIGHT*2+21, -1);
-        Gui.drawRect(panelPartyFinderSettings.getBounds().x-1,fr.FONT_HEIGHT*2+20,panelPartyFinderSettings.getBounds().x, getBounds().height, -1);
+        Gui.drawRect(0, fr.FONT_HEIGHT * 2 + 20, getBounds().width, fr.FONT_HEIGHT * 2 + 21, -1);
+        Gui.drawRect(panelPartyFinderSettings.getBounds().x - 1, fr.FONT_HEIGHT * 2 + 20, panelPartyFinderSettings.getBounds().x, getBounds().height, -1);
         // prev next bar
 
         GlStateManager.pushMatrix();
-            GlStateManager.translate(fr.FONT_HEIGHT*2+21, 0,0);
-            GlStateManager.scale(2,2,1);
-            fr.drawString("Party Finder", 5,5,-1);
+        GlStateManager.translate(fr.FONT_HEIGHT * 2 + 21, 0, 0);
+        GlStateManager.scale(2, 2, 1);
+        fr.drawString("Party Finder", 5, 5, -1);
         GlStateManager.popMatrix();
-   }
+    }
 
     public synchronized void onChestUpdate(WindowUpdateEvent windowUpdateEvent) {
         if (windowUpdateEvent == null) {
@@ -169,12 +170,14 @@ public class PanelPartyFinder extends MPanel {
             if (guiChest == null) {
                 panelPartyListElementMap.clear();
             } else {
-                for (int x = 1; x<=7; x++) {
+                for (int x = 1; x <= 7; x++) {
                     for (int y = 1; y <= 3; y++) {
                         int i = y * 9 + x;
                         Slot s = guiChest.inventorySlots.getSlot(i);
                         PanelPartyListElement prev = panelPartyListElementMap.remove(i);
-                        if (s == null || !s.getHasStack()) { continue; }
+                        if (s == null || !s.getHasStack()) {
+                            continue;
+                        }
                         if (!filter(s.getStack())) continue;
 
                         if (prev == null) prev = new PanelPartyListElement(this, i);
@@ -191,7 +194,7 @@ public class PanelPartyFinder extends MPanel {
                         this.next.setEnabled(false);
                     }
 
-                    Slot prev = guiChest.inventorySlots.getSlot(9 * 2 + 0);
+                    Slot prev = guiChest.inventorySlots.getSlot(9 * 2);
                     if (prev.getStack() != null && prev.getStack().getItem() == Items.arrow) {
                         this.previous.setEnabled(true);
                         extractPage(prev.getStack());
@@ -208,25 +211,25 @@ public class PanelPartyFinder extends MPanel {
                 int i = windowUpdateEvent.getPacketSetSlot().func_149173_d();
 
                 ItemStack stack = windowUpdateEvent.getPacketSetSlot().func_149174_e();
-                if (i == 9*2+8) {
+                if (i == 9 * 2 + 8) {
                     if (stack != null && stack.getItem() == Items.arrow) {
                         this.next.setEnabled(true);
                         extractPage(stack);
                     } else {
                         this.next.setEnabled(false);
                     }
-                } else if (i == 9*2) {
+                } else if (i == 9 * 2) {
                     if (stack != null && stack.getItem() == Items.arrow) {
                         this.previous.setEnabled(true);
                         extractPage(stack);
                     } else {
                         this.previous.setEnabled(false);
                     }
-                } else if (i == 9*5+7) {
+                } else if (i == 9 * 5 + 7) {
                     panelPartyFinderSettings.setDelistable(stack != null && stack.getItem() == Item.getItemFromBlock(Blocks.bookshelf));
                 }
 
-                if (i%9 == 0 || i%9 == 8 || i/9 == 0 || i/9 >= 4) {
+                if (i % 9 == 0 || i % 9 == 8 || i / 9 == 0 || i / 9 >= 4) {
                     return;
                 }
 
@@ -236,7 +239,7 @@ public class PanelPartyFinder extends MPanel {
                     panelPartyListElementMap.put(i, prev);
                 }
             } else if (windowUpdateEvent.getWindowItems() != null) {
-                for (int x = 1; x<=7; x++) {
+                for (int x = 1; x <= 7; x++) {
                     for (int y = 1; y <= 3; y++) {
                         int i = y * 9 + x;
                         ItemStack item = windowUpdateEvent.getWindowItems().getItemStacks()[i];
@@ -265,7 +268,7 @@ public class PanelPartyFinder extends MPanel {
                         this.previous.setEnabled(false);
                     }
 
-                    ItemStack delist = windowUpdateEvent.getWindowItems().getItemStacks()[9*5+7];
+                    ItemStack delist = windowUpdateEvent.getWindowItems().getItemStacks()[9 * 5 + 7];
                     panelPartyFinderSettings.setDelistable(delist != null && delist.getItem() == Item.getItemFromBlock(Blocks.bookshelf));
                 }
             }
@@ -290,8 +293,8 @@ public class PanelPartyFinder extends MPanel {
                     String str = nbttaglist1.getStringTagAt(i);
                     if (str.startsWith("§ePage ")) {
                         int pg = Integer.parseInt(str.substring(7));
-                        if (itemStack.getDisplayName().equals("§aPrevious Page")) page = pg+1;
-                        else page = pg-1;
+                        if (itemStack.getDisplayName().equals("§aPrevious Page")) page = pg + 1;
+                        else page = pg - 1;
                     }
                 }
             }

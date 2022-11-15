@@ -46,8 +46,11 @@ import java.util.List;
 import java.util.Set;
 
 public class PanelPartyListElement extends MPanel {
-    private PanelPartyFinder panelPartyFinder;
-    private int slot;
+    boolean clicked = false;
+    private final PanelPartyFinder panelPartyFinder;
+    private final int slot;
+    private MTooltip mTooltip;
+    private ItemStack lastStack;
 
     public PanelPartyListElement(PanelPartyFinder panelPartyFinder, int slot) {
         this.panelPartyFinder = panelPartyFinder;
@@ -59,9 +62,6 @@ public class PanelPartyListElement extends MPanel {
         return new Dimension(-1, 32);
     }
 
-    private MTooltip mTooltip;
-
-    private ItemStack lastStack;
     @Override
     public void render(int absMousex, int absMousey, int relMousex0, int relMousey0, float partialTicks, Rectangle scissor) {
         GuiCustomPartyFinder guiCustomPartyFinder = panelPartyFinder.getGuiCustomPartyFinder();
@@ -102,7 +102,7 @@ public class PanelPartyListElement extends MPanel {
                         } else if (str.startsWith("§7Dungeon Level Required: §b")) {
                             minDungeon = Integer.parseInt(str.substring(28));
                         } else if (str.startsWith("§cRequires ")) cantjoin = true;
-                        if (str.endsWith("§b)")) pplIn ++;
+                        if (str.endsWith("§b)")) pplIn++;
 
                         if (str.startsWith(" ") && str.contains(":")) {
                             String clazz = TextUtils.stripColor(str).trim().split(" ")[1];
@@ -113,7 +113,7 @@ public class PanelPartyListElement extends MPanel {
             }
         }
 
-        boolean nodupe = note.toLowerCase().contains("nodupe") || note.toLowerCase().contains("no dupe") || (note.toLowerCase().contains("nd") && (note.toLowerCase().indexOf("nd") == 0 || note.charAt(note.toLowerCase().indexOf("nd")-1) == ' '));
+        boolean nodupe = note.toLowerCase().contains("nodupe") || note.toLowerCase().contains("no dupe") || (note.toLowerCase().contains("nd") && (note.toLowerCase().indexOf("nd") == 0 || note.charAt(note.toLowerCase().indexOf("nd") - 1) == ' '));
 
         note = note.replaceAll("(?i)(S\\+)", "§6$1§r");
         note = note.replaceAll("(?i)(carry)", "§4$1§r");
@@ -124,18 +124,19 @@ public class PanelPartyListElement extends MPanel {
                     note = note.replaceAll("(?i)(" + s1 + ")", "§e§l$1§r");
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
-        if (cantjoin) {}
-        else if (clicked) {
+        if (cantjoin) {
+        } else if (clicked) {
             color = RenderUtils.blendAlpha(0x141414, 0.10f);
         } else if (lastAbsClip.contains(absMousex, absMousey) && (getTooltipsOpen() == 0 || (mTooltip != null && mTooltip.isOpen()))) {
             color = RenderUtils.blendAlpha(0x141414, 0.12f);
         }
-        if (cantjoin) {}
-        else if (note.contains("§e")) {
+        if (cantjoin) {
+        } else if (note.contains("§e")) {
             color = RenderUtils.blendTwoColors(color, 0x44FFFF00);
-        } else if (note.contains("§6")){
+        } else if (note.contains("§6")) {
             color = RenderUtils.blendTwoColors(color, 0x44FFAA00);
         }
 
@@ -143,41 +144,41 @@ public class PanelPartyListElement extends MPanel {
             color = RenderUtils.blendTwoColors(color, 0x44FF0000);
             note = note.replace("nodupe", "§cnodupe§r").replace("no dupe", "§cno dupe§r").replace("nd", "§cnd§r");
         }
-        Gui.drawRect(0,0,getBounds().width,getBounds().height,color);
+        Gui.drawRect(0, 0, getBounds().width, getBounds().height, color);
 
-        RenderItem renderItem=  Minecraft.getMinecraft().getRenderItem();
+        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
         GlStateManager.pushMatrix();
         RenderHelper.disableStandardItemLighting();
         RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.scale(2,2,1);
+        GlStateManager.scale(2, 2, 1);
         GlStateManager.enableDepth();
-        renderItem.renderItemAndEffectIntoGUI(itemStack, 0,0);
+        renderItem.renderItemAndEffectIntoGUI(itemStack, 0, 0);
         GlStateManager.popMatrix();
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         GlStateManager.pushMatrix();
-        GlStateManager.translate(37,(32 - 2*fr.FONT_HEIGHT)/2,0);
-        GlStateManager.scale(2,2,1);
+        GlStateManager.translate(37, (32 - 2 * fr.FONT_HEIGHT) / 2, 0);
+        GlStateManager.scale(2, 2, 1);
         String name = itemStack.getDisplayName();
         if (name.contains("'"))
             name = name.substring(0, name.indexOf("'"));
-        fr.drawString(name, 0,0,-1);
+        fr.drawString(name, 0, 0, -1);
 
         if (!notfound)
-            note = "§7("+pplIn+") §f"+note;
-        fr.drawString(note, fr.getStringWidth("AAAAAAAAAAAAAAAA")+5, 0,-1);
+            note = "§7(" + pplIn + ") §f" + note;
+        fr.drawString(note, fr.getStringWidth("AAAAAAAAAAAAAAAA") + 5, 0, -1);
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
         String sideNote = "";
-        if (minClass != -1) sideNote += "§7CLv ≥§b"+minClass+" ";
-        if (minDungeon != -1) sideNote += "§7DLv ≥§b"+minDungeon+" ";
+        if (minClass != -1) sideNote += "§7CLv ≥§b" + minClass + " ";
+        if (minDungeon != -1) sideNote += "§7DLv ≥§b" + minDungeon + " ";
         if (cantjoin && !notfound) sideNote = "§cCan't join";
         sideNote = sideNote.trim();
 
-        GlStateManager.translate(getBounds().width,(32 - 2*fr.FONT_HEIGHT)/2,0);
-        GlStateManager.scale(2,2,0);
-        GlStateManager.translate(-fr.getStringWidth(sideNote), 0,0);
-        fr.drawString(sideNote, 0,0,-1);
+        GlStateManager.translate(getBounds().width, (32 - 2 * fr.FONT_HEIGHT) / 2, 0);
+        GlStateManager.scale(2, 2, 0);
+        GlStateManager.translate(-fr.getStringWidth(sideNote), 0, 0);
+        fr.drawString(sideNote, 0, 0, -1);
 
         GlStateManager.popMatrix();
         if (lastAbsClip.contains(absMousex, absMousey) && (mTooltip == null || !mTooltip.isOpen()) && getTooltipsOpen() == 0) {
@@ -194,9 +195,9 @@ public class PanelPartyListElement extends MPanel {
             mTooltip = new MTooltipText(list);
             mTooltip.setScale(scaledResolution.getScaleFactor());
             mTooltip.open(this);
-        } else if (!lastAbsClip.contains(absMousex, absMousey)){
+        } else if (!lastAbsClip.contains(absMousex, absMousey)) {
             if (mTooltip != null)
-            mTooltip.close();
+                mTooltip.close();
             mTooltip = null;
         }
     }
@@ -210,10 +211,9 @@ public class PanelPartyListElement extends MPanel {
         }
     }
 
-    boolean clicked = false;
     @Override
     public void mouseClicked(int absMouseX, int absMouseY, int relMouseX, int relMouseY, int mouseButton) {
-        if (lastAbsClip.contains(absMouseX, absMouseY)&& (getTooltipsOpen() == 0 || (mTooltip != null && mTooltip.isOpen()))) {
+        if (lastAbsClip.contains(absMouseX, absMouseY) && (getTooltipsOpen() == 0 || (mTooltip != null && mTooltip.isOpen()))) {
             clicked = true;
 
             GuiChest chest = panelPartyFinder.getGuiCustomPartyFinder().getGuiChest();

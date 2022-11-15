@@ -29,6 +29,12 @@ import java.awt.*;
 public class GuiCustomPartyFinder extends MGui {
     @Getter
     private GuiChest guiChest;
+    private final PanelPartyFinder panelPartyFinder;
+
+    public GuiCustomPartyFinder() {
+        panelPartyFinder = new PanelPartyFinder(this);
+        getMainPanel().add(panelPartyFinder);
+    }
 
     public void setGuiChest(GuiChest guiChest) {
         if (this.guiChest != null) this.guiChest.onGuiClosed();
@@ -42,21 +48,15 @@ public class GuiCustomPartyFinder extends MGui {
         panelPartyFinder.onChestUpdate(windowUpdateEvent);
     }
 
-    private PanelPartyFinder panelPartyFinder;
-    public GuiCustomPartyFinder() {
-        panelPartyFinder = new PanelPartyFinder(this);
-        getMainPanel().add(panelPartyFinder);
-    }
-
     @Override
     public void initGui() {
         super.initGui();
-        int width  = 3*Minecraft.getMinecraft().displayWidth/5;
+        int width = 3 * Minecraft.getMinecraft().displayWidth / 5;
         width = Math.max(width, 1000);
-        int height = 3*Minecraft.getMinecraft().displayHeight/5;
+        int height = 3 * Minecraft.getMinecraft().displayHeight / 5;
         height = Math.max(height, 600);
 
-        panelPartyFinder.setBounds(new Rectangle((Minecraft.getMinecraft().displayWidth-width)/2, (Minecraft.getMinecraft().displayHeight-height)/2, width, height));
+        panelPartyFinder.setBounds(new Rectangle((Minecraft.getMinecraft().displayWidth - width) / 2, (Minecraft.getMinecraft().displayHeight - height) / 2, width, height));
     }
 
     @Override
