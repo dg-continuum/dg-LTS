@@ -20,7 +20,10 @@ package kr.syeyoung.dungeonsguide.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
 
 import javax.vecmath.Vector2d;
 
@@ -48,4 +51,11 @@ public class VectorUtils {
         Vec3 p = posVec.addVector(lookVec.xCoord * t, lookVec.yCoord * t, lookVec.zCoord * t);
         return p.squareDistanceTo(objectVec) / p.squareDistanceTo(posVec);
     }
+
+    @NotNull
+    public static BlockPos Vec3ToBlockPos(@NotNull Vector3d vec){
+        return new BlockPos(vec.x, vec.y, vec.z);
+    }
+
+
 }

@@ -29,11 +29,20 @@ import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonStateChangeEvent;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.*;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.CachedStrategyBuilder;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.DungeonRoomAccessor;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.IPathfinderStrategy;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.NodeProcessorDungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.AStarCornerCut;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.AStarFineGrid;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.JPSPathfinder;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.block.Block;
@@ -45,6 +54,8 @@ import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
@@ -53,7 +64,7 @@ import java.util.*;
 import java.util.concurrent.Future;
 
 @Getter
-public class DungeonRoom {
+public class DungeonRoom implements DungeonRoomAccessor {
     private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 16), new Vector2d(0, -16), new Vector2d(16, 0), new Vector2d(-16, 0));
     private static final float playerWidth = 0.3f;
     private final List<Point> unitPoints;
@@ -177,6 +188,12 @@ public class DungeonRoom {
 
     public Future<List<Vec3>> createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, BlockPos targetPos, float dist, int timeout) {
 
+        Vec3 positionVector = entityIn.getPositionVector();
+        org.joml.Vector3d from = new org.joml.Vector3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord);
+
+        org.joml.Vector3d to = new org.joml.Vector3d(targetPos.getX(), targetPos.getY(), targetPos.getZ()).add(.5, .5, .5);
+
+
         switch (DgOneCongifConfig.secretPathfindStrategy){
             case 0:
                 return DungeonFacade.INSTANCE.ex.submit(() -> {
@@ -188,9 +205,11 @@ public class DungeonRoom {
 
             case 1:
                 return DungeonFacade.INSTANCE.ex.submit(() -> {
-                    AStarCornerCut pathFinder =
-                            activeBetterAStarCornerCut.computeIfAbsent(targetPos, pos -> new AStarCornerCut(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
-                    pathFinder.pathfind(entityIn.getPositionVector(), timeout);
+
+                    IPathfinderStrategy pathFinder =
+                            CachedStrategyBuilder.Companion.getINSTANCE().build(this, to, 1);
+
+                    pathFinder.pathfind(from, to, timeout);
                     return pathFinder.getRoute();
                 });
 
@@ -295,6 +314,7 @@ public class DungeonRoom {
         return x >= 0 && z >= 0 && (shape >> ((z / 32) * 4 + (x / 32)) & 0x1) > 0;
     }
 
+    @Override
     public boolean isBlocked(int x, int y, int z) {
         if (x < minx || z < minz || x >= maxx || z >= maxz || y < miny || y >= maxy) return true;
         int dx = x - minx, dy = y - miny, dz = z - minz;
@@ -365,6 +385,12 @@ public class DungeonRoom {
         int bitIdx = dx * leny * lenz + dy * lenz + dz;
         int location = bitIdx / 4;
         arr[location] = 0;
+    }
+
+    @Nullable
+    @Override
+    public IBlockState getBlockState(@NotNull org.joml.Vector3d location) {
+        return BlockCache.getBlockState(VectorUtils.Vec3ToBlockPos(location));
     }
 
     @AllArgsConstructor

@@ -2,7 +2,7 @@ package kr.syeyoung.dungeonsguide.dungeon;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.Main;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.ThetaStar;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Setter;
 import lombok.val;

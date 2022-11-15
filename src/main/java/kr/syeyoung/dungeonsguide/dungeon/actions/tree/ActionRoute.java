@@ -30,7 +30,10 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import java.util.List;
 
 public class ActionRoute {
-    @Getter
+    public String getMechanic() {
+        return mechanic;
+    }
+
     private final String mechanic;
     @Getter
     private final String state;

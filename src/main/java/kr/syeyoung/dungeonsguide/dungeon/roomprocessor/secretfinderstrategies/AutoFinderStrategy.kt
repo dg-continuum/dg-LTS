@@ -4,7 +4,6 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionComplete
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
@@ -16,70 +15,81 @@ import kr.syeyoung.dungeonsguide.utils.SimpleTimer
 import net.minecraft.client.Minecraft
 import net.minecraft.util.BlockPos
 import java.awt.Color
-import java.util.*
 
 class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(parent) {
 
-    private val reevaluateOurWholeExisitance = SimpleTimer(20)
-    override val actionPath: MutableMap<String, ActionRoute> = HashMap()
+    private val autoPathFindCandidates: MutableMap<MechanicId, AutoGuideSecretCandidate> = HashMap()
 
+    data class MechanicId(val id: String)
 
-    override fun update() {
-        if (reevaluateOurWholeExisitance.shouldRun()) {
-            updateCandidates()
-        }
-        reevaluateOurWholeExisitance.tick()
-
-
-        navigateToLowestScoreSecret()
-
-        val toRemove = HashSet<String>()
-        for ((key, v) in actionPath) {
-            v.onTick()
-            if (v.currentAction is ActionComplete) {
-                toRemove.add(key)
-            }
-        }
-
-        for ((_, value) in parent.dungeonRoom.mechanics) {
-            if (value is DungeonSecret) {
-                value.tick(parent.dungeonRoom)
-            }
-        }
-        if (toRemove.contains("AUTO-BROWSE") && AutoPathfindPage.autoBrowseToNext) {
-            searchForNextTarget()
-        }
-
-    }
-
-    class AutoGuideSecretCandidate(
-        val mechanicName: String,
+    data class AutoGuideSecretCandidate(
+        val mechanic: DungeonSecret,
         var cost: Double,
         var pos: BlockPos,
         var descipriton: String,
         var isDone: Boolean
     )
 
-    private val autoPathFindCandidates: MutableMap<String, AutoGuideSecretCandidate> = HashMap()
+    private val updateTimer = SimpleTimer(20)
+
+    override fun update() {
+
+        if (updateTimer.shouldRun()) {
+            updateCandidates()
+
+            navigateToLowestScoreSecret()
+        }
+        updateTimer.tick()
+
+
+        // tick mechanics
+        for ((_, value) in parent.dungeonRoom.mechanics) {
+            if (value is DungeonSecret) {
+                value.tick(parent.dungeonRoom)
+            }
+        }
+
+        // tick actions and remove finished actions
+        for ((mechid, route) in actionPath) {
+            val id = MechanicId(route.mechanic)
+            route.onTick()
+
+
+            if ((route.currentAction is ActionComplete) or (route.currentAction.isComplete(parent.dungeonRoom))) {
+                autoPathFindCandidates[id]?.let {
+                    it.isDone = true
+                }
+            }
+        }
+
+
+        autoPathFindCandidates[lastFoundMechanic]?.let {
+            if (it.isDone && AutoPathfindPage.autoBrowseToNext) {
+                searchForNextTarget()
+            }
+        }
+
+
+    }
 
     override fun draw(partialTicks: Float) {
         if (DgOneCongifConfig.DEBUG_MODE) {
-            for (autoPathFindCandidate in autoPathFindCandidates) {
+            for ((id, value) in autoPathFindCandidates) {
                 RenderUtils.highlightBlock(
-                    autoPathFindCandidate.value.pos,
-                    if (autoPathFindCandidate.value.isDone) Color.CYAN else Color.GRAY,
+                    value.pos,
+                    if (value.isDone) Color.CYAN else Color.GRAY,
                     partialTicks
                 )
 
-                val x = autoPathFindCandidate.value.pos.x
-                val y = autoPathFindCandidate.value.pos.y
-                val z = autoPathFindCandidate.value.pos.z
+                val x = value.pos.x
+                val y = value.pos.y
+                val z = value.pos.z
                 RenderUtils.drawTextAtWorld(
-                    "Mechanic name: ${autoPathFindCandidate.value.mechanicName}",
+                    "Mechanic name: ${id.id}",
                     x.toFloat(),
                     y.toFloat(),
                     z.toFloat(),
-                    if (!autoPathFindCandidate.value.isDone) 0xFFFFFF else 0xcccccc,
+                    if (!value.isDone) 0xFFFFFF else 0xcccccc,
                     0.1F,
                     false,
                     true,
@@ -87,11 +97,11 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
                 )
 
                 RenderUtils.drawTextAtWorld(
-                    if (!autoPathFindCandidate.value.isDone) "cost: ${autoPathFindCandidate.value.cost}" else "Done",
+                    if (!value.isDone) "cost: ${value.cost}" else "Done",
                     x.toFloat(),
                     y.toFloat() - 1F,
                     z.toFloat(),
-                    if (!autoPathFindCandidate.value.isDone) 0xFFFFFF else 0xcccccc,
+                    if (!value.isDone) 0xFFFFFF else 0xcccccc,
                     0.1F,
                     false,
                     true,
@@ -109,89 +119,104 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         searchForNextTarget()
     }
 
-    var lastFoundMechanic: String = ""
+    var lastFoundMechanic: MechanicId? = null
 
     fun searchForNextTarget() {
         if (parent.dungeonRoom.currentState == DungeonRoom.RoomState.FINISHED) {
             cancelAll()
             return
         }
-        val lowestWeightMechanic = simplesMechanic
-        if (lowestWeightMechanic.isPresent) {
-            lastFoundMechanic = lowestWeightMechanic.get()
-            addAction(
-                "AUTO-BROWSE",
-                lowestWeightMechanic.get(),
-                "found",
-                FeatureRegistry.SECRET_LINE_PROPERTIES_AUTOPATHFIND.routeProperties
-            )
-        } else {
-            visited.clear()
+        calculateMechanicCosts()
+        getCheapestMechanic()?.let {
+            if (lastFoundMechanic == it) {
+                return
+            } else {
+                lastFoundMechanic = it
+                addAction(
+                    "AUTO-BROWSE",
+                    it.id,
+                    "found",
+                    FeatureRegistry.SECRET_LINE_PROPERTIES_AUTOPATHFIND.routeProperties
+                )
+            }
         }
+
     }
 
-    private val visited: MutableSet<String> = HashSet()
 
-    private val simplesMechanic: Optional<String>
-        get() = calculateMechanicCosts()
-
-    private fun calculateMechanicCosts(): Optional<String> {
-        val playerPos = Minecraft.getMinecraft().thePlayer.position
-        var lowestWeightSecretName: String? = null
-        var lowestCost = Float.MAX_VALUE.toDouble()
+    private fun calculateMechanicCosts() {
+        // get all mechanics from parent if they already are not candidates
         for ((secretName, secretMechanic) in parent.dungeonRoom.mechanics) {
+            val mechId = MechanicId(secretName)
             if (secretMechanic is DungeonSecret) {
-                if (!visited.contains(secretName)) {
-                    if (secretMechanic.getSecretStatus(parent.dungeonRoom) != DungeonSecret.SecretStatus.FOUND) {
-                        var cost = 0.0
-                        if (secretMechanic.secretType == DungeonSecret.SecretType.BAT) {
-                            cost -= 100_000_000
-                        }
-                        if (secretMechanic.preRequisite.size == 0) {
-                            cost -= 100_000_000
-                        } else {
-                            cost += (secretMechanic.preRequisite.size * 100).toDouble()
-                        }
+                if (!autoPathFindCandidates.contains(mechId)) {
+                    val representingPoint = secretMechanic.getRepresentingPoint(parent.dungeonRoom)
+                    if (representingPoint != null) {
+                        val secretPos = representingPoint
+                            .getBlockPos(parent.dungeonRoom)
 
-                        val representingPoint = secretMechanic.getRepresentingPoint(parent.dungeonRoom)
-                        if (representingPoint != null) {
-                            val secretPos = representingPoint
-                                .getBlockPos(parent.dungeonRoom)
-
-                            cost += if (DgOneCongifConfig.usePathfindCostCacls) {
-                                DungeonsGuide.getDungeonsGuide().dungeonFacade.calculatePathLenght(
-                                    playerPos,
-                                    secretPos,
-                                    parent.dungeonRoom
-                                ).toDouble()
-                            } else {
-                                secretPos.distanceSq(playerPos)
-                            }
-
-                            autoPathFindCandidates[secretName] =
-                                AutoGuideSecretCandidate(
-                                    secretName,
-                                    cost,
-                                    secretPos,
-                                    secretMechanic.toString(),
-                                    false
-                                )
-                        }
-                        if (cost < lowestCost) {
-                            lowestCost = cost
-                            lowestWeightSecretName = secretName
-                        }
+                        autoPathFindCandidates[mechId] =
+                            AutoGuideSecretCandidate(
+                                secretMechanic,
+                                0.0,
+                                secretPos,
+                                secretMechanic.toString(),
+                                false
+                            )
                     }
-                } else {
-                    val cock: AutoGuideSecretCandidate? = autoPathFindCandidates[secretName]
-                    if (cock != null) {
-                        cock.isDone = true
-                        autoPathFindCandidates[secretName] = cock
-                    }
+
                 }
             }
         }
-        return if (lowestWeightSecretName == null) Optional.empty() else Optional.of(lowestWeightSecretName)
+
+
+        for ((key, value) in actionPath) {
+            val id = MechanicId(key)
+            autoPathFindCandidates[id]?.let {
+                if(value.currentAction.isComplete(parent.dungeonRoom)){
+                    it.isDone = true
+                }
+            }
+        }
+
+
+
+        val playerPos = Minecraft.getMinecraft().thePlayer.position
+
+        // re calculate cost for each candidate
+        for ((key, value) in autoPathFindCandidates) {
+            if (value.isDone) continue
+
+            value.cost = 0.0
+
+            if (value.mechanic.secretType == DungeonSecret.SecretType.BAT) {
+                value.cost -= 100_000_000
+            }
+            if (value.mechanic.preRequisite.size == 0) {
+                value.cost -= 100_000_000
+            } else {
+                value.cost += (value.mechanic.preRequisite.size * 100).toDouble()
+            }
+
+            val representingPoint = value.mechanic.getRepresentingPoint(parent.dungeonRoom)
+            if (representingPoint != null) {
+                val secretPos = representingPoint
+                    .getBlockPos(parent.dungeonRoom)
+
+                value.cost += if (DgOneCongifConfig.usePathfindCostCacls) {
+                    DungeonsGuide.getDungeonsGuide().dungeonFacade.calculatePathLenght(
+                        playerPos,
+                        secretPos,
+                        parent.dungeonRoom
+                    ).toDouble()
+                } else {
+                    secretPos.distanceSq(playerPos)
+                }
+
+                autoPathFindCandidates[key] = value
+            }
+        }
+
     }
 
 
@@ -203,20 +228,22 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
     var navigateBiasLastUpdate: Long = -1L
 
-    fun navigateToLowestScoreSecret() {
-        var lowestWeightMechanic = ""
 
+    fun getCheapestMechanic(): MechanicId? {
+        var lowestWeightMechanic: MechanicId? = null
         var lowstCost: Double = Double.MAX_VALUE
         for ((key, value) in autoPathFindCandidates) {
-            if (value.cost < lowstCost) {
+            if (value.cost < lowstCost && !value.isDone) {
                 lowestWeightMechanic = key
                 lowstCost = value.cost
             }
         }
+        return lowestWeightMechanic
+    }
 
-        if (lowestWeightMechanic == "") {
-            return
-        }
+    fun navigateToLowestScoreSecret() {
+
+        val lowestWeightMechanic = getCheapestMechanic() ?: return
 
 
         // make sure we don't start navigating to the same secret twice
@@ -228,7 +255,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
         // make sure we don't flip-flop between secrets instantly
         // two seconds from update is smaller than now. aka 2 seconds passed since finding better secret
-        if (navigateBiasLastUpdate != -1L && ((navigateBiasLastUpdate + 1000) < now)) {
+        if (navigateBiasLastUpdate != -1L && ((navigateBiasLastUpdate + 500) > now)) {
             return
         }
 
@@ -237,12 +264,13 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         // remove the last
         actionPath.remove("AUTO-BROWSE")
 
-        // start navigating to the new one
         lastFoundMechanic = lowestWeightMechanic
         navigateBiasLastUpdate = now
+
+        // start navigating to the new one
         addAction(
             "AUTO-BROWSE",
-            lowestWeightMechanic,
+            lowestWeightMechanic.id,
             "found",
             FeatureRegistry.SECRET_LINE_PROPERTIES_AUTOPATHFIND.routeProperties
         )
