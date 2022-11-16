@@ -18,7 +18,6 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers;
 
-import com.google.common.base.Predicate;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
@@ -32,10 +31,8 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,18 +71,15 @@ public class RoomProcessorRiddle extends GeneralRoomProcessor {
             }
         }
         if (foundMatch) {
-            ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eRiddle §7:: " + ch2.split(":")[0].trim() + " §fhas the reward!"));
+            ChatTransmitter.addToQueue(ChatTransmitter.PREFIX + "§eRiddle §7:: " + ch2.split(":")[0].trim() + " §fhas the reward!");
             final String name = TextUtils.stripColor(ch2.split(":")[0]).replace("[NPC] ", "").trim();
             final BlockPos low = getDungeonRoom().getMin();
             final BlockPos high = getDungeonRoom().getMax();
             World w = getDungeonRoom().getContext().getWorld();
-            List<EntityArmorStand> armor = w.getEntities(EntityArmorStand.class, new Predicate<EntityArmorStand>() {
-                @Override
-                public boolean apply(@Nullable EntityArmorStand input) {
-                    BlockPos pos = input.getPosition();
-                    return low.getX() < pos.getX() && pos.getX() < high.getX()
-                            && low.getZ() < pos.getZ() && pos.getZ() < high.getZ() && TextUtils.stripColor(input.getName()).equalsIgnoreCase(name);
-                }
+            List<EntityArmorStand> armor = w.getEntities(EntityArmorStand.class, input -> {
+                BlockPos pos = input.getPosition();
+                return low.getX() < pos.getX() && pos.getX() < high.getX()
+                        && low.getZ() < pos.getZ() && pos.getZ() < high.getZ() && TextUtils.stripColor(input.getName()).equalsIgnoreCase(name);
             });
 
             if (armor != null) {

@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomfinder;
 
 import com.google.common.collect.Sets;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
@@ -29,9 +28,7 @@ import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonStateChangeEvent;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.CachedStrategyBuilder;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.DungeonRoomAccessor;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.IPathfinderStrategy;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.NodeProcessorDungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.AStarCornerCut;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.AStarFineGrid;
@@ -61,6 +58,7 @@ import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Getter
@@ -188,12 +186,6 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
     public Future<List<Vec3>> createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, BlockPos targetPos, float dist, int timeout) {
 
-        Vec3 positionVector = entityIn.getPositionVector();
-        org.joml.Vector3d from = new org.joml.Vector3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord);
-
-        org.joml.Vector3d to = new org.joml.Vector3d(targetPos.getX(), targetPos.getY(), targetPos.getZ()).add(.5, .5, .5);
-
-
         switch (DgOneCongifConfig.secretPathfindStrategy){
             case 0:
                 return DungeonFacade.INSTANCE.ex.submit(() -> {
@@ -205,12 +197,26 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
             case 1:
                 return DungeonFacade.INSTANCE.ex.submit(() -> {
+                    try {
+                        Vec3 positionVector = entityIn.getPositionVector();
+                        org.joml.Vector3d from = new org.joml.Vector3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord);
 
-                    IPathfinderStrategy pathFinder =
-                            CachedStrategyBuilder.Companion.getINSTANCE().build(this, to, 1);
+                        org.joml.Vector3d to = new org.joml.Vector3d(targetPos.getX(), targetPos.getY(), targetPos.getZ()).add(.5, .5, .5);
 
-                    pathFinder.pathfind(from, to, timeout);
-                    return pathFinder.getRoute();
+                        LinkedList<org.joml.Vector3d> path = DungeonFacade.INSTANCE.getCachedPathFinder().pathFind(from, to, this).get().getPath();
+
+                        List<Vec3> realPaht = new LinkedList<>();
+
+                        for (org.joml.Vector3d vector3d : path) {
+                            realPaht.add(new Vec3(vector3d.x, vector3d.y, vector3d.z));
+                        }
+
+                        return realPaht;
+
+                    } catch (InterruptedException | ExecutionException | NullPointerException e) {
+                        e.printStackTrace();
+                    }
+                    throw null;
                 });
 
             case 2:
@@ -283,7 +289,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
         // validate x y z's
         if (canAccessRelative(x, z)) {
             BlockPos pos = new BlockPos(x, y, z).add(min.getX(), min.getY(), min.getZ());
-            return DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos).getBlock();
+            return BlockCache.getBlockState(pos).getBlock();
         }
         return null;
     }
@@ -296,7 +302,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
         // validate x y z's
         if (canAccessRelative(x, z)) {
             BlockPos pos = new BlockPos(x, y, z).add(min.getX(), min.getY(), min.getZ());
-            IBlockState iBlockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
+            IBlockState iBlockState = BlockCache.getBlockState(pos);
             return iBlockState.getBlock().getMetaFromState(iBlockState);
         }
         return -1;
@@ -341,7 +347,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
             for (int l1 = i1; l1 < j1; ++l1) {
                 for (int i2 = k - 1; i2 < l; ++i2) {
                     blockPos.set(k1, i2, l1);
-                    IBlockState iblockstate1 = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(blockPos);
+                    IBlockState iblockstate1 = BlockCache.getBlockState(blockPos);
                     Block b = iblockstate1.getBlock();
                     if (!b.getMaterial().blocksMovement()) continue;
                     if (b.isFullCube() && i2 == k - 1) continue;

@@ -2,6 +2,7 @@ package kr.syeyoung.dungeonsguide.dungeon;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.Main;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.CachedPathFinder;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Setter;
@@ -22,6 +23,13 @@ import java.util.concurrent.Future;
 
 public class DungeonFacade {
 
+
+    public CachedPathFinder getCachedPathFinder() {
+        return cachedPathFinder;
+    }
+
+    final CachedPathFinder cachedPathFinder;
+
     public final ExecutorService ex;
 
     public static DungeonFacade INSTANCE;
@@ -38,6 +46,7 @@ public class DungeonFacade {
         ex = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder().setNameFormat("Dg-AsyncPathFinder-%d").build()
         );
+        cachedPathFinder = new CachedPathFinder();
     }
 
     public void init() {

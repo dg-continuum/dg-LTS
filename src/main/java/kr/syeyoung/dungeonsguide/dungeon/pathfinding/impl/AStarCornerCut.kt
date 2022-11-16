@@ -22,7 +22,6 @@ import kr.syeyoung.dungeonsguide.dungeon.pathfinding.IPathfinderStrategy
 import lombok.Getter
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
-import net.minecraft.util.Vec3
 import org.joml.Vector3d
 import java.util.*
 import kotlin.math.roundToInt
@@ -77,8 +76,6 @@ class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): IPathfinder
 
         var parent: Node? = null
 
-
-
         companion object {
             fun makeHash(x: Int, y: Int, z: Int): Long {
                 return y.toLong() and 32767L or (x.toShort().toLong() and 32767L shl 16) or (z.toShort()
@@ -106,17 +103,17 @@ class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): IPathfinder
         pfindIdx++
         if (lastSx != (from.x * 2).roundToInt() || lastSy != (from.y * 2).roundToInt() || lastSz != (from.z * 2).roundToInt()
         ) open.clear()
-        lastSx = Math.round(from.x * 2).toInt()
-        lastSy = Math.round(from.y * 2).toInt()
-        lastSz = Math.round(from.z * 2).toInt()
+        lastSx = (from.x * 2).roundToInt()
+        lastSy = (from.y * 2).roundToInt()
+        lastSz = (from.z * 2).roundToInt()
         val startNode = openNode(dx, dy, dz)
         val goalNode = openNode(lastSx, lastSy, lastSz)
         if (goalNode.parent != null) {
-            val route = LinkedList<Vec3>()
+            val route = LinkedList<Vector3d>()
             var curr: Node? = goalNode
             while (curr!!.parent != null) {
                 route.addLast(
-                    Vec3(
+                    Vector3d(
                         curr.coordinate!!.x / 2.0,
                         curr.coordinate!!.y / 2.0 + 0.1,
                         curr.coordinate!!.z / 2.0
@@ -124,7 +121,7 @@ class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): IPathfinder
                 )
                 curr = curr.parent
             }
-            route.addLast(Vec3(curr.coordinate!!.x / 2.0, curr.coordinate!!.y / 2.0 + 0.1, curr.coordinate!!.z / 2.0))
+            route.addLast(Vector3d(curr.coordinate!!.x / 2.0, curr.coordinate!!.y / 2.0 + 0.1, curr.coordinate!!.z / 2.0))
             this.route = route
             return true
         }
@@ -145,11 +142,11 @@ class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): IPathfinder
             }
             if (n === goalNode) {
                 // route = reconstructPath(startNode)
-                val route = LinkedList<Vec3>()
+                val route = LinkedList<Vector3d>()
                 var curr: Node? = goalNode
                 while (curr!!.parent != null) {
                     route.addLast(
-                        Vec3(
+                        Vector3d(
                             curr.coordinate!!.x / 2.0,
                             curr.coordinate!!.y / 2.0 + 0.1,
                             curr.coordinate!!.z / 2.0
@@ -158,7 +155,7 @@ class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): IPathfinder
                     curr = curr.parent
                 }
                 route.addLast(
-                    Vec3(
+                    Vector3d(
                         curr.coordinate!!.x / 2.0,
                         curr.coordinate!!.y / 2.0 + 0.1,
                         curr.coordinate!!.z / 2.0
