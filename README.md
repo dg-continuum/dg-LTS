@@ -19,7 +19,7 @@
 # Dungeons Guide
 The most intelligent Hypixel Skyblock Dungeons Mod.
 ## Official Support Discord
-Join Our [Discord!](https://discord.gg/vuGsXhY5Bv)
+Join Our [Discord!](https://discord.gg/sNVagTGPEX)
 
 ## Features
 ### Solvers
