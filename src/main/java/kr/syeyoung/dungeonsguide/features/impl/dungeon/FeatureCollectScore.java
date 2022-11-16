@@ -18,16 +18,17 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon;
 
+import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import kr.syeyoung.dungeonsguide.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.stomp.StompPayload;
 import kr.syeyoung.dungeonsguide.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import net.minecraft.util.ChatComponentText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,8 @@ public class FeatureCollectScore extends SimpleFeatureV2 {
     public FeatureCollectScore() {
         super("misc.gatherscoredata");
     }
+
+    @Exclude
     static final Logger logger = LogManager.getLogger("FeatureCollectScore");
 
     public static void collectDungeonRunData(byte[] mapData, DungeonContext context) {

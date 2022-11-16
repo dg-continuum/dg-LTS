@@ -1,15 +1,16 @@
 package kr.syeyoung.dungeonsguide.features.impl.debug;
 
+import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
 import kr.syeyoung.dungeonsguide.stomp.StompManager;
 import kr.syeyoung.dungeonsguide.stomp.StompPayload;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -47,7 +48,8 @@ import static kr.syeyoung.dungeonsguide.utils.TabListUtil.getString;
 
 public class FeatureTestPepole extends GuiFeature {
 
-    Logger logger = LogManager.getLogger("FeatureTestPepole");
+    @Exclude
+    transient Logger logger = LogManager.getLogger("FeatureTestPepole");
     private Set<String> lastmebersRaw;
     private boolean broadcastLock;
 

@@ -1,5 +1,6 @@
 package kr.syeyoung.dungeonsguide.features.impl.debug;
 
+import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import cc.polyfrost.oneconfig.hud.BasicHud;
 import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import net.minecraft.client.Minecraft;
@@ -10,8 +11,8 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 public class TestMap extends BasicHud {
-
-    static final Logger logger = LogManager.getLogger("TestMap");
+    @Exclude
+    transient static final Logger logger = LogManager.getLogger("TestMap");
 
     @Override
     protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {

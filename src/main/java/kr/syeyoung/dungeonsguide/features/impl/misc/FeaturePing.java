@@ -1,5 +1,6 @@
 package kr.syeyoung.dungeonsguide.features.impl.misc;
 
+import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.utils.SimpleLock;
@@ -96,7 +97,8 @@ public class FeaturePing extends SingleTextHud {
         if(DgOneCongifConfig.DEBUG_MODE) logger.info("Updating ping: {}", ping);
     }
 
-    static Logger logger = LogManager.getLogger("FeaturePing");
+    @Exclude
+    transient static Logger logger = LogManager.getLogger("FeaturePing");
     final SimpleLock pingLock = new SimpleLock();
 
     public void setup(){
