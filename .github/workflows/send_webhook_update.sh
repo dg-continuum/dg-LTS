@@ -34,7 +34,7 @@ case "$STATUS" in
     ;;
   SUCCESS)
     color="$COLOR_SUCCESS"
-    status_message="Build succeeded.  <@1042906817283498064>"
+    status_message="Build succeeded."
     to_upload=$(echo build/libs/*-all.jar)
     upload_name=Dglts-beta-dep.jar
     ;;

@@ -44,8 +44,6 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: gradle
-      - name: Download hychat as a dependency
-        run: mkdir jars && wget https://cdn.discordapp.com/attachments/782825804983566356/791708191519932426/Hychat-1.12.1-BETA.jar -O jars/Hychat-1.12.1-BETA.jar
       - name: Build with Gradle
         run: chmod +x ./gradlew && ./gradlew clean test remapJar --no-daemon
       - uses: actions/upload-artifact@v3
@@ -55,6 +53,7 @@ jobs:
         if: ${{ env.WEBHOOK_URL && success() }}
         run: |
           ./.github/workflows/send_webhook_update.sh
+           curl -H "Content-Type: application/json" -d '{"username": "Beta Build Ping", "content": "<@&1042906817283498064>"}' "$WEBHOOK_URL"
         env:
           STATUS: SUCCESS
           MESSAGE_ID: ${{ steps.sendmsg.outputs.MESSAGE_ID }}
