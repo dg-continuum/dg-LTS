@@ -135,7 +135,10 @@ tasks.shadowJar {
 
     relocate 'org.java_websocket', 'kr.syeyoung.org.java_websocket'
 
+    relocate 'org.joml', 'kr.syeyoung.org.joml'
+
     dependencies {
+        include(dependency('org.joml:joml:..*'))
         include(dependency('org.java-websocket:Java-WebSocket:1.5.3'))
         include(dependency('org.slf4j:slf4j-api:1.7.25'))
         include(dependency('org.json:json:20220924'))
