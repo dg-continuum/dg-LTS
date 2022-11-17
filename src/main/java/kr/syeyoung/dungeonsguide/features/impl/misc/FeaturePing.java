@@ -45,14 +45,14 @@ public class FeaturePing extends SingleTextHud {
     }
 
 
-    boolean shouldShowAverage = false;
-    ArrayList<Long> averagePingStore = new ArrayList<>();
-    Long averagePing = 0L;
-    private long whenWasPingLocked;
+    transient boolean shouldShowAverage = false;
+    transient ArrayList<Long> averagePingStore = new ArrayList<>();
+    transient Long averagePing = 0L;
+    transient private long whenWasPingLocked;
 
-    static final int TIMEOUT_THRESHOLD = 330;
+    transient static final int TIMEOUT_THRESHOLD = 330;
 
-    boolean lastTimeOutStatus;
+    transient boolean lastTimeOutStatus;
 
     @Override
     public boolean isEnabled() {
@@ -80,7 +80,7 @@ public class FeaturePing extends SingleTextHud {
         }
     }
 
-    long ping = 0;
+    transient long ping = 0;
 
     void setPing(long ping){
         this.ping = ping;
@@ -99,7 +99,7 @@ public class FeaturePing extends SingleTextHud {
 
     @Exclude
     transient static Logger logger = LogManager.getLogger("FeaturePing");
-    final SimpleLock pingLock = new SimpleLock();
+    transient final SimpleLock pingLock = new SimpleLock();
 
     public void setup(){
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("Dg Ping pool").build();

@@ -71,19 +71,19 @@ import java.util.List;
 
 public class FeatureDungeonMap extends BasicHud {
 
-    public static final Ordering<NetworkPlayerInfo> sorter = Ordering.from((compare1, compare2) -> {
+    transient public static final Ordering<NetworkPlayerInfo> sorter = Ordering.from((compare1, compare2) -> {
         ScorePlayerTeam scoreplayerteam = compare1.getPlayerTeam();
         ScorePlayerTeam scoreplayerteam1 = compare2.getPlayerTeam();
         return ComparisonChain.start().compareTrueFirst(compare1.getGameType() != WorldSettings.GameType.SPECTATOR, compare2.getGameType() != WorldSettings.GameType.SPECTATOR).compare(scoreplayerteam != null ? scoreplayerteam.getRegisteredName() : "", scoreplayerteam1 != null ? scoreplayerteam1.getRegisteredName() : "").compare(compare1.getGameProfile().getName(), compare2.getGameProfile().getName()).result();
     });
-    private static final ResourceLocation mapIcons = new ResourceLocation("textures/map/map_icons.png");
-    private final DynamicTexture mapTexture = new DynamicTexture(128, 128);
-    private final ResourceLocation generatedMapTexture = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("dungeonmap/map", mapTexture);
-    private final int[] mapTextureData = mapTexture.getTextureData();
-    int[] lastRoomColors = new int[50];
-    int[] lastRoomSecrets = new int[50];
-    long nextRefresh;
-    Tuple<String[], List<NetworkPlayerInfo>> playerListCached;
+    transient private static final ResourceLocation mapIcons = new ResourceLocation("textures/map/map_icons.png");
+    transient private final DynamicTexture mapTexture = new DynamicTexture(128, 128);
+    transient private final ResourceLocation generatedMapTexture = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("dungeonmap/map", mapTexture);
+    transient private final int[] mapTextureData = mapTexture.getTextureData();
+    transient int[] lastRoomColors = new int[50];
+    transient int[] lastRoomSecrets = new int[50];
+    transient long nextRefresh;
+    transient Tuple<String[], List<NetworkPlayerInfo>> playerListCached;
 
     @Color(name = "Color of the player border")
     public static OneColor playerColor = new OneColor(255, 255, 255, 0);

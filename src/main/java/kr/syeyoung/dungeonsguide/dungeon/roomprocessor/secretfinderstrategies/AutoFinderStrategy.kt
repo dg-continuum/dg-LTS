@@ -34,6 +34,11 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
     override fun update() {
 
+        if (parent.dungeonRoom.currentState == DungeonRoom.RoomState.FINISHED) {
+            cancelAll()
+            return
+        }
+
         if (updateTimer.shouldRun()) {
             updateCandidates()
 
@@ -50,7 +55,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         }
 
         // tick actions and remove finished actions
-        for ((mechid, route) in actionPath) {
+        for ((_, route) in actionPath) {
             val id = MechanicId(route.mechanic)
             route.onTick()
 
@@ -122,10 +127,6 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
     var lastFoundMechanic: MechanicId? = null
 
     fun searchForNextTarget() {
-        if (parent.dungeonRoom.currentState == DungeonRoom.RoomState.FINISHED) {
-            cancelAll()
-            return
-        }
         calculateMechanicCosts()
         getCheapestMechanic()?.let {
             if (lastFoundMechanic == it) {

@@ -40,8 +40,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FeatureAbilityCooldown extends TextHud {
-    private static final Map<String, SkyblockAbility> skyblockAbilities = new HashMap<>();
-    private static final Map<String, List<SkyblockAbility>> skyblockAbilitiesByItemID = new HashMap<>();
+    transient private static final Map<String, SkyblockAbility> skyblockAbilities = new HashMap<>();
+    transient private static final Map<String, List<SkyblockAbility>> skyblockAbilitiesByItemID = new HashMap<>();
 
     @Data
     @AllArgsConstructor
@@ -62,7 +62,7 @@ public class FeatureAbilityCooldown extends TextHud {
     }
 
 
-    private final TreeSet<UsedAbility> usedAbilities = new TreeSet<>((c1, c2) -> {
+    transient private final TreeSet<UsedAbility> usedAbilities = new TreeSet<>((c1, c2) -> {
         int a = Comparator.comparingLong(UsedAbility::getCooldownEnd).compare(c1, c2);
         return c1.getAbility().getName().equals(c2.getAbility().getName()) ? 0 : a;
     });
@@ -210,10 +210,10 @@ public class FeatureAbilityCooldown extends TextHud {
         register("Seismic Wave", -1, 15, "DUNGEON_STONE");
         register("Castle of Stone", -1, 150, "DUNGEON_STONE");
     }
-    Pattern thePattern = Pattern.compile("§b-(\\d+) Mana \\(§6(.+)§b\\)");
-    Pattern thePattern2 = Pattern.compile("§r§aUsed (.+)§r§a! §r§b\\((1194) Mana\\)§r");
-    Pattern thePattern3 = Pattern.compile("§r§aUsed (.+)§r§a!§r");
-    private String lastActionbarAbility;
+    transient Pattern thePattern = Pattern.compile("§b-(\\d+) Mana \\(§6(.+)§b\\)");
+    transient Pattern thePattern2 = Pattern.compile("§r§aUsed (.+)§r§a! §r§b\\((1194) Mana\\)§r");
+    transient Pattern thePattern3 = Pattern.compile("§r§aUsed (.+)§r§a!§r");
+    transient private String lastActionbarAbility;
 
     public FeatureAbilityCooldown() {
         super(true);

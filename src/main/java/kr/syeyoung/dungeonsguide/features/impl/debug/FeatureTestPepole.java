@@ -205,9 +205,9 @@ public class FeatureTestPepole extends GuiFeature {
 
     private Set<String> ready = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
-    private static final List<String> readyPhrase = Arrays.asList("r", "rdy", "ready");
-    private static final List<String> negator = Arrays.asList("not ", "not", "n", "n ");
-    private static final Map<String, Boolean> readynessIndicator = new HashMap<>();
+    transient private static final List<String> readyPhrase = Arrays.asList("r", "rdy", "ready");
+    transient private static final List<String> negator = Arrays.asList("not ", "not", "n", "n ");
+    transient private static final Map<String, Boolean> readynessIndicator = new HashMap<>();
 
     static {
         readyPhrase.forEach(val -> readynessIndicator.put(val, true));

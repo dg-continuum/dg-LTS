@@ -72,8 +72,8 @@ public class FeatureSoulRoomWarning extends SingleTextHud {
         return warning > System.currentTimeMillis();
     }
 
-    private UUID lastRoomUID = UUID.randomUUID();
-    private long warning = 0;
+    transient private UUID lastRoomUID = UUID.randomUUID();
+    transient private long warning = 0;
 
     @Override
     protected String getText(boolean example) {

@@ -786,15 +786,14 @@ public class DgOneCongifConfig extends Config {
     public static boolean renderSecretDestText = true;
 
 
-    //    THETA_STAR("The default pathfinding algorithm. It will generate sub-optimal path quickly."),
+//    THETA_STAR("The default pathfinding algorithm. It will generate sub-optimal path quickly."),
 //    A_STAR_DIAGONAL("New pathfinding algorithm. It will generate path that looks like the one JPS generates"),
 //    A_STAR_FINE_GRID("New pathfinding algorithm. It will generate path that kind of looks like stair"),
-//    JPS_LEGACY("The improved pathfinding algorithm. Not suggested for usage. It will have problems on diagonal movements, thus giving wrong routes"),
-//    A_STAR_LEGACY("The first pathfinding algorithm. It may have problem on navigating through stairs. This is the one used by Minecraft for mob pathfind.")
+//    JPS_LEGACY("The improved pathfinding algorithm. Not suggested for usage. It will have problems on diagonal movements, thus giving wrong routes")
     @Dropdown(
-            description = "Select pathfind algorithm used by paths",
-            name = "Pathfind Algorithm",
-            options = {"THETA_STAR", "A_STAR_DIAGONAL", "A_STAR_FINE_GRID", "JPS_LEGACY", "A_STAR_LEGACY"},
+            description = "Select pathfinding algorithm used by paths",
+            name = "Pathfinding Algorithm",
+            options = {"THETA* (recommended)", "A* Diagonal", "A* Fine-Grid", "Jump Point Search"},
             category = "secrets",
             subcategory = "Preferences"
     )

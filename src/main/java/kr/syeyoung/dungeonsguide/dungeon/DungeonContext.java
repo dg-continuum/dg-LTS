@@ -77,7 +77,7 @@ public class DungeonContext {
     private final Set<String> players = new HashSet<>();
     @Getter
     private final List<DungeonEvent> events = new ArrayList<>();
-    static public final Rectangle roomBoundary = new Rectangle(-10, -10, 138, 138);
+    public static final Rectangle roomBoundary = new Rectangle(-10, -10, 138, 138);
     @Getter
     @Setter
     public int percentage;

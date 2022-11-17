@@ -153,7 +153,7 @@ public class DungeonListener {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent ev) {
         if (ev.side == Side.SERVER || ev.phase != TickEvent.Phase.START) return;
-
+        if (Minecraft.getMinecraft().thePlayer == null) return;
         if (!SkyblockStatus.isOnDungeon()) return;
 
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();

@@ -38,8 +38,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FeatureDungeonDeaths extends TextHud {
-    final Pattern deathPattern = Pattern.compile("§r§c ☠ (.+?)§r§7 .+and became a ghost.+");
-    final Pattern meDeathPattern = Pattern.compile("§r§c ☠ §r§7You .+and became a ghost.+");
+    transient final Pattern deathPattern = Pattern.compile("§r§c ☠ (.+?)§r§7 .+and became a ghost.+");
+    transient final Pattern meDeathPattern = Pattern.compile("§r§c ☠ §r§7You .+and became a ghost.+");
 
     public FeatureDungeonDeaths() {
         super(true);

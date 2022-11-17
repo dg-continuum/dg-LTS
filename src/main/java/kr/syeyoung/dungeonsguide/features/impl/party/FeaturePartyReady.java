@@ -129,13 +129,13 @@ public class FeaturePartyReady extends TextHud {
         }
     }
 
-    private final Set<String> ready = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    transient private final Set<String> ready = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
-    private final Map<String, String> terminal = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    private static final List<String> readyPhrase = Arrays.asList("r", "rdy", "ready");
-    private static final List<String> negator = Arrays.asList("not ", "not", "n", "n ");
-    private static final List<String> terminalPhrase = Arrays.asList("ss", "s1", "1", "2b", "2t", "3", "4", "s3", "s4", "s2", "2");
-    private static final Map<String, Boolean> readynessIndicator = new HashMap<>();
+    transient private final Map<String, String> terminal = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    transient private static final List<String> readyPhrase = Arrays.asList("r", "rdy", "ready");
+    transient private static final List<String> negator = Arrays.asList("not ", "not", "n", "n ");
+    transient private static final List<String> terminalPhrase = Arrays.asList("ss", "s1", "1", "2b", "2t", "3", "4", "s3", "s4", "s2", "2");
+    transient private static final Map<String, Boolean> readynessIndicator = new HashMap<>();
 
     static {
         readyPhrase.forEach(val -> readynessIndicator.put(val, true));

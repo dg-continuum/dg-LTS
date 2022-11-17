@@ -23,8 +23,8 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.actions.*;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.NodeProcessorDungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -104,8 +104,8 @@ public class DungeonSecret implements DungeonMechanic {
                 for (int i = 0; i < player.distanceTo(pos); i++) {
                     Vec3 vec = player.addVector(vec3.xCoord * i, vec3.yCoord * i, vec3.zCoord * i);
                     BlockPos bpos = new BlockPos(vec);
-                    IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(bpos);
-                    if (!NodeProcessorDungeonRoom.isValidBlock(blockState))
+                    IBlockState blockState = BlockCache.getBlockState(bpos);
+                    if (!DungeonRoom.isValidBlock(blockState))
                         return;
                 }
                 dungeonRoom.getRoomContext().put("i-" + pos, true);
@@ -163,7 +163,7 @@ public class DungeonSecret implements DungeonMechanic {
                     Vec3 vec = player.addVector(vec3.xCoord * i, vec3.yCoord * i, vec3.zCoord * i);
                     BlockPos bpos = new BlockPos(vec);
                     IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(bpos);
-                    if (!NodeProcessorDungeonRoom.isValidBlock(blockState))
+                    if (!DungeonRoom.isValidBlock(blockState))
                         return SecretStatus.NOT_SURE;
                 }
                 dungeonRoom.getRoomContext().put("i-" + pos, true);

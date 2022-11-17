@@ -25,7 +25,6 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMoveNearestAir
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.NodeProcessorDungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonAddSet
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit
@@ -341,7 +340,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
 
     override fun onBlockUpdate(blockUpdateEvent: BlockUpdateEvent) {
         for (updatedBlock in blockUpdateEvent.updatedBlocks) {
-            if (updatedBlock.second == NodeProcessorDungeonRoom.preBuilt) continue
+            if (updatedBlock.second == DungeonRoom.preBuilt) continue
             dungeonRoom.resetBlock(updatedBlock.first)
         }
     }

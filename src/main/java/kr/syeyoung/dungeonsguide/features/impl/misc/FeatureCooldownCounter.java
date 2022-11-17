@@ -15,7 +15,7 @@ public class FeatureCooldownCounter extends SingleTextHud {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private long leftDungeonTime = 0L;
+    transient private long leftDungeonTime = 0L;
     @Override
     protected boolean shouldShow() {
         return System.currentTimeMillis() - leftDungeonTime < 20000;

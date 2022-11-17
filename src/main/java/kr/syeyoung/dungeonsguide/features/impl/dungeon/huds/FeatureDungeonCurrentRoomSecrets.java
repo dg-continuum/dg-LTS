@@ -25,8 +25,8 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class FeatureDungeonCurrentRoomSecrets extends SingleTextHud {
-    private int latestCurrSecrets = 0;
-    private int latestTotalSecrets = 0;
+    transient private int latestCurrSecrets = 0;
+    transient private int latestTotalSecrets = 0;
 
     public FeatureDungeonCurrentRoomSecrets() {
 //        super("Dungeon.HUDs",

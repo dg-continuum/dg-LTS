@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import org.joml.Vector3d;
 
 import java.util.HashSet;
 import java.util.List;
@@ -48,14 +48,14 @@ public class ActionMove extends AbstractAction {
 
     private OffsetPoint target;
     private int tick = -1;
-    private List<Vec3> poses;
-    private Future<List<Vec3>> latestFuture;
+    private List<Vector3d> poses;
+    private Future<List<Vector3d>> latestFuture;
 
     public ActionMove(OffsetPoint target) {
         this.target = target;
     }
 
-    static void draw(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag, OffsetPoint target, List<Vec3> poses) {
+    static void draw(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag, OffsetPoint target, List<Vector3d> poses) {
         BlockPos pos = target.getBlockPos(dungeonRoom);
 
         float distance = MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()));
@@ -110,14 +110,14 @@ public class ActionMove extends AbstractAction {
 
         if (tick == 0 && actionRouteProperties.isPathfind() && latestFuture == null) {
             if (!DgOneCongifConfig.freezePathfindingStatus || poses == null) {
-                latestFuture = dungeonRoom.createEntityPathTo(dungeonRoom.getContext().getWorld(), Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom), Integer.MAX_VALUE, 10000);
+                latestFuture = dungeonRoom.createEntityPathTo(Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom));
             }
         }
     }
 
     public void forceRefresh(DungeonRoom dungeonRoom) {
         if (latestFuture == null) {
-            latestFuture = dungeonRoom.createEntityPathTo(dungeonRoom.getContext().getWorld(), Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom), Integer.MAX_VALUE, 10000);
+            latestFuture = dungeonRoom.createEntityPathTo(Minecraft.getMinecraft().thePlayer, target.getBlockPos(dungeonRoom));
         }
     }
 

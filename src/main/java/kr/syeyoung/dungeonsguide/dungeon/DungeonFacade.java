@@ -8,14 +8,12 @@ import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Setter;
 import lombok.val;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import org.joml.Vector3d;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,25 +57,24 @@ public class DungeonFacade {
         }
     }
 
-    private final Map<Vec3, ThetaStar> activeThetaStar = new HashMap<>();
 
     public float calculatePathLenght(BlockPos from, BlockPos to, DungeonRoom r){
         float distance = -1;
-        Vec3 fromv3 = new Vec3(from.getX(), from.getY(), from.getZ());
-        Vec3 tov3 = new Vec3(to.getX(), to.getY(), to.getZ());
+        Vector3d fromv3 = new Vector3d(from.getX(), from.getY(), from.getZ());
+        Vector3d tov3 = new Vector3d(to.getX(), to.getY(), to.getZ());
         val a = genPathfind(fromv3, tov3, r);
-        List<Vec3> b = null;
+        List<Vector3d> b;
         try {
             b = a.get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
 
-        Vec3 last = null;
-        for (Iterator<Vec3> iterator = b.iterator(); iterator.hasNext(); ) {
-            Vec3 vec3 = iterator.next();
+        Vector3d last = null;
+        for (Iterator<Vector3d> iterator = b.iterator(); iterator.hasNext(); ) {
+            Vector3d vec3 = iterator.next();
             if(last != null){
-                distance += vec3.distanceTo(last);
+                distance += vec3.distance(last);
             }
             last = vec3;
         }
@@ -86,13 +83,10 @@ public class DungeonFacade {
     }
 
 
-    Future<List<Vec3>> genPathfind(Vec3 from, Vec3 to, DungeonRoom room){
+    Future<List<Vector3d>> genPathfind(Vector3d from, Vector3d to, DungeonRoom room){
         return ex.submit(() -> {
-            BlockPos poss = new BlockPos(from);
-            ThetaStar pathFinder =
-                    activeThetaStar.computeIfAbsent(from, pos -> new ThetaStar(room,new Vec3(poss.getX(), poss.getY(), poss.getZ())
-                            .addVector(0.5, 0.5, 0.5)));
-            pathFinder.pathfind(to, 100);
+            ThetaStar pathFinder = new ThetaStar(room);
+            pathFinder.pathfind(from, to,100);
             return pathFinder.getRoute();
         });
     }

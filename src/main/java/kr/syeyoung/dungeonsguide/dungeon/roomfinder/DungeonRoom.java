@@ -29,28 +29,21 @@ import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonStateChangeEvent;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.DungeonRoomAccessor;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.NodeProcessorDungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.AStarCornerCut;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.AStarFineGrid;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.JPSPathfinder;
-import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
+import kr.syeyoung.dungeonsguide.dungeon.pathfinding.PfJob;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
-import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.val;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.pathfinding.PathFinder;
-import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
-import net.minecraft.world.IBlockAccess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,16 +51,23 @@ import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Getter
 public class DungeonRoom implements DungeonRoomAccessor {
+    public static final Set<Block> allowed = Sets.newHashSet(Blocks.air, Blocks.water, Blocks.lava, Blocks.flowing_water, Blocks.flowing_lava, Blocks.vine, Blocks.ladder
+            , Blocks.standing_sign, Blocks.wall_sign, Blocks.trapdoor, Blocks.iron_trapdoor, Blocks.wooden_button, Blocks.stone_button, Blocks.fire,
+            Blocks.torch, Blocks.rail, Blocks.golden_rail, Blocks.activator_rail, Blocks.detector_rail, Blocks.carpet, Blocks.redstone_torch);
+    public static final IBlockState preBuilt = Blocks.stone.getStateFromMeta(2);
     private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 16), new Vector2d(0, -16), new Vector2d(16, 0), new Vector2d(-16, 0));
     private static final float playerWidth = 0.3f;
     private final List<Point> unitPoints;
     private final short shape;
     private final byte color;
+
+    public static boolean isValidBlock(IBlockState state) {
+        return state.equals(preBuilt) || allowed.contains(state.getBlock());
+    }
 
     public BlockPos getMin() {
         return min;
@@ -85,11 +85,6 @@ public class DungeonRoom implements DungeonRoomAccessor {
     private final List<DungeonDoor> doors = new ArrayList<>();
     private final int unitWidth; // X
     private final int unitHeight; // Z
-    private final Map<BlockPos, AStarFineGrid> activeBetterAStar = new HashMap<>();
-    private final Map<BlockPos, AStarCornerCut> activeBetterAStarCornerCut = new HashMap<>();
-    private final Map<BlockPos, ThetaStar> activeThetaStar = new HashMap<>();
-    @Getter
-    private final NodeProcessorDungeonRoom nodeProcessorDungeonRoom;
 
     public Map<String, Object> getRoomContext() {
         return roomContext;
@@ -163,7 +158,6 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
         buildDoors(doorsAndStates);
         buildRoom();
-        nodeProcessorDungeonRoom = new NodeProcessorDungeonRoom(this);
         updateRoomProcessor();
     }
 
@@ -184,74 +178,25 @@ public class DungeonRoom implements DungeonRoomAccessor {
         this.currentState = currentState;
     }
 
-    public Future<List<Vec3>> createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, BlockPos targetPos, float dist, int timeout) {
+    public Future<List<org.joml.Vector3d>> createEntityPathTo(Entity entityIn, BlockPos targetPos) {
 
-        switch (DgOneCongifConfig.secretPathfindStrategy){
-            case 0:
-                return DungeonFacade.INSTANCE.ex.submit(() -> {
-                    ThetaStar pathFinder =
-                            activeThetaStar.computeIfAbsent(targetPos, pos -> new ThetaStar(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
-                    pathFinder.pathfind(entityIn.getPositionVector(), timeout);
-                    return pathFinder.getRoute();
-                });
+        return DungeonFacade.INSTANCE.ex.submit(() -> {
+            try {
+                Vec3 positionVector = entityIn.getPositionVector();
 
-            case 1:
-                return DungeonFacade.INSTANCE.ex.submit(() -> {
-                    try {
-                        Vec3 positionVector = entityIn.getPositionVector();
-                        org.joml.Vector3d from = new org.joml.Vector3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord);
+                val pfjob = new PfJob(
+                        new org.joml.Vector3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord),
+                        new org.joml.Vector3d(targetPos.getX(), targetPos.getY(), targetPos.getZ()).add(.5, .5, .5),
+                        this
+                );
 
-                        org.joml.Vector3d to = new org.joml.Vector3d(targetPos.getX(), targetPos.getY(), targetPos.getZ()).add(.5, .5, .5);
+                return DungeonFacade.INSTANCE.getCachedPathFinder().pathFind(pfjob).getPath();
 
-                        LinkedList<org.joml.Vector3d> path = DungeonFacade.INSTANCE.getCachedPathFinder().pathFind(from, to, this).get().getPath();
-
-                        List<Vec3> realPaht = new LinkedList<>();
-
-                        for (org.joml.Vector3d vector3d : path) {
-                            realPaht.add(new Vec3(vector3d.x, vector3d.y, vector3d.z));
-                        }
-
-                        return realPaht;
-
-                    } catch (InterruptedException | ExecutionException | NullPointerException e) {
-                        e.printStackTrace();
-                    }
-                    throw null;
-                });
-
-            case 2:
-                return DungeonFacade.INSTANCE.ex.submit(() -> {
-                    AStarFineGrid pathFinder =
-                            activeBetterAStar.computeIfAbsent(targetPos, pos -> new AStarFineGrid(this, new Vec3(pos.getX(), pos.getY(), pos.getZ()).addVector(0.5, 0.5, 0.5)));
-                    pathFinder.pathfind(entityIn.getPositionVector(), timeout);
-                    return pathFinder.getRoute();
-                });
-            case 3:
-
-                return DungeonFacade.INSTANCE.ex.submit(() -> {
-                    JPSPathfinder pathFinder = new JPSPathfinder(this);
-                    pathFinder.pathfind(entityIn.getPositionVector(), new Vec3(targetPos).addVector(0.5, 0.5, 0.5), 1.5f, timeout);
-                    return pathFinder.getRoute();
-                });
-
-
-
-            default:
-                return DungeonFacade.INSTANCE.ex.submit(() -> {
-                    PathFinder pathFinder = new PathFinder(nodeProcessorDungeonRoom);
-                    PathEntity latest = pathFinder.createEntityPathTo(blockaccess, entityIn, targetPos, dist);
-                    if (latest != null) {
-                        List<Vec3> poses = new ArrayList<>();
-                        for (int i = 0; i < latest.getCurrentPathLength(); i++) {
-                            PathPoint pathPoint = latest.getPathPointFromIndex(i);
-                            poses.add(new Vec3(getMin().add(pathPoint.xCoord, pathPoint.yCoord, pathPoint.zCoord)).addVector(0.5, 0.5, 0.5));
-                        }
-                        return poses;
-                    }
-                    return new ArrayList<>();
-                });
-
-        }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
     }
 
 
@@ -351,7 +296,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
                     Block b = iblockstate1.getBlock();
                     if (!b.getMaterial().blocksMovement()) continue;
                     if (b.isFullCube() && i2 == k - 1) continue;
-                    if (iblockstate1.equals(NodeProcessorDungeonRoom.preBuilt)) continue;
+                    if (iblockstate1.equals(preBuilt)) continue;
                     if (b.isFullCube()) {
                         theBit |= (3L << bitStart);
                         arr[location] = theBit;
@@ -362,7 +307,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
                     } catch (Exception e) {
                         return true;
                     }
-                    if (list.size() > 0) {
+                    if (!list.isEmpty()) {
                         theBit |= (3L << bitStart);
                         arr[location] = theBit;
                         return true;

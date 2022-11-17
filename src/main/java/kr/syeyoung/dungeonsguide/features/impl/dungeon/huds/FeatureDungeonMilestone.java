@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.util.regex.Pattern;
 
 public class FeatureDungeonMilestone extends SingleTextHud {
-    public static final Pattern milestone_pattern = Pattern.compile("§r§e§l(.+) Milestone §r§e(.)§r§7: .+ §r§a(.+)§r");
+    transient public static final Pattern milestone_pattern = Pattern.compile("§r§e§l(.+) Milestone §r§e(.)§r§7: .+ §r§a(.+)§r");
 
     public FeatureDungeonMilestone() {
         super("Milestone", true);
