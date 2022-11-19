@@ -1,21 +1,8 @@
-<p align="center">
-<a href="https://github.com/cyoung06/Skyblock-Dungeons-Guide/releases" target="_blank">
-<img alt="release" src="https://img.shields.io/github/v/release/cyoung06/Skyblock-Dungeons-Guide?color=00FFFF&style=for-the-badge" />
-</a>
-<a href="https://github.com/cyoung06/Skyblock-Dungeons-Guide/releases" target="_blank">
-<img alt="downloads" src="https://img.shields.io/github/downloads/cyoung06/Skyblock-Dungeons-Guide/total?color=00FFFF&style=for-the-badge" />
-</a>
-<a href="https://github.com/cyoung06/Skyblock-Dungeons-Guide/blob/master/LICENSE">
-    <img alt="license" src="https://img.shields.io/github/license/cyoung06/Skyblock-Dungeons-Guide?color=00FFFF&style=for-the-badge">
- </a>
-  <a href="https://github.com/cyoung06/Skyblock-Dungeons-Guide/">
-    <img alt="lines" src="https://img.shields.io/tokei/lines/github/cyoung06/Skyblock-Dungeons-Guide?color=00FFFF&style=for-the-badge">
- </a>
-    <a href="https://discord.gg/vuGsXhY5Bv" target="_blank">
-    <img alt="discord" src="https://img.shields.io/discord/781913473872560189?color=00FFFF&label=discord&style=for-the-badge" />
-  </a>
- </p>
- 
+![licence](https://img.shields.io/github/license/dg-continuum/dg-LTS?style=flat)
+![release](https://img.shields.io/github/v/release/dg-continuum/dg-LTS?style=flat&color=0xFF0000)
+![line-count](https://img.shields.io/tokei/lines/github/dg-continuum/dg-LTS?color=0xFF0000)
+![Discord](https://img.shields.io/discord/1038927303733940225?color=4C58D3&label=discord)
+
 # Dungeons Guide
 The most intelligent Hypixel Skyblock Dungeons Mod.
 ## Official Support Discord
@@ -68,8 +55,6 @@ Join Our [Discord!](https://discord.gg/sNVagTGPEX)
 - **Broken Crypts Indicator** (Same as what Tab-list shows, but without pressing the tab.)
 - **Current Milestone Indicator** (Shows the current milestone you have achieved.)
 
-### Assorted Other Features
-- **Discord Rich Presence** (Shows basic information in DRP. Supports ask to join.)
 
 ## Bannable
 Features such as **Secret Finder** are allowed under Hypixel rules as the waypoints are based on a static set of coordinates from a corner of the room a player is in. This is similar to fairy soul waypoints (which Simon has confirmed are allowed) since it is not scanning for the secrets but rather displaying a waypoint over a set coordinate. Dungeon Guide itself has been confirmed allowed on hypixel by an [admin](https://media.discordapp.net/attachments/781913473872560194/867454697387065354/image0.png)
