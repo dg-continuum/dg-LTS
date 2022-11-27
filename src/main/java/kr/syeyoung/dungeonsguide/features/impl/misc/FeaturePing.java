@@ -50,7 +50,7 @@ public class FeaturePing extends SingleTextHud {
     transient Long averagePing = 0L;
     transient private long whenWasPingLocked;
 
-    transient static final int TIMEOUT_THRESHOLD = 330;
+    transient static final int TIMEOUT_THRESHOLD = 350;
 
     transient boolean lastTimeOutStatus;
 
@@ -68,7 +68,7 @@ public class FeaturePing extends SingleTextHud {
     public void onTick(TickEvent.ClientTickEvent e){
         if(e.phase != TickEvent.Phase.START || e.side != Side.CLIENT) return;
         if(System.currentTimeMillis() - PacketListener.lastPacketReceived > TIMEOUT_THRESHOLD){
-            if(!lastTimeOutStatus){
+            if(!lastTimeOutStatus && !Minecraft.getMinecraft().isSingleplayer()){
                 TitleRender.displayTitle("", "§cServer stopped responding", 0,50000, 8);
             }
             lastTimeOutStatus = true;
