@@ -74,9 +74,11 @@ public class ActionMove extends AbstractAction {
         }
         RenderUtils.drawTextAtWorld(String.format("%.2f", MathHelper.sqrt_double(pos.distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) + "m", pos.getX() + 0.5f, pos.getY() + 0.5f - scale, pos.getZ() + 0.5f, 0xFFFFFF00, flag ? 2f : 1f, true, false, partialTicks);
 
-        if ((DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().get(0) != UKeyboard.KEY_NONE) || !DgOneCongifConfig.togglePathfindStatus) {
-            if (poses != null) {
-                RenderUtils.drawLinesVec3(poses, actionRouteProperties.getLineColor(), actionRouteProperties.getLineWidth(), partialTicks, true);
+        if(!DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().isEmpty()){
+            if ((DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().get(0) != UKeyboard.KEY_NONE) || !DgOneCongifConfig.togglePathfindStatus) {
+                if (poses != null) {
+                    RenderUtils.drawLinesVec3(poses, actionRouteProperties.getLineColor(), actionRouteProperties.getLineWidth(), partialTicks, true);
+                }
             }
         }
     }
