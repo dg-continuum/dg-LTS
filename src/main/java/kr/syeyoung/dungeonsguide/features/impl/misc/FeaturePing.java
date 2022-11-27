@@ -1,12 +1,13 @@
 package kr.syeyoung.dungeonsguide.features.impl.misc;
 
 import cc.polyfrost.oneconfig.config.annotations.Exclude;
+import cc.polyfrost.oneconfig.config.annotations.Slider;
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import kr.syeyoung.dungeonsguide.utils.SimpleLock;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.events.PacketListener;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.SimpleLock;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TitleRender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerAddress;
@@ -49,6 +50,13 @@ public class FeaturePing extends SingleTextHud {
     transient ArrayList<Long> averagePingStore = new ArrayList<>();
     transient Long averagePing = 0L;
     transient private long whenWasPingLocked;
+
+    @Slider(
+            name = "Delay bettwen Pings",
+            min = 2,
+            max = 20
+    )
+    public static long pingtimeout = 4;
 
     transient static final int TIMEOUT_THRESHOLD = 350;
 
@@ -124,7 +132,7 @@ public class FeaturePing extends SingleTextHud {
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
-        }, 10,1000, TimeUnit.MILLISECONDS);
+        }, 10,4 * 1000, TimeUnit.MILLISECONDS);
     }
 
 
