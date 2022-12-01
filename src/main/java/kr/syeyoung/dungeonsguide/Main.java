@@ -18,14 +18,9 @@
 
 package kr.syeyoung.dungeonsguide;
 
-import kr.syeyoung.dungeonsguide.auth.AuthManager;
-import kr.syeyoung.dungeonsguide.auth.InvalidDungeonsGuideCredentialsException;
-import kr.syeyoung.dungeonsguide.auth.ResourceManager;
-import kr.syeyoung.dungeonsguide.mod.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.url.DGStreamHandlerFactory;
+import cc.polyfrost.oneconfig.events.EventManager;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -40,39 +35,26 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 @Mod(modid = Main.MOD_ID, version = Main.VERSION)
 public class Main {
 
-    public static final String MOD_ID = "skyblock_dungeons_guide";
-    public static final String VERSION = "3.8.0";
-    Logger logger = LogManager.getLogger("DG-main");
+    @Mod.Instance(MOD_ID)
+    public Main INSTANCE;
+
+    public static final String MOD_ID = "@ID@";
+    public static final String NAME = "@NAME@";
+    public static final String VERSION = "@VER@";
+
+    final Logger logger = LogManager.getLogger("DG-main");
 
 
-    IDungeonGuide dgInstance;
+    static final DungeonsGuide dgInstance = new DungeonsGuide();
 
     private boolean isLoaded = false;
 
-
-    public static final String SERVER_URL = "https://dungeons.guide";
-    public static final String SOME_FUNNY_KEY_THING = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxO89qtwG67jNucQ9Y44c" +
-            "IUs/B+5BeJPs7G+RG2gfs4/2+tzF/c1FLDc33M7yKw8aKk99vsBUY9Oo8gxxiEPB" +
-            "JitP/qfon2THp94oM77ZTpHlmFoqbZMcKGZVI8yfvEL4laTM8Hw+qh5poQwtpEbK" +
-            "Xo47AkxygxJasUnykER2+aSTZ6kWU2D4xiNtFA6lzqN+/oA+NaYfPS0amAvyVlHR" +
-            "n/8IuGkxb5RrlqVssQstFnxsJuv88qdGSEqlcKq2tLeg9hb8eCnl2OFzvXmgbVER" +
-            "0JaV+4Z02fVG1IlR3Xo1mSit7yIU6++3usRCjx2yfXpnGGJUW5pe6YETjNew3ax+" +
-            "FAZ4GePWCdmS7FvBnbbABKo5pE06ZTfDUTCjQlAJQiUgoF6ntMJvQAXPu48Vr8q/" +
-            "mTcuZWVnI6CDgyE7nNq3WNoq3397sBzxRohMxuqzl3T19zkfPKF05iV2Ju1HQMW5" +
-            "I119bYrmVD240aGESZc20Sx/9g1BFpNzQbM5PGUlWJ0dhLjl2ge4ip2hHciY3OEY" +
-            "p2Qy2k+xEdenpKdL+WMRimCQoO9gWe2Tp4NmP5dppDXZgPjXqjZpnGs0Uxs+fXqW" +
-            "cwlg3MbX3rFl9so/fhVf4p9oXZK3ve7z5D6XSSDRYECvsKIa08WAxJ/U6n204E/4" +
-            "xUF+3ZgFPdzZGn2PU7SsnOsCAwEAAQ==";
     @EventHandler
     public void initEvent(final FMLInitializationEvent initializationEvent) {
-        MinecraftForge.EVENT_BUS.register(this);
         try {
             logger.info("init-ing DungeonsGuide");
             dgInstance.init();
@@ -93,62 +75,30 @@ public class Main {
 
     }
 
-
     @Getter
     static File configDir;
 
     @EventHandler
     public void preInit(final FMLPreInitializationEvent preInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(new YoMamaOutdated());
+        MinecraftForge.EVENT_BUS.register(this);
 
-        ProgressManager.ProgressBar progressBar = null;
-
-        try {
-            try (InputStream premiumControlClass = this.getClass().getResourceAsStream("/kr/syeyoung/dungeonsguide/e.class")) {
-                progressBar = ProgressManager.push("DungeonsGuide", premiumControlClass == null ? 7 : 6);
-            }
-
-            AuthManager.getInstance().setBaseserverurl(SERVER_URL);
-            AuthManager.getInstance().init();
+        ProgressManager.ProgressBar progressBar = ProgressManager.push("DungeonsGuide", 2);
 
 
-            configDir = new File(preInitializationEvent.getModConfigurationDirectory(), "dungeonsguide");
+        configDir = new File(preInitializationEvent.getModConfigurationDirectory(), "dungeonsguide");
 
 
-            String version = null;
-            try (InputStream resourceAsStream = this.getClass().getResourceAsStream("/kr/syeyoung/dungeonsguide/DungeonsGuide.class")) {
-                if (resourceAsStream == null) {
-                    if (System.getProperty("dg.version") == null) {
-                        version = "nlatest";
-                    } else {
-                        version = System.getProperty("dg.version");
-                    }
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            ResourceManager.getInstance().setBaseUrl(Main.SERVER_URL);
-            ResourceManager.getInstance().setBASE64_X509ENCODEDKEYSPEC(Main.SOME_FUNNY_KEY_THING);
+        progressBar.step("Initializing");
 
-            if(!AuthManager.getInstance().isPlebUser() && version != null){
-                ResourceManager.getInstance().downloadAssets(version);
-            }
+        EventManager.INSTANCE.register(dgInstance);
+        MinecraftForge.EVENT_BUS.register(dgInstance);
 
-            URL.setURLStreamHandlerFactory(new DGStreamHandlerFactory());
-            LaunchClassLoader classLoader = (LaunchClassLoader) Main.class.getClassLoader();
-            classLoader.addURL(new URL("z:///"));
+        dgInstance.preinit();
 
-            progressBar.step("Initializing");
+        finishUpProgressBar(progressBar);
+        isLoaded = true;
 
-            dgInstance = new DungeonsGuide();
-            dgInstance.preinit();
-
-            finishUpProgressBar(progressBar);
-            isLoaded = true;
-
-        } catch (IOException | InvalidDungeonsGuideCredentialsException e) {
-            handleException(e, progressBar);
-        }
     }
 
 

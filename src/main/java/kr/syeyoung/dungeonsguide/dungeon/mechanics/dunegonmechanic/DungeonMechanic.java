@@ -18,9 +18,9 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic;
 
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -34,6 +34,7 @@ public interface DungeonMechanic extends Serializable {
     String getCurrentState(DungeonRoom dungeonRoom);
 
     Set<String> getPossibleStates(DungeonRoom dungeonRoom);
+
     Set<String> getTotalPossibleStates(DungeonRoom dungeonRoom);
 
     OffsetPoint getRepresentingPoint(DungeonRoom dungeonRoom);

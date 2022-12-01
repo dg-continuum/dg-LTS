@@ -19,18 +19,18 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.ActionChangeState;
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.ActionMoveNearestAir;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.List;
@@ -40,14 +40,14 @@ import java.util.*;
 public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
     private static final long serialVersionUID = -1810891721127873330L;
     private OffsetPointSet secretPoint = new OffsetPointSet();
-    private List<String> preRequisite = new ArrayList<String>();
+    private List<String> preRequisite = new ArrayList<>();
 
 
     @Override
     public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
         if (state.equalsIgnoreCase("navigate")) {
             Set<AbstractAction> base;
-            Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
+            Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
             preRequisites = actionMove.getPreRequisite();
@@ -58,18 +58,17 @@ public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
             }
             return base;
         }
-        if (!("open".equalsIgnoreCase(state))) throw new IllegalArgumentException(state+" is not valid state for door");
+        if (!("open".equalsIgnoreCase(state)))
+            throw new IllegalArgumentException(state + " is not valid state for door");
         if (!isBlocking(dungeonRoom)) {
             return Collections.emptySet();
         }
         Set<AbstractAction> base;
-        Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
-        {
-            for (String str : preRequisite) {
-                if (str.isEmpty()) continue;
-                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
-                preRequisites.add(actionChangeState);
-            }
+        Set<AbstractAction> preRequisites = base = new HashSet<>();
+        for (String str : preRequisite) {
+            if (str.isEmpty()) continue;
+            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+            preRequisites.add(actionChangeState);
         }
         return base;
     }
@@ -78,12 +77,12 @@ public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
         if (secretPoint.getOffsetPointList().isEmpty()) return;
         OffsetPoint firstpt = secretPoint.getOffsetPointList().get(0);
-        BlockPos pos = firstpt.getBlockPos(dungeonRoom);
-        RenderUtils.drawTextAtWorld(name, pos.getX() +0.5f, pos.getY()+0.75f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() +0.5f, pos.getY()+0.25f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        Vector3i pos = firstpt.getVector3i(dungeonRoom);
+        RenderUtils.drawTextAtWorld(name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.x + 0.5f, pos.y + 0.25f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
 
         for (OffsetPoint offsetPoint : secretPoint.getOffsetPointList()) {
-            RenderUtils.highlightBlock(offsetPoint.getBlockPos(dungeonRoom), color,partialTicks);
+            RenderUtils.highlightBlock(offsetPoint.getVector3i(dungeonRoom), color, partialTicks);
         }
     }
 
@@ -98,13 +97,13 @@ public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
     public DungeonOnewayDoor clone() throws CloneNotSupportedException {
         DungeonOnewayDoor dungeonSecret = new DungeonOnewayDoor();
         dungeonSecret.secretPoint = (OffsetPointSet) secretPoint.clone();
-        dungeonSecret.preRequisite = new ArrayList<String>(preRequisite);
+        dungeonSecret.preRequisite = new ArrayList<>(preRequisite);
         return dungeonSecret;
     }
 
     @Override
     public String getCurrentState(DungeonRoom dungeonRoom) {
-        return isBlocking(dungeonRoom) ?"closed":"open";
+        return isBlocking(dungeonRoom) ? "closed" : "open";
     }
 
 
@@ -115,6 +114,7 @@ public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
             return Sets.newHashSet("navigate", "open");
         return Sets.newHashSet("navigate");
     }
+
     @Override
     public Set<String> getTotalPossibleStates(DungeonRoom dungeonRoom) {
         return Sets.newHashSet("open", "closed");

@@ -19,13 +19,17 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.*;
+import kr.syeyoung.dungeonsguide.dungeon.actions.*;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionClick;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.List;
@@ -33,8 +37,8 @@ import java.util.*;
 
 @Data
 public class DungeonLever implements DungeonMechanic {
-    private OffsetPoint leverPoint = new OffsetPoint(0,0,0);
-    private List<String> preRequisite = new ArrayList<String>();
+    private OffsetPoint leverPoint = new OffsetPoint(0, 0, 0);
+    private List<String> preRequisite = new ArrayList<>();
     private String triggering = "";
 
     @Override
@@ -42,7 +46,7 @@ public class DungeonLever implements DungeonMechanic {
         if (state.equals(getCurrentState(dungeonRoom))) return Collections.emptySet();
         if (state.equalsIgnoreCase("navigate")) {
             Set<AbstractAction> base;
-            Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
+            Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
             preRequisites = actionMove.getPreRequisite();
@@ -54,52 +58,50 @@ public class DungeonLever implements DungeonMechanic {
             return base;
         }
 
-        if (!("triggered".equalsIgnoreCase(state) || "untriggered".equalsIgnoreCase(state))) throw new IllegalArgumentException(state+" is not valid state for secret");
-        Set<AbstractAction> base;
-        Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
-        if (!state.equalsIgnoreCase(getCurrentState(dungeonRoom))){
-            ActionClick actionClick;
-            preRequisites.add(actionClick = new ActionClick(leverPoint));
+        if (!("triggered".equalsIgnoreCase(state) || "untriggered".equalsIgnoreCase(state)))
+            throw new IllegalArgumentException(state + " is not valid state for secret");
+        Set<AbstractAction> base = new HashSet<>();
+        Set<AbstractAction> preRequisites = new HashSet<>();
+        if (!state.equalsIgnoreCase(getCurrentState(dungeonRoom))) {
+            ActionClick actionClick = new ActionClick(leverPoint);
+            preRequisites.add(actionClick);
             preRequisites = actionClick.getPreRequisite();
         }
-        {
-            ActionMove actionMove = new ActionMove(leverPoint);
-            preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
-        }
-        {
-            for (String str : preRequisite) {
-                if (str.isEmpty()) continue;
-                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
-                preRequisites.add(actionChangeState);
-            }
+        ActionMove actionMove = new ActionMove(leverPoint);
+        preRequisites.add(actionMove);
+        preRequisites = actionMove.getPreRequisite();
+        for (String str : preRequisite) {
+            if (str.isEmpty()) continue;
+            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+            preRequisites.add(actionChangeState);
         }
         return base;
     }
 
     @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
-        BlockPos pos = getLeverPoint().getBlockPos(dungeonRoom);
-        RenderUtils.highlightBlock(pos, color,partialTicks);
-        RenderUtils.drawTextAtWorld(name, pos.getX() +0.5f, pos.getY()+0.75f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() +0.5f, pos.getY()+0.25f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        Vector3i pos = getLeverPoint().getVector3i(dungeonRoom);
+        RenderUtils.highlightBlock(pos, color, partialTicks);
+        RenderUtils.drawTextAtWorld(name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.x + 0.5f, pos.y + 0.25f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
     public DungeonLever clone() throws CloneNotSupportedException {
         DungeonLever dungeonSecret = new DungeonLever();
         dungeonSecret.leverPoint = (OffsetPoint) leverPoint.clone();
         dungeonSecret.triggering = triggering;
-        dungeonSecret.preRequisite = new ArrayList<String>(preRequisite);
+        dungeonSecret.preRequisite = new ArrayList<>(preRequisite);
         return dungeonSecret;
     }
 
 
     @Override
     public String getCurrentState(DungeonRoom dungeonRoom) {
-        if (triggering == null) triggering = "null";
+        if (triggering == null) {
+            triggering = "null";
+        }
         DungeonMechanic mechanic = dungeonRoom.getMechanics().get(triggering);
-        if (mechanic == null)
-        {
+        if (mechanic == null) {
             return "undeterminable";
         } else {
             String state = mechanic.getCurrentState(dungeonRoom);
@@ -117,13 +119,15 @@ public class DungeonLever implements DungeonMechanic {
         if (currentStatus.equalsIgnoreCase("untriggered"))
             return Sets.newHashSet("navigate", "triggered");
         else if (currentStatus.equalsIgnoreCase("triggered"))
-            return Sets.newHashSet("navigate","untriggered");
+            return Sets.newHashSet("navigate", "untriggered");
         return Sets.newHashSet("navigate");
     }
+
     @Override
     public Set<String> getTotalPossibleStates(DungeonRoom dungeonRoom) {
         return Sets.newHashSet("triggered", "untriggered");
     }
+
     @Override
     public OffsetPoint getRepresentingPoint(DungeonRoom dungeonRoom) {
         return leverPoint;

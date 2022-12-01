@@ -37,6 +37,7 @@ public class PredicateBat implements Predicate<Entity> {
     public int hashCode() {
         return 0;
     }
+
     @Override
     public boolean equals(Object o) {
         return o == this || o != null && (o.getClass() == this.getClass());

@@ -19,17 +19,17 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
-import kr.syeyoung.dungeonsguide.mod.dungeon.actions.ActionChangeState;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.mod.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.mod.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.List;
@@ -45,7 +45,8 @@ public class DungeonDoor implements DungeonMechanic, RouteBlocker {
 
     @Override
     public Set<AbstractAction> getAction(String state, DungeonRoom dungeonRoom) {
-        if (!("open".equalsIgnoreCase(state) || "closed".equalsIgnoreCase(state))) throw new IllegalArgumentException(state+" is not valid state for door");
+        if (!("open".equalsIgnoreCase(state) || "closed".equalsIgnoreCase(state)))
+            throw new IllegalArgumentException(state + " is not valid state for door");
         if (state.equalsIgnoreCase(getCurrentState(dungeonRoom))) return Collections.emptySet();
         Set<AbstractAction> base;
         Set<AbstractAction> preRequisites = base = new HashSet<AbstractAction>();
@@ -71,12 +72,12 @@ public class DungeonDoor implements DungeonMechanic, RouteBlocker {
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
         if (secretPoint.getOffsetPointList().isEmpty()) return;
         OffsetPoint firstpt = secretPoint.getOffsetPointList().get(0);
-        BlockPos pos = firstpt.getBlockPos(dungeonRoom);
-        RenderUtils.drawTextAtWorld(name, pos.getX() +0.5f, pos.getY()+0.75f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() +0.5f, pos.getY()+0.25f, pos.getZ()+0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        Vector3i pos = firstpt.getVector3i(dungeonRoom);
+        RenderUtils.drawTextAtWorld(name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.x + 0.5f, pos.y + 0.25f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
 
         for (OffsetPoint offsetPoint : secretPoint.getOffsetPointList()) {
-            RenderUtils.highlightBlock(offsetPoint.getBlockPos(dungeonRoom), color,partialTicks);
+            RenderUtils.highlightBlock(offsetPoint.getVector3i(dungeonRoom), color, partialTicks);
         }
     }
 
@@ -98,7 +99,7 @@ public class DungeonDoor implements DungeonMechanic, RouteBlocker {
 
     @Override
     public String getCurrentState(DungeonRoom dungeonRoom) {
-        return isBlocking(dungeonRoom) ?"closed":"open";
+        return isBlocking(dungeonRoom) ? "closed" : "open";
     }
 
 
@@ -111,6 +112,7 @@ public class DungeonDoor implements DungeonMechanic, RouteBlocker {
             return Collections.singleton("closed");
         return Collections.emptySet();
     }
+
     @Override
     public Set<String> getTotalPossibleStates(DungeonRoom dungeonRoom) {
         return Sets.newHashSet("open", "closed");
