@@ -21,22 +21,23 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chamb
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.RoomProcessorBombDefuseSolver;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambers.BDChamber;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambers.GeneralDefuseChamberProcessor;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 
 public class CreeperLeftProcessor extends GeneralDefuseChamberProcessor {
-    private final BlockPos[] poses;
+    private final Vector3i[] poses;
     private int answer = -1;
 
 
     public CreeperLeftProcessor(RoomProcessorBombDefuseSolver solver, BDChamber chamber) {
         super(solver, chamber);
 
-        poses = new BlockPos[9];
+        poses = new Vector3i[9];
         for (int i = 0; i < 9; i++) {
             poses[i] = chamber.getBlockPos(3 + (i % 3), 1, 1 + (i / 3));
         }
@@ -53,8 +54,8 @@ public class CreeperLeftProcessor extends GeneralDefuseChamberProcessor {
         if (answer != -1) return;
         answer = 0;
         for (int i = 0; i < poses.length; i++) {
-            BlockPos pos = poses[i];
-            if (getChamber().getRoom().getContext().getWorld().getBlockState(pos).getBlock() == Blocks.air) {
+            Vector3i pos = poses[i];
+            if (BlockCache.getBlock(pos) == Blocks.air) {
                 answer |= (1 << i);
             }
         }

@@ -23,18 +23,18 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambe
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambers.GeneralDefuseChamberProcessor;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 
 public class CreeperRightProcessor extends GeneralDefuseChamberProcessor {
-    private final BlockPos[] poses;
-    private final BlockPos center;
+    private final Vector3i[] poses;
+    private final Vector3i center;
     private int answer = -1;
     public CreeperRightProcessor(RoomProcessorBombDefuseSolver solver, BDChamber chamber) {
         super(solver, chamber);
 
-        poses = new BlockPos[9];
+        poses = new Vector3i[9];
         for (int i = 0; i < 9; i++) {
             poses[i] = chamber.getBlockPos(3 + (i % 3), 1, 1 + (i / 3));
         }
@@ -54,7 +54,7 @@ public class CreeperRightProcessor extends GeneralDefuseChamberProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        RenderUtils.drawTextAtWorld(answer == -1 ? "Answer not received yet. Visit left room to obtain solution" : "", center.getX() + 0.5f, center.getY(), center.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(answer == -1 ? "Answer not received yet. Visit left room to obtain solution" : "", center.x + 0.5f, center.y, center.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
         if (answer != -1) {
             for (int i = 0; i < 9; i++) {
                 if (((answer >> i) & 0x01) == 0) {

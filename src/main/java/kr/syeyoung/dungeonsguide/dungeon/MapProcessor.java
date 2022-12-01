@@ -25,15 +25,13 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
-import kr.syeyoung.dungeonsguide.dungeon.events.SerializableBlockPos;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonRoomDiscoverEvent;
 import kr.syeyoung.dungeonsguide.dungeon.map.DungeonMapData;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.features.impl.dungeon.FeatureCollectScore;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
-import kr.syeyoung.dungeonsguide.utils.SimpleLock;
-import kr.syeyoung.dungeonsguide.utils.SimpleTimeFuse;
-import kr.syeyoung.dungeonsguide.utils.SimpleTimer;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleLock;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleTimeFuse;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleTimer;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -44,6 +42,9 @@ import net.minecraft.util.*;
 import net.minecraft.world.storage.MapData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
+import org.joml.Vector3i;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
@@ -64,7 +65,7 @@ public class MapProcessor {
     private final DungeonContext context;
     @Getter
     private final BiMap<String, String> mapIconToPlayerMap = HashBiMap.create();
-    private final List<Point> roomsFound = new ArrayList<>();
+    private final List<Vector2i> roomsFound = new ArrayList<>();
     static final Logger logger = LogManager.getLogger("MapProcessor");
     /**
      * If the player on the map is closer than value this it won't save it
@@ -178,24 +179,26 @@ public class MapProcessor {
         return new BlockPos(x, 70, y);
     }
 
-    public Point roomPointToMapPoint(Point roomPoint) {
-        return new Point(roomPoint.x * (unitRoomDimension.width + doorDimensions.height) + topLeftMapPoint.x, roomPoint.y * (unitRoomDimension.height + doorDimensions.height) + topLeftMapPoint.y);
+    public Vector2i roomPointToMapPoint(Vector2i roomPoint) {
+        return new Vector2i(roomPoint.x * (unitRoomDimension.width + doorDimensions.height) + topLeftMapPoint.x, roomPoint.y * (unitRoomDimension.height + doorDimensions.height) + topLeftMapPoint.y);
     }
 
-    public BlockPos roomPointToWorldPoint(Point roomPoint) {
-        return new BlockPos(context.getDungeonMin().getX() + (roomPoint.x * 32), context.getDungeonMin().getY(), context.getDungeonMin().getZ() + (roomPoint.y * 32));
+    public Vector3i roomPointToWorldPoint(Vector2i roomPoint) {
+        return new Vector3i(context.getDungeonMin().getX() + (roomPoint.x * 32), context.getDungeonMin().getY(), context.getDungeonMin().getZ() + (roomPoint.y * 32));
     }
-
-    public Point worldPointToRoomPoint(BlockPos worldPoint) {
+    @Nullable
+    public Vector2i worldPointToRoomPoint(Vector3i worldPoint) {
         if (context.getDungeonMin() == null) return null;
-        return new Point((worldPoint.getX() - context.getDungeonMin().getX()) / 32, (worldPoint.getZ() - context.getDungeonMin().getZ()) / 32);
+        return new Vector2i((worldPoint.x - context.getDungeonMin().getX()) / 32, (worldPoint.z - context.getDungeonMin().getZ()) / 32);
     }
 
-    public Point worldPointToMapPoint(Vec3 worldPoint) {
+    @Nullable
+    public Vector2i worldPointToMapPoint(Vec3 worldPoint) {
         if (context.getDungeonMin() == null) return null;
-        return new Point(topLeftMapPoint.x + (int) ((worldPoint.xCoord - context.getDungeonMin().getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height)), topLeftMapPoint.y + (int) ((worldPoint.zCoord - context.getDungeonMin().getZ()) / 32.0f * (unitRoomDimension.height + doorDimensions.height)));
+        return new Vector2i(topLeftMapPoint.x + (int) ((worldPoint.xCoord - context.getDungeonMin().getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height)), topLeftMapPoint.y + (int) ((worldPoint.zCoord - context.getDungeonMin().getZ()) / 32.0f * (unitRoomDimension.height + doorDimensions.height)));
     }
 
+    @Nullable
     public Vector2d worldPointToMapPointFLOAT(Vec3 worldPoint) {
         if (context.getDungeonMin() == null) return null;
         double x = topLeftMapPoint.x + ((worldPoint.xCoord - context.getDungeonMin().getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height));
@@ -210,11 +213,12 @@ public class MapProcessor {
         undiscoveredRoom = 0;
         for (int y = 0; y <= roomHeight; y++) {
             for (int x = 0; x <= roomWidth; x++) {
-                Point mapPoint = roomPointToMapPoint(new Point(x, y));
+                Vector2i o = new Vector2i(x,y);
+                Vector2i mapPoint = roomPointToMapPoint(o);
                 byte color = MapUtils.getMapColorAt(mapData, mapPoint.x, mapPoint.y);
                 MapUtils.record(mapData, mapPoint.x, mapPoint.y, new Color(255, 255, 0, 80));
-                if (roomsFound.contains(new Point(x, y))) {
-                    DungeonRoom dungeonRoom = context.getRoomMapper().get(new Point(x, y));
+                if (roomsFound.contains(o)) {
+                    DungeonRoom dungeonRoom = context.getRoomMapper().get(o);
                     if (color == 18 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.FINISHED) {
                         dungeonRoom.setCurrentState(DungeonRoom.RoomState.COMPLETE_WITHOUT_SECRETS);
                         dungeonRoom.setTotalSecrets(0);
@@ -240,11 +244,10 @@ public class MapProcessor {
                     }
                 } else if (color != 0 && color != 85) {
                     MapUtils.record(mapData, mapPoint.x, mapPoint.y, new Color(0, 255, 255, 80));
-                    DungeonRoom room = buildRoom(mapData, new Point(x, y));
+                    DungeonRoom room = buildRoom(mapData, o);
 
 
                     // USELESS DEBUG CODE
-                    context.createEvent(new DungeonRoomDiscoverEvent(room.getUnitPoints().get(0), room.getRoomMatcher().getRotation(), new SerializableBlockPos(room.getMin()), new SerializableBlockPos(room.getMax()), room.getShape(), room.getColor(), room.getDungeonRoomInfo().getUuid(), room.getDungeonRoomInfo().getName(), room.getDungeonRoomInfo().getProcessorId()));
                     ChatTransmitter.sendDebugChat(new ChatComponentText("New Map discovered! shape: " + room.getShape() + " color: " + room.getColor() + " unitPos: " + x + "," + y));
                     ChatTransmitter.sendDebugChat(new ChatComponentText("New Map discovered! mapMin: " + room.getMin() + " mapMx: " + room.getMax()));
                     StringBuilder builder = new StringBuilder();
@@ -260,7 +263,7 @@ public class MapProcessor {
 
 
                     context.getDungeonRoomList().add(room);
-                    for (Point p : room.getUnitPoints()) {
+                    for (Vector2i p : room.getUnitPoints()) {
                         roomsFound.add(p);
                         context.getRoomMapper().put(p, room);
                     }
@@ -275,18 +278,18 @@ public class MapProcessor {
         }
     }
 
-    private DungeonRoom buildRoom(byte[] mapData, Point unitPoint) {
-        Queue<Point[]> toCheck = new LinkedList<>();
-        toCheck.add(new Point[]{unitPoint, unitPoint}); // requestor, target
-        Set<Point> checked = new HashSet<>();
-        List<Point> ayConnected = new ArrayList<>();
+    private DungeonRoom buildRoom(byte[] mapData, Vector2i unitPoint) {
+        Queue<Vector2i[]> toCheck = new LinkedList<>();
+        toCheck.add(new Vector2i[]{unitPoint, unitPoint}); // requestor, target
+        Set<Vector2i> checked = new HashSet<>();
+        List<Vector2i> ayConnected = new ArrayList<>();
 
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;
         int maxX = 0;
         int maxY = 0;
         while (toCheck.peek() != null) {
-            Point[] check = toCheck.poll();
+            Vector2i[] check = toCheck.poll();
             if (checked.contains(check[1])) {
                 continue;
             }
@@ -299,27 +302,27 @@ public class MapProcessor {
                 if (check[1].x > maxX) maxX = check[1].x;
                 if (check[1].y > maxY) maxY = check[1].y;
                 for (Vector2d dir : directions) {
-                    Point newPt = new Point(check[1].x + (int) dir.x, check[1].y + (int) dir.y);
-                    toCheck.add(new Point[]{check[1], newPt});
+                    Vector2i newPt = new Vector2i(check[1].x + (int) dir.x, check[1].y + (int) dir.y);
+                    toCheck.add(new Vector2i[]{check[1], newPt});
                 }
             }
         }
 
         short shape = 0;
-        for (Point p : ayConnected) {
+        for (Vector2i p : ayConnected) {
             int localX = p.x - minX;
             int localY = p.y - minY;
             shape |= 1 << (localY * 4 + localX);
         }
         Set<Vector2d> doors = new HashSet<>();
-        for (Point p : ayConnected) {
+        for (Vector2i p : ayConnected) {
             for (Vector2d v : door_dirs) {
                 Vector2d v2 = new Vector2d(p.x + v.x, p.y + v.y);
                 if (doors.contains(v2)) doors.remove(v2);
                 else doors.add(v2);
             }
         }
-        Point pt2 = roomPointToMapPoint(ayConnected.get(0));
+        Vector2i pt2 = roomPointToMapPoint(ayConnected.get(0));
         byte unit1 = MapUtils.getMapColorAt(mapData, pt2.x, pt2.y);
 
         // 0: none 1: open door 2. unopen door 3: wither door 4. red door
@@ -328,8 +331,8 @@ public class MapProcessor {
         for (Vector2d door : doors) {
             int floorX = (int) Math.floor(door.x);
             int floorY = (int) Math.floor(door.y);
-            Point mapPt = roomPointToMapPoint(new Point(floorX, floorY));
-            Point target = new Point(mapPt.x + unitRoomDimension.width / 2 + (int) (halfWidth * (door.x - floorX)), mapPt.y + unitRoomDimension.height / 2 + (int) (halfWidth * (door.y - floorY)));
+            Vector2i mapPt = roomPointToMapPoint(new Vector2i(floorX, floorY));
+            Vector2i target = new Vector2i(mapPt.x + unitRoomDimension.width / 2 + (int) (halfWidth * (door.x - floorX)), mapPt.y + unitRoomDimension.height / 2 + (int) (halfWidth * (door.y - floorY)));
             MapUtils.record(mapData, target.x, target.y, Color.green);
 
             byte color = MapUtils.getMapColorAt(mapData, target.x, target.y);
@@ -351,16 +354,22 @@ public class MapProcessor {
         }
 
 
-        return new DungeonRoom(ayConnected, shape, unit1, roomPointToWorldPoint(new Point(minX, minY)), roomPointToWorldPoint(new Point(maxX + 1, maxY + 1)).add(-1, 0, -1), context, doorsAndStates);
+        return new DungeonRoom(ayConnected,
+                shape,
+                unit1,
+                roomPointToWorldPoint(new Vector2i(minX, minY)),
+                roomPointToWorldPoint(new Vector2i(maxX + 1, maxY + 1)).add(-1, 0, -1),
+                context,
+                doorsAndStates);
 
     }
 
-    private boolean checkIfConnected(byte[] mapData, Point unitPoint1, Point unitPoint2) {
+    private boolean checkIfConnected(byte[] mapData, Vector2i unitPoint1, Vector2i unitPoint2) {
         if (unitPoint1 == unitPoint2) return true;
         if (unitPoint1.equals(unitPoint2)) return true;
 
 
-        Point high;
+        Vector2i high;
         if (unitPoint2.y > unitPoint1.y) {
             high = unitPoint2;
         } else {
@@ -371,7 +380,7 @@ public class MapProcessor {
             }
         }
 
-        Point low;
+        Vector2i low;
         if (high == unitPoint2) {
             low = unitPoint1;
         } else {
@@ -380,11 +389,11 @@ public class MapProcessor {
 
         int xOff = low.x - high.x;
         int yOff = low.y - high.y;
-        Point pt = roomPointToMapPoint(high);
-        Point pt2 = roomPointToMapPoint(low);
+        Vector2i pt = roomPointToMapPoint(high);
+        Vector2i pt2 = roomPointToMapPoint(low);
         byte unit1 = MapUtils.getMapColorAt(mapData, pt.x, pt.y);
         byte unit2 = MapUtils.getMapColorAt(mapData, pt2.x, pt2.y);
-        pt.translate(xOff, yOff);
+        pt.add(xOff, yOff);
         byte unit3 = MapUtils.getMapColorAt(mapData, pt.x, pt.y);
 
         return unit1 == unit2 && unit2 == unit3 && unit1 != 0;
@@ -397,7 +406,6 @@ public class MapProcessor {
             colorData = latestMapData.colors;
         }
 
-        return true;
 //        boolean equals = Arrays.equals(colorData1, colorData);
 //
 //        boolean foundDIffrentThen0 = false;
@@ -412,6 +420,7 @@ public class MapProcessor {
 //
 //
 //        return !(equals && foundDIffrentThen0);
+        return true;
     }
 
     private void processFinishedMap(byte[] mapData) {

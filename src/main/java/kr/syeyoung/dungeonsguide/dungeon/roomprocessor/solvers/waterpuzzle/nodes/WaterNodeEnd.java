@@ -20,17 +20,18 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.node
 
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.LeverState;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.WaterNode;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 @Data
 @AllArgsConstructor
 public class WaterNodeEnd implements WaterNode {
-    BlockPos blockPos;
+    Vector3i blockPos;
     private String resultId;
     private int x, y;
 
@@ -46,12 +47,8 @@ public class WaterNodeEnd implements WaterNode {
 
     @Override
     public boolean isWaterFilled(World w) {
-        Block b = w.getChunkFromBlockCoords(blockPos).getBlock(blockPos);
+        Block b = BlockCache.getBlock(blockPos);
         return b == Blocks.water || b == Blocks.flowing_water;
-    }
-
-    public BlockPos getBlockPos() {
-        return blockPos;
     }
 
     public String toString() {

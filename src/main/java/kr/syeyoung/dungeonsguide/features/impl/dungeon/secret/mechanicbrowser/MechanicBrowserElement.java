@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret.mechanicbrowser;
 
 import kr.syeyoung.dungeonsguide.gui.MPanel;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -55,7 +54,5 @@ public class MechanicBrowserElement extends MPanel {
 
     @Override
     public void mouseMoved(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0) {
-        if (lastAbsClip.contains(absMouseX, absMouseY) && onClick != null)
-            setCursor(EnumCursor.POINTING_HAND);
     }
 }

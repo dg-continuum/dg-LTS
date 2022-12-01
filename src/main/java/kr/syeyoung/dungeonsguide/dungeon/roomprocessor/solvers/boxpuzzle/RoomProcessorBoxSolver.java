@@ -24,7 +24,9 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -32,6 +34,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -40,13 +43,13 @@ import java.util.List;
 import java.util.Queue;
 import java.util.*;
 
-import static kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig.SOLVER_BOX_LINEWIDTH;
+import static kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig.solverBoxLinewidth;
 
 public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
 
 
     private static final java.util.List<Point> directions = Arrays.asList(new Point(-1, 0), new Point(1, 0), new Point(0, 1), new Point(0, -1));
-    private BlockPos[][] poses = new BlockPos[7][7];
+    private Vector3i[][] poses = new Vector3i[7][7];
     private boolean bugged = true;
     private BoxPuzzleSolvingThread puzzleSolvingThread;
     private boolean calcReq = true;
@@ -56,9 +59,9 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
     private byte[][] lastState;
     private boolean yState = true;
     private List<BoxPuzzleSolvingThread.BoxMove> solution;
-    private List<BlockPos> pathFound;
-    private List<BlockPos> totalPath;
-    private List<BlockPos> totalPushedBlocks;
+    private List<Vector3i> pathFound;
+    private List<Vector3i> totalPath;
+    private List<Vector3i> totalPushedBlocks;
     private Point lastPlayer;
     public RoomProcessorBoxSolver(DungeonRoom dungeonRoom) {
         super(dungeonRoom);
@@ -68,7 +71,7 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
             if (ops != null) {
                 for (int y = 0; y < 7; y++) {
                     for (int x = 0; x < 7; x++) {
-                        poses[y][x] = ops.getOffsetPointList().get(y * 7 + x).getBlockPos(dungeonRoom);
+                        poses[y][x] = ops.getOffsetPointList().get(y * 7 + x).getVector3i(dungeonRoom);
                     }
                 }
                 bugged = false;
@@ -87,8 +90,8 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
                     board[y][x] = -1;
                     continue;
                 }
-                BlockPos pos = poses[y][x];
-                Block b = w.getChunkFromBlockCoords(pos).getBlock(pos);
+                Vector3i pos = poses[y][x];
+                Block b = BlockCache.getBlock(pos);
                 if (b == Blocks.air)
                     board[y][x] = 0;
                 else
@@ -101,7 +104,7 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
     @Override
     public void tick() {
         super.tick();
-        if (!DgOneCongifConfig.SOLVER_BOX) return;
+        if (!DgOneCongifConfig.solverBox) return;
         if (bugged) return;
         byte[][] currboard = buildCurrentState();
         if (puzzleSolvingThread == null) {
@@ -118,10 +121,10 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
         if (calcReq) {
             OffsetPointSet ops = (OffsetPointSet) getDungeonRoom().getDungeonRoomInfo().getProperties().get("board");
             if (ops != null) {
-                poses = new BlockPos[7][7];
+                poses = new Vector3i[7][7];
                 for (int y = 0; y < 7; y++) {
                     for (int x = 0; x < 7; x++) {
-                        poses[y][x] = ops.getOffsetPointList().get(y * 7 + x).getBlockPos(getDungeonRoom());
+                        poses[y][x] = ops.getOffsetPointList().get(y * 7 + x).getVector3i(getDungeonRoom());
                     }
                 }
                 bugged = false;
@@ -149,8 +152,8 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
                 step = 0;
                 calcDone2 = false;
                 pathFindReq = true;
-                totalPath = new LinkedList<BlockPos>();
-                totalPushedBlocks = new LinkedList<BlockPos>();
+                totalPath = new LinkedList<Vector3i>();
+                totalPushedBlocks = new LinkedList<Vector3i>();
                 solution = new LinkedList<BoxPuzzleSolvingThread.BoxMove>();
                 return;
             } else {
@@ -191,7 +194,7 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
                 target = new Point(boxMove.x - boxMove.dx, boxMove.y - boxMove.dy);
             }
             List<Point> semi_pathFound = pathfind(currboard, player, target);
-            pathFound = new LinkedList<BlockPos>();
+            pathFound = new LinkedList<Vector3i>();
             for (Point point : semi_pathFound) {
                 pathFound.add(poses[point.y][point.x].add(0, -1, 0));
             }
@@ -204,8 +207,8 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
 
     public void calcTotalPath() {
         Point player = new Point(0, 6);
-        totalPath = new LinkedList<BlockPos>();
-        totalPushedBlocks = new LinkedList<BlockPos>();
+        totalPath = new LinkedList<Vector3i>();
+        totalPushedBlocks = new LinkedList<Vector3i>();
         byte[][] currboard = buildCurrentState();
         for (int i = 0; i <= solution.size(); i++) {
             Point target = null;
@@ -226,25 +229,25 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
                 int fromX = boxMove.x - boxMove.dx;
                 int fromY = boxMove.y - boxMove.dy;
 
-                BlockPos pos = poses[fromY][fromX];
-                BlockPos pos2 = poses[boxMove.y][boxMove.x];
-                BlockPos dir = pos.subtract(pos2);
-                dir = new BlockPos(MathHelper.clamp_int(dir.getX(), -1, 1), 0, MathHelper.clamp_double(dir.getZ(), -1, 1));
+                Vector3i pos = poses[fromY][fromX];
+                Vector3i pos2 = poses[boxMove.y][boxMove.x];
+                Vector3i dir = pos.sub(pos2);
+                dir = new Vector3i(MathHelper.clamp_int(dir.x, -1, 1), 0, (int) MathHelper.clamp_double(dir.z, -1, 1));
 
-                BlockPos highlight = pos2.add(dir);
+                Vector3i highlight = pos2.add(dir);
                 totalPushedBlocks.add(highlight);
             }
         }
     }
 
     public Point getPlayerPos(byte[][] map) {
-        BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+        Vector3i playerPos = VectorUtils.getPlayerVector3i();
         int minDir = Integer.MAX_VALUE;
         Point pt = null;
         for (int y = 0; y < poses.length; y++) {
             for (int x = 0; x < poses[0].length; x++) {
                 if (map[y][x] == 1) continue;
-                int dir = (int) poses[y][x].distanceSq(playerPos);
+                int dir = (int) poses[y][x].distance(playerPos);
                 if (dir < minDir) {
                     minDir = dir;
                     pt = new Point(x, y);
@@ -310,7 +313,7 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
 
     @Override
     public void chatReceived(IChatComponent chat) {
-        if (!DgOneCongifConfig.SOLVER_BOX) return;
+        if (!DgOneCongifConfig.solverBox) return;
         if (chat.getFormattedText().toLowerCase().contains("recalc")) {
             if (calcDone) {
                 calcReq = true;
@@ -325,8 +328,8 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
     @Override
     public void drawScreen(float partialTicks) {
         super.drawScreen(partialTicks);
-        if (!DgOneCongifConfig.SOLVER_BOX) return;
-        if (DgOneCongifConfig.SOLVER_BOX_DISABLE_TEXT) return;
+        if (!DgOneCongifConfig.solverBox) return;
+        if (DgOneCongifConfig.solverBoxDisableText) return;
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -337,7 +340,7 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!DgOneCongifConfig.SOLVER_BOX) return;
+        if (!DgOneCongifConfig.solverBox) return;
         if (bugged) return;
         if (!calcDone) return;
         if (solution == null) return;
@@ -347,29 +350,29 @@ public class RoomProcessorBoxSolver extends GeneralRoomProcessor {
                 int fromX = boxMove.x - boxMove.dx;
                 int fromY = boxMove.y - boxMove.dy;
 
-                BlockPos pos = poses[fromY][fromX];
-                BlockPos pos2 = poses[boxMove.y][boxMove.x];
-                BlockPos dir = pos.subtract(pos2);
-                dir = new BlockPos(MathHelper.clamp_int(dir.getX(), -1, 1), 0, MathHelper.clamp_double(dir.getZ(), -1, 1));
+                Vector3i pos = poses[fromY][fromX];
+                Vector3i pos2 = poses[boxMove.y][boxMove.x];
+                Vector3i dir = pos.sub(pos2);
+                dir = new Vector3i(MathHelper.clamp_int(dir.x, -1, 1), 0, (int) MathHelper.clamp_double(dir.z, -1, 1));
 
-                BlockPos highlight = pos2.add(dir);
-                AColor color = new AColor(DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getRed(), DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getBlue(), DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getGreen(), DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getAlpha()).multiplyAlpha(MathHelper.clamp_double(Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(highlight), 100, 255) / 255);
-                RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(highlight.getX(), highlight.getY(), highlight.getZ(), highlight.getX() + 1, highlight.getY() + 1, highlight.getZ() + 1), color, partialTicks, false);
+                Vector3i highlight = pos2.add(dir);
+                AColor color = new AColor(DgOneCongifConfig.solverBoxTargetColor.getRed(), DgOneCongifConfig.solverBoxTargetColor.getBlue(), DgOneCongifConfig.solverBoxTargetColor.getGreen(), DgOneCongifConfig.solverBoxTargetColor.getAlpha()).multiplyAlpha(MathHelper.clamp_double(VectorUtils.getPlayerVector3i().distance(highlight), 100, 255) / 255);
+                RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(highlight.x, highlight.y, highlight.z, highlight.x + 1, highlight.y + 1, highlight.z + 1), color, partialTicks, false);
             }
 
             if (pathFound != null) {
-                RenderUtils.drawLines(pathFound, new AColor(DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getRed(), DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getBlue(), DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getGreen(), DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getAlpha()), SOLVER_BOX_LINEWIDTH, partialTicks, true);
+                RenderUtils.drawLines(pathFound, new AColor(DgOneCongifConfig.solverBoxLineColor.getRed(), DgOneCongifConfig.solverBoxLineColor.getBlue(), DgOneCongifConfig.solverBoxLineColor.getGreen(), DgOneCongifConfig.solverBoxLineColor.getAlpha()), solverBoxLinewidth, partialTicks, true);
             }
         } else {
             if (totalPath != null) {
-                RenderUtils.drawLines(totalPath, new AColor(DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getRed(), DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getBlue(), DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getGreen(), DgOneCongifConfig.SOLVER_BOX_LINE_COLOR.getAlpha()), SOLVER_BOX_LINEWIDTH, partialTicks, false);
+                RenderUtils.drawLines(totalPath, new AColor(DgOneCongifConfig.solverBoxLineColor.getRed(), DgOneCongifConfig.solverBoxLineColor.getBlue(), DgOneCongifConfig.solverBoxLineColor.getGreen(), DgOneCongifConfig.solverBoxLineColor.getAlpha()), solverBoxLinewidth, partialTicks, false);
             }
             if (totalPushedBlocks != null) {
                 for (int i = 0; i < totalPushedBlocks.size(); i++) {
-                    BlockPos pos = totalPushedBlocks.get(i);
-                    RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1), new AColor(DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getRed(), DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getBlue(), DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getGreen(), DgOneCongifConfig.SOLVER_BOX_TARGET_COLOR.getAlpha()), partialTicks, false);
-                    RenderUtils.drawTextAtWorld("#" + i, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, i != step ?
-                            RenderUtils.getColorAt(pos.getX(), pos.getY(), pos.getZ(), new AColor(DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR.getRed(), DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR.getBlue(), DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR.getGreen(), DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR.getAlpha())) : RenderUtils.getColorAt(pos.getX(), pos.getY(), pos.getZ(), new AColor(DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR_NEXT_STEP.getRed(), DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR_NEXT_STEP.getBlue(), DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR_NEXT_STEP.getGreen(), DgOneCongifConfig.SOLVER_BOX_TEXT_COLOR_NEXT_STEP.getAlpha())), 0.1f, false, false, partialTicks);
+                    Vector3i pos = totalPushedBlocks.get(i);
+                    RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(pos.x, pos.y, pos.z, pos.x + 1, pos.y + 1, pos.z + 1), new AColor(DgOneCongifConfig.solverBoxTargetColor.getRed(), DgOneCongifConfig.solverBoxTargetColor.getBlue(), DgOneCongifConfig.solverBoxTargetColor.getGreen(), DgOneCongifConfig.solverBoxTargetColor.getAlpha()), partialTicks, false);
+                    RenderUtils.drawTextAtWorld("#" + i, pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f, i != step ?
+                            RenderUtils.getColorAt(pos.x, pos.y, pos.z, new AColor(DgOneCongifConfig.solverBoxTextColor.getRed(), DgOneCongifConfig.solverBoxTextColor.getBlue(), DgOneCongifConfig.solverBoxTextColor.getGreen(), DgOneCongifConfig.solverBoxTextColor.getAlpha())) : RenderUtils.getColorAt(pos.x, pos.y, pos.z, new AColor(DgOneCongifConfig.solverBoxTextColorNextStep.getRed(), DgOneCongifConfig.solverBoxTextColorNextStep.getBlue(), DgOneCongifConfig.solverBoxTextColorNextStep.getGreen(), DgOneCongifConfig.solverBoxTextColorNextStep.getAlpha())), 0.1f, false, false, partialTicks);
                 }
             }
         }

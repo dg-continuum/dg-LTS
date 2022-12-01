@@ -6,7 +6,6 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonNodataEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonContextInitializationEvent;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
 import net.minecraft.client.Minecraft;
@@ -115,7 +114,6 @@ public class DungeonMapData {
         ChatTransmitter.sendDebugChat(new ChatComponentText("Dimension:" + unitRoomDimension));
         ChatTransmitter.sendDebugChat(new ChatComponentText("top Left:" + topLeftMapPoint));
         ChatTransmitter.sendDebugChat(new ChatComponentText("door dimension:" + doorDimensions));
-        context.createEvent(new DungeonNodataEvent("MAP_PROCESSOR_INIT"));
         initialized = true;
         MinecraftForge.EVENT_BUS.post(new DungeonContextInitializationEvent());
 

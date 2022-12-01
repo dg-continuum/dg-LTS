@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.config.guiconfig;
 
 import com.google.common.base.Function;
-import kr.syeyoung.dungeonsguide.auth.AuthManager;
 import kr.syeyoung.dungeonsguide.config.guiconfig.location.GuiGuiLocationConfig;
 import kr.syeyoung.dungeonsguide.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
@@ -265,11 +264,8 @@ public class RootConfigPanel extends MPanelScaledGUI {
 
         FontRenderer fr  = Minecraft.getMinecraft().fontRendererObj;
 
-        if(AuthManager.getInstance().getToken() == null) {
-            fr.drawString("ERROR CONNECTING TO DG, YOUR COSMETICS ARE NOT VISIBLE",(effectiveDim.width - fr.getStringWidth("ERROR CONNECTING TO DG, YOUR COSMETICS ARE NOT VISIBLE"))/2, (10 - fr.FONT_HEIGHT)/2, 0xFFFF0000);
-        }
 
-        fr.drawString("DungeonsGuide By syeyoung", (effectiveDim.width - fr.getStringWidth("DungeonsGuide By syeyoung"))/2, (25 - fr.FONT_HEIGHT)/2, 0xFF02EE67);
+        fr.drawString("DungeonsGuide LTS By Contributors", (effectiveDim.width - fr.getStringWidth("DungeonsGuide LTS By Contributors"))/2, (25 - fr.FONT_HEIGHT)/2, 0xFF02EE67);
     }
 
     @Override

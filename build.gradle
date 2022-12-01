@@ -95,11 +95,12 @@ dependencies {
     implementation 'org.java-websocket:Java-WebSocket:1.5.3'
     implementation 'org.json:json:20220924'
     implementation 'com.twelvemonkeys.imageio:imageio-bmp:3.9.3'
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+    implementation 'org.joml:joml:1.10.5'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    implementation 'org.joml:joml:1.10.5'
 
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
@@ -137,8 +138,11 @@ tasks.shadowJar {
 
     relocate 'org.joml', 'kr.syeyoung.org.joml'
 
+    relocate 'com.github.benmanes.caffeine', 'kr.syeyoung.com.github.benmanes.caffeine'
+
     dependencies {
         include(dependency('org.joml:joml:..*'))
+        include(dependency('com.github.ben-manes.caffeine:caffeine:..*'))
         include(dependency('org.java-websocket:Java-WebSocket:1.5.3'))
         include(dependency('org.slf4j:slf4j-api:1.7.25'))
         include(dependency('org.json:json:20220924'))

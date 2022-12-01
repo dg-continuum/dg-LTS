@@ -22,16 +22,16 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.nodes
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.nodes.WaterNodeToggleable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 @Data
 @AllArgsConstructor
 public class SwitchData {
     private WaterBoard waterBoard;
 
-    private BlockPos switchLoc;
-    private BlockPos blockLoc;
+    private Vector3i switchLoc;
+    private Vector3i blockLoc;
 
     private String blockId;
 

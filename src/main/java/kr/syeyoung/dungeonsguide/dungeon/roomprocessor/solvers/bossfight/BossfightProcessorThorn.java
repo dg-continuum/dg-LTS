@@ -20,12 +20,13 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight;
 
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.Set;
 public class BossfightProcessorThorn extends GeneralBossfightProcessor {
 
 
-    private final Set<BlockPos> progressBar = new HashSet<BlockPos>();
+    private final Set<Vector3i> progressBar = new HashSet<Vector3i>();
     private final World w;
     private int ticksPassed = 0;
 
@@ -54,9 +55,9 @@ public class BossfightProcessorThorn extends GeneralBossfightProcessor {
             progressBar.clear();
             for (int x = -30; x <= 30; x++) {
                 for (int y = -30; y <= 30; y++) {
-                    BlockPos newPos = new BlockPos(5 + x, 77, 5 + y);
-                    Block b = w.getBlockState(newPos).getBlock();
-                    if ((b == Blocks.coal_block || b == Blocks.sea_lantern) && w.getBlockState(newPos.add(0, 1, 0)).getBlock() != Blocks.carpet)
+                    Vector3i newPos = new Vector3i(5 + x, 77, 5 + y);
+                    Block b = BlockCache.getBlock(newPos);
+                    if ((b == Blocks.coal_block || b == Blocks.sea_lantern) && BlockCache.getBlock(newPos.add(0, 1, 0)) != Blocks.carpet)
                         progressBar.add(newPos);
                 }
             }
@@ -78,8 +79,8 @@ public class BossfightProcessorThorn extends GeneralBossfightProcessor {
     public double calculatePercentage() {
         int total = progressBar.size(), lit = 0;
         if (total == 0) return 0;
-        for (BlockPos pos : progressBar) {
-            if (w.getBlockState(pos).getBlock() == Blocks.sea_lantern) lit++;
+        for (Vector3i pos : progressBar) {
+            if (BlockCache.getBlock(pos) == Blocks.sea_lantern) lit++;
         }
 
         return lit / (double) total;
@@ -88,12 +89,12 @@ public class BossfightProcessorThorn extends GeneralBossfightProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!DgOneCongifConfig.DEBUG_MODE) return;
+        if (!DgOneCongifConfig.debugMode) return;
         try {
-            BlockPos pos = new BlockPos(205, 77, 205);
+            Vector3i pos = new Vector3i(205, 77, 205);
             RenderUtils.highlightBlock(pos, new Color(0, 255, 255, 50), partialTicks, false);
-            for (BlockPos pos2 : progressBar) {
-                RenderUtils.highlightBlock(pos2, w.getBlockState(pos2).getBlock() == Blocks.sea_lantern ?
+            for (Vector3i pos2 : progressBar) {
+                RenderUtils.highlightBlock(pos2, BlockCache.getBlock(pos) == Blocks.sea_lantern ?
                         new Color(0, 255, 0, 50) : new Color(255, 0, 0, 50), partialTicks, false);
             }
         } catch (Exception e) {

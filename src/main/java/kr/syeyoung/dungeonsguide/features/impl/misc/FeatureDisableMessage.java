@@ -20,7 +20,6 @@ package kr.syeyoung.dungeonsguide.features.impl.misc;
 
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
-import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.oneconfig.misc.DisableMessagePage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -74,7 +73,7 @@ public class FeatureDisableMessage extends SimpleFeatureV2 {
 
     public void onChat(ClientChatReceivedEvent clientChatReceivedEvent) {
         if (clientChatReceivedEvent.type == 2) return;
-        if (!DgOneCongifConfig.disableMessages) return;
+        if (!DisableMessagePage.disableMessages) return;
         if (!SkyblockStatus.isOnSkyblock()) return;
         String msg = clientChatReceivedEvent.message.getFormattedText();
 

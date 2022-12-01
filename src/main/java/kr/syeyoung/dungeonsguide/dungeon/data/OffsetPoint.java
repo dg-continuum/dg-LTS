@@ -25,6 +25,8 @@ import lombok.Data;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 
 import javax.vecmath.Vector2d;
 import java.io.Serializable;
@@ -38,17 +40,16 @@ public class OffsetPoint implements Cloneable, Serializable {
     private int y;
     private int z;
 
-    public OffsetPoint(DungeonRoom dungeonRoom, BlockPos pos) {
+    public OffsetPoint(DungeonRoom dungeonRoom, Vector3i pos) {
         setPosInWorld(dungeonRoom, pos);
     }
-
     public OffsetPoint(DungeonRoom dungeonRoom, Vec3 pos) {
-        setPosInWorld(dungeonRoom, new BlockPos((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord));
+        setPosInWorld(dungeonRoom, new Vector3i((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord));
     }
 
 
-    public void setPosInWorld(DungeonRoom dungeonRoom, BlockPos pos) {
-        Vector2d vector2d = new Vector2d(pos.getX() - dungeonRoom.getMin().getX(), pos.getZ() - dungeonRoom.getMin().getZ());
+    public void setPosInWorld(DungeonRoom dungeonRoom, Vector3i pos) {
+        Vector2d vector2d = new Vector2d(pos.x - dungeonRoom.getMin().x, pos.z - dungeonRoom.getMin().z);
         for (int i = 0; i < dungeonRoom.getRoomMatcher().getRotation(); i++) {
             vector2d = VectorUtils.rotateClockwise(vector2d);
             if (i % 2 == 0) {
@@ -60,38 +61,50 @@ public class OffsetPoint implements Cloneable, Serializable {
 
         this.x = (int) vector2d.x;
         this.z = (int) vector2d.y;
-        this.y = pos.getY() - dungeonRoom.getMin().getY();
+        this.y = pos.y - dungeonRoom.getMin().y;
     }
 
-    public BlockPos toRotatedRelBlockPos(DungeonRoom dungeonRoom) {
+    public Vector3i toRotatedRelBlockPos(DungeonRoom dungeonRoom) {
         Vector2d rot = new Vector2d(x, z);
         for (int i = 0; i < dungeonRoom.getRoomMatcher().getRotation(); i++) {
             rot = VectorUtils.rotateCounterClockwise(rot);
             if (i % 2 == 0) {
-                rot.y += dungeonRoom.getMax().getZ() - dungeonRoom.getMin().getZ() + 1; // + Z
+                rot.y += dungeonRoom.getMax().z - dungeonRoom.getMin().z + 1; // + Z
             } else {
-                rot.y += dungeonRoom.getMax().getX() - dungeonRoom.getMin().getX() + 1; // + X
+                rot.y += dungeonRoom.getMax().x - dungeonRoom.getMin().x + 1; // + X
             }
         }
 
-        return new BlockPos(rot.x, y, rot.y);
+        return new Vector3i((int) rot.x, y, (int) rot.y);
     }
 
     public Block getBlock(DungeonRoom dungeonRoom) {
-        BlockPos relBp = toRotatedRelBlockPos(dungeonRoom);
+        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
 
-        return dungeonRoom.getRelativeBlockAt(relBp.getX(), relBp.getY(), relBp.getZ());
+        return dungeonRoom.getRelativeBlockAt(relBp.x, relBp.y, relBp.z);
+    }
+
+    public Vector3i getVector3i(DungeonRoom dungeonRoom) {
+        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
+        return dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z);
+    }
+
+    public Vector3d getVector3d(DungeonRoom dungeonRoom) {
+        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
+        Vector3i relativeBlockPosAt = dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z);
+        return new Vector3d(relativeBlockPosAt.x, relativeBlockPosAt.y, relativeBlockPosAt.z);
     }
 
     public BlockPos getBlockPos(DungeonRoom dungeonRoom) {
-        BlockPos relBp = toRotatedRelBlockPos(dungeonRoom);
-        return dungeonRoom.getRelativeBlockPosAt(relBp.getX(), relBp.getY(), relBp.getZ());
+        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
+        Vector3i relativeBlockPosAt = dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z);
+        return new BlockPos(relativeBlockPosAt.x, relativeBlockPosAt.y, relativeBlockPosAt.z);
     }
 
     public int getData(DungeonRoom dungeonRoom) {
-        BlockPos relBp = toRotatedRelBlockPos(dungeonRoom);
+        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
 
-        return dungeonRoom.getRelativeBlockDataAt(relBp.getX(), relBp.getY(), relBp.getZ());
+        return dungeonRoom.getRelativeBlockDataAt(relBp.x, relBp.y, relBp.z);
     }
 
     @Override

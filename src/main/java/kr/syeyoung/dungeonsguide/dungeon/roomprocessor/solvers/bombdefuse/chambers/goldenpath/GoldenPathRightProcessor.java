@@ -24,10 +24,12 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambe
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambers.GeneralDefuseChamberProcessor;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -40,8 +42,8 @@ public class GoldenPathRightProcessor extends GeneralDefuseChamberProcessor {
             new Point(0, -1),
             new Point(1, 0)
     };
-    private final BlockPos center;
-    private final LinkedList<BlockPos> blocksolution = new LinkedList<BlockPos>();
+    private final Vector3i center;
+    private final LinkedList<Vector3i> blocksolution = new LinkedList<Vector3i>();
     public GoldenPathRightProcessor(RoomProcessorBombDefuseSolver solver, BDChamber chamber) {
         super(solver, chamber);
 
@@ -56,7 +58,7 @@ public class GoldenPathRightProcessor extends GeneralDefuseChamberProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        RenderUtils.drawTextAtWorld(blocksolution.size() == 0 ? "Answer not received yet. Visit left room to obtain solution" : "", center.getX() + 0.5f, center.getY(), center.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(blocksolution.size() == 0 ? "Answer not received yet. Visit left room to obtain solution" : "", center.x + 0.5f, center.y, center.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
 
         RenderUtils.drawLines(blocksolution, new AColor(0, 0, 255, 0), 1, partialTicks, false);
 
@@ -81,11 +83,11 @@ public class GoldenPathRightProcessor extends GeneralDefuseChamberProcessor {
             World w = getChamber().getRoom().getContext().getWorld();
             for (int x = 0; x < 9; x++) {
                 for (int z = 0; z < 6; z++) {
-                    BlockPos pos = getChamber().getBlockPos(x, 1, z);
+                    Vector3i pos = getChamber().getBlockPos(x, 1, z);
                     if (blocksolution.contains(pos)) {
-                        w.setBlockState(pos, Blocks.light_weighted_pressure_plate.getDefaultState());
+                        w.setBlockState(VectorUtils.Vec3iToBlockPos(pos), Blocks.light_weighted_pressure_plate.getDefaultState());
                     } else {
-                        w.setBlockState(pos, Blocks.wooden_pressure_plate.getDefaultState());
+                        w.setBlockState(VectorUtils.Vec3iToBlockPos(pos), Blocks.wooden_pressure_plate.getDefaultState());
                     }
                 }
             }

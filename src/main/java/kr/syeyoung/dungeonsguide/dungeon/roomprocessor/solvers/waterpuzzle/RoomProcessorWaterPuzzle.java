@@ -24,7 +24,7 @@ import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.List;
@@ -94,8 +94,8 @@ public class RoomProcessorWaterPuzzle extends GeneralRoomProcessor {
                 if (switchData.getCurrentState(getDungeonRoom().getContext().getWorld()) != condition.isRequiredState()) {
 
                     RenderUtils.highlightBlock(switchData.getSwitchLoc(), new Color(0, 255, 0, 50), partialTicks, true);
-                    RenderUtils.drawTextAtWorld("#" + j, switchData.getSwitchLoc().getX(), switchData.getSwitchLoc().getY() + 1, switchData.getSwitchLoc().getZ(), 0xFF000000, 0.1f, false, false, partialTicks);
-                    RenderUtils.drawTextAtWorld(condition.isRequiredState() ? "on" : "off", switchData.getSwitchLoc().getX(), switchData.getSwitchLoc().getY(), switchData.getSwitchLoc().getZ(), 0xFF000000, 0.1f, false, false, partialTicks);
+                    RenderUtils.drawTextAtWorld("#" + j, switchData.getSwitchLoc().x, switchData.getSwitchLoc().y + 1, switchData.getSwitchLoc().z, 0xFF000000, 0.1f, false, false, partialTicks);
+                    RenderUtils.drawTextAtWorld(condition.isRequiredState() ? "on" : "off", switchData.getSwitchLoc().x, switchData.getSwitchLoc().y, switchData.getSwitchLoc().z, 0xFF000000, 0.1f, false, false, partialTicks);
                     j++;
                 }
             }
@@ -103,9 +103,9 @@ public class RoomProcessorWaterPuzzle extends GeneralRoomProcessor {
                 RenderUtils.highlightBlock(node.getBlockPos(), new Color(0, 255, 255, 50), partialTicks, true);
             }
         }
-        List<BlockPos> targets = waterBoard.getTarget();
+        List<Vector3i> targets = waterBoard.getTarget();
         if (targets != null) {
-            for (BlockPos target : targets) {
+            for (Vector3i target : targets) {
                 RenderUtils.highlightBlock(target, new Color(0, 255, 255, 100), partialTicks, true);
             }
             RenderUtils.highlightBlock(waterBoard.getToggleableMap().get("mainStream").getBlockPos(), new Color(0, 255, 0, 255), partialTicks, true);

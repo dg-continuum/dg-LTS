@@ -33,6 +33,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -61,17 +62,17 @@ public class RoomProcessorBlazeSolver extends GeneralRoomProcessor {
 
         DungeonRoom dungeonRoom = getDungeonRoom();
         World w = dungeonRoom.getContext().getWorld();
-        final BlockPos low = dungeonRoom.getMin();
-        final BlockPos high = dungeonRoom.getMax();
+        final Vector3i low = dungeonRoom.getMin();
+        final Vector3i high = dungeonRoom.getMax();
         entityList = new ArrayList<EntityArmorStand>(w.getEntities(EntityArmorStand.class, input -> {
             BlockPos pos = input.getPosition();
-            return low.getX() < pos.getX() && pos.getX() < high.getX()
-                    && low.getZ() < pos.getZ() && pos.getZ() < high.getZ() && input.getName().toLowerCase().contains("blaze");
+            return low.x < pos.getX() && pos.getX() < high.x
+                    && low.z < pos.getZ() && pos.getZ() < high.z && input.getName().toLowerCase().contains("blaze");
         }));
         blazeList = new ArrayList<EntityBlaze>(w.getEntities(EntityBlaze.class, input -> {
             BlockPos pos = input.getPosition();
-            return low.getX() < pos.getX() && pos.getX() < high.getX()
-                    && low.getZ() < pos.getZ() && pos.getZ() < high.getZ();
+            return low.x < pos.getX() && pos.getX() < high.x
+                    && low.z < pos.getZ() && pos.getZ() < high.z;
         }));
 
         Comparator<EntityArmorStand> comparator = Comparator.comparingInt(a -> {
@@ -109,7 +110,7 @@ public class RoomProcessorBlazeSolver extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!DgOneCongifConfig.BLAZE_SOLVER) return;
+        if (!DgOneCongifConfig.blazeSolver) return;
         if (next == null) return;
         Vec3 pos = next.getPositionEyes(partialTicks);
         RenderUtils.drawTextAtWorld("NEXT", (float) pos.xCoord, (float) pos.yCoord, (float) pos.zCoord, 0xFFFF0000, 0.5f, true, false, partialTicks);
@@ -156,16 +157,16 @@ public class RoomProcessorBlazeSolver extends GeneralRoomProcessor {
 
             boolean border = true;
 
-            RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-0.8, 0, -0.8, 0.8, 2, 0.8), new AColor(DgOneCongifConfig.BLAZE_SOLVER_COLOR_NORMAL.getRed(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NORMAL.getBlue(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NORMAL.getGreen(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NORMAL.getAlpha()), partialTicks, false);
+            RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-0.8, 0, -0.8, 0.8, 2, 0.8), new AColor(DgOneCongifConfig.blazeSolverColorNormal.getRed(), DgOneCongifConfig.blazeSolverColorNormal.getBlue(), DgOneCongifConfig.blazeSolverColorNormal.getGreen(), DgOneCongifConfig.blazeSolverColorNormal.getAlpha()), partialTicks, false);
             if (entity == theoneafterit) {
-                RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-0.8, 0, -0.8, 0.8, 2, 0.8), new AColor(DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT_UP.getRed(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT_UP.getBlue(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT_UP.getGreen(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT_UP.getAlpha()), partialTicks, false);
+                RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-0.8, 0, -0.8, 0.8, 2, 0.8), new AColor(DgOneCongifConfig.blazeSolverColorNextUp.getRed(), DgOneCongifConfig.blazeSolverColorNextUp.getBlue(), DgOneCongifConfig.blazeSolverColorNextUp.getGreen(), DgOneCongifConfig.blazeSolverColorNextUp.getAlpha()), partialTicks, false);
             } else if (entity == nextBlaze)
-                RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-0.8, 0, -0.8, 0.8, 2, 0.8), new AColor(DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT.getRed(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT.getBlue(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT.getGreen(), DgOneCongifConfig.BLAZE_SOLVER_COLOR_NEXT.getAlpha()), partialTicks, false);
+                RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-0.8, 0, -0.8, 0.8, 2, 0.8), new AColor(DgOneCongifConfig.blazeSolverColorNext.getRed(), DgOneCongifConfig.blazeSolverColorNext.getBlue(), DgOneCongifConfig.blazeSolverColorNext.getGreen(), DgOneCongifConfig.blazeSolverColorNext.getAlpha()), partialTicks, false);
 
             GlStateManager.color(1, 1, 1, 1);
 
 
-            if (DgOneCongifConfig.BLAZE_SOLVER_BORDER.getAlpha() > 0x10) {
+            if (DgOneCongifConfig.blazeSolverBorder.getAlpha() > 0x10) {
                 GL11.glStencilFunc(GL11.GL_NOTEQUAL, 3, 0x01);
                 GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE);
                 GlStateManager.pushMatrix();
@@ -184,7 +185,7 @@ public class RoomProcessorBlazeSolver extends GeneralRoomProcessor {
                 GL11.glStencilFunc(GL11.GL_EQUAL, 3, 0xFF);
                 GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
 
-                RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-1, 0, -1, 1, 2, 1), new AColor(DgOneCongifConfig.BLAZE_SOLVER_BORDER.getRed(), DgOneCongifConfig.BLAZE_SOLVER_BORDER.getBlue(), DgOneCongifConfig.BLAZE_SOLVER_BORDER.getGreen(), DgOneCongifConfig.BLAZE_SOLVER_BORDER.getAlpha()), partialTicks, false);
+                RenderUtils.highlightBox(entity, AxisAlignedBB.fromBounds(-1, 0, -1, 1, 2, 1), new AColor(DgOneCongifConfig.blazeSolverBorder.getRed(), DgOneCongifConfig.blazeSolverBorder.getBlue(), DgOneCongifConfig.blazeSolverBorder.getGreen(), DgOneCongifConfig.blazeSolverBorder.getAlpha()), partialTicks, false);
 
 
             }

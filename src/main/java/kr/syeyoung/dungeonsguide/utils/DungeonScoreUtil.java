@@ -3,17 +3,12 @@ package kr.syeyoung.dungeonsguide.utils;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.stomp.StaticResource;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.MathHelper;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class DungeonScoreUtil {
     public static int getCompleteRooms() {
@@ -125,14 +120,6 @@ public class DungeonScoreUtil {
         {
             bonus += tombs = MathHelper.clamp_int(DungeonUtil.getTombsFound(), 0, 5);
             if (context.isGotMimic()) bonus += 2;
-            CompletableFuture<StaticResource> staticResourceCompletableFuture = StaticResourceCache.INSTANCE.getResource(StaticResourceCache.BONUS_SCORE);
-            if (staticResourceCompletableFuture.isDone()) {
-                try {
-                    bonus += Integer.parseInt(staticResourceCompletableFuture.get().getValue().trim());
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         // amazing thing

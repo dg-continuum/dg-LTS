@@ -1,7 +1,7 @@
 package kr.syeyoung.dungeonsguide.whosonline.api;
 
-import kr.syeyoung.dungeonsguide.stomp.StompClient;
-import kr.syeyoung.dungeonsguide.utils.SimpleFuse;
+import kr.syeyoung.dungeonsguide.whosonline.WebSocketClientStatus;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleFuse;
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager;
 import kr.syeyoung.dungeonsguide.whosonline.api.messages.AbstractMessage;
 import kr.syeyoung.dungeonsguide.whosonline.api.messages.MessageParser;
@@ -37,11 +37,11 @@ public class WhosOnlineWebSocket extends WebSocketClient {
     private final SimpleFuse timeoutFuse;
     long lastPong = -1;
 
-    public StompClient.StompClientStatus getStatus() {
+    public WebSocketClientStatus getStatus() {
         return status;
     }
 
-    private StompClient.StompClientStatus status;
+    private WebSocketClientStatus status;
     @Getter
     private long ping;
 
@@ -60,7 +60,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
         this.playerUuid = playerUuid;
         this.se = se;
-        status = StompClient.StompClientStatus.CONNECTING;
+        status = WebSocketClientStatus.CONNECTING;
         timeoutFuse = new SimpleFuse();
         sentMessages = new ConcurrentHashMap<>();
     }
@@ -89,7 +89,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
         // send pings
         long now = System.currentTimeMillis();
-        if (this.status == StompClient.StompClientStatus.CONNECTED) {
+        if (this.status == WebSocketClientStatus.CONNECTED) {
             if (nextPing > now) return;
 
             String msg = WhosOnlineManager.gson.toJson(new C03Ping(String.valueOf(now)));
@@ -128,8 +128,8 @@ public class WhosOnlineWebSocket extends WebSocketClient {
         }
 
         if (res instanceof S00ConnectAck) {
-            if (status == StompClient.StompClientStatus.CONNECTING) {
-                status = StompClient.StompClientStatus.CONNECTED;
+            if (status == WebSocketClientStatus.CONNECTING) {
+                status = WebSocketClientStatus.CONNECTED;
                 logger.info("Connection established");
             } else {
                 logger.info("Received unexpected \"connected\" ");
@@ -189,7 +189,7 @@ public class WhosOnlineWebSocket extends WebSocketClient {
 
         sentMessages.clear();
 
-        status = StompClient.StompClientStatus.DISCONNECTED;
+        status = WebSocketClientStatus.DISCONNECTED;
         MinecraftForge.EVENT_BUS.post(new WhosOnlineManager.WhosOnlineDied());
     }
 

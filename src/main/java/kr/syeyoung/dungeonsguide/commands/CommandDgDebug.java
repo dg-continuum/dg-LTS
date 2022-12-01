@@ -10,22 +10,21 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonRoomInfoRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
+import kr.syeyoung.dungeonsguide.dungeon.detector.blockbased.BlockDetector;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.events.DungeonEventHolder;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.party.PartyContext;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import kr.syeyoung.dungeonsguide.utils.*;
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager;
 import lombok.val;
@@ -48,18 +47,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.joml.Vector2i;
+import org.joml.Vector3i;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.security.*;
-import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -67,6 +62,8 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 public class CommandDgDebug extends CommandBase {
+
+    GuiScreen toOpen;
 
     @Override
     public String getCommandName() {
@@ -140,15 +137,6 @@ public class CommandDgDebug extends CommandBase {
                 e.printStackTrace();
             }
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cAn error has occurred while loading roomdata"));
-        } else if ("reloadah".equals(arg)) {
-            try {
-                AhUtils.loadAuctions();
-            } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException |
-                     InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException |
-                     KeyStoreException | IllegalBlockSizeException | KeyManagementException e) {
-                e.printStackTrace();
-            }
-            sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fReloaded Ah data"));
         } else if ("brand".equals(arg)) {
             String serverBrand = Minecraft.getMinecraft().thePlayer.getClientBrand();
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §e" + serverBrand));
@@ -158,7 +146,7 @@ public class CommandDgDebug extends CommandBase {
                 EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
                 if (thePlayer == null) return;
                 if (context.getBossfightProcessor() != null) context.getBossfightProcessor().tick();
-                Point roomPt = context.getMapProcessor().worldPointToRoomPoint(thePlayer.getPosition());
+                Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
 
                 DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
                 GeneralRoomProcessor grp = (GeneralRoomProcessor) dungeonRoom.getRoomProcessor();
@@ -266,40 +254,7 @@ public class CommandDgDebug extends CommandBase {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fInternal Party id: " + Optional.ofNullable(PartyManager.INSTANCE.getPartyContext()).map(PartyContext::getPartyID).orElse(null)));
         } else if ("loc".equals(arg)) {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fYou're in " + DungeonContext.getDungeonName()));
-        } else if ("saverun".equals(arg)) {
-            try {
-                File f = Main.getConfigDir();
-                File runDir = new File(f, "dungeonruns");
-                runDir.mkdirs();
-
-                File runFile = new File(runDir, UUID.randomUUID() + ".dgrun");
-
-                DungeonContext dungeonContext = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-                if (dungeonContext == null) {
-                    sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cCouldn't find dungeon to save!"));
-                    return;
-                }
-                DungeonEventHolder dungeonEventHolder = new DungeonEventHolder();
-                dungeonEventHolder.setDate(dungeonContext.getInit());
-                dungeonEventHolder.setPlayers(dungeonContext.getPlayers());
-                dungeonEventHolder.setEventDataList(dungeonContext.getEvents());
-
-
-                ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(runFile.toPath()));
-                oos.writeObject(dungeonEventHolder);
-                oos.flush();
-                oos.close();
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully saved dungeon run to " + runFile.getAbsolutePath()));
-            } catch (Exception e) {
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cAn error occured while writing rundata " + e.getMessage()));
-                e.printStackTrace();
-            }
-        } else if ("requeststaticresource".equals(arg)) {
-            UUID uid = UUID.fromString(args[1]);
-            StaticResourceCache.INSTANCE.getResource(uid).thenAccept(a -> {
-                sender.addChatMessage(new ChatComponentText(a.getResourceID() + ": " + a.getValue() + ": " + a.isExists()));
-            });
-        } else if ("createfakeroom".equals(arg)) {// load schematic
+        }  else if ("createfakeroom".equals(arg)) {// load schematic
             File f = new File(Main.getConfigDir(), "schematics/new roonm-b2df250c-4af2-4201-963c-0ee1cb6bd3de-5efb1f0c-c05f-4064-bde7-cad0874fdf39.schematic");
             NBTTagCompound compound;
             try {
@@ -364,10 +319,10 @@ public class CommandDgDebug extends CommandBase {
             mapProcessor.setTopLeftMapPoint(new Point(0, 0));
             fakeContext.setDungeonMin(new BlockPos(0, 70, 0));
 
-            DungeonRoom dungeonRoom = new DungeonRoom(Arrays.asList(new Point(0, 0)), ShortUtils.topLeftifyInt((short) 1), (byte) 63, new BlockPos(0, 70, 0), new BlockPos(31, 70, 31), fakeContext, Collections.emptySet());
+            DungeonRoom dungeonRoom = new DungeonRoom(Arrays.asList(new Vector2i(0, 0)), ShortUtils.topLeftifyInt((short) 1), (byte) 63, new Vector3i(0, 70, 0), new Vector3i(31, 70, 31), fakeContext, Collections.emptySet());
 
             fakeContext.getDungeonRoomList().add(dungeonRoom);
-            for (Point p : Arrays.asList(new Point(0, 0))) {
+            for (Vector2i p : Arrays.asList(new Vector2i(0, 0))) {
                 fakeContext.getRoomMapper().put(p, dungeonRoom);
             }
 
@@ -427,11 +382,11 @@ public class CommandDgDebug extends CommandBase {
             DungeonsGuide.getDungeonsGuide().setWhosOnlineManager(new WhosOnlineManager("wss://virginity.kokoniara.software/ws"));
             DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().init();
         } else if ("isonline".equals(arg)) {
-            if(args.length > 2){
+            if (args.length > 2) {
                 sender.addChatMessage(new ChatComponentText("TOO LITTLE ARGS"));
             }
 
-            if(DungeonsGuide.getDungeonsGuide().getWhosOnlineManager() == null){
+            if (DungeonsGuide.getDungeonsGuide().getWhosOnlineManager() == null) {
                 sender.addChatMessage(new ChatComponentText("didnt init manager"));
             }
 
@@ -440,7 +395,7 @@ public class CommandDgDebug extends CommandBase {
 
             (new Thread(() -> {
                 Future<Boolean> online = DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().getWebsocketClient().isOnline(tocheck);
-                if(online != null){
+                if (online != null) {
                     boolean aBoolean = false;
                     try {
                         aBoolean = online.get();
@@ -449,7 +404,7 @@ public class CommandDgDebug extends CommandBase {
                     }
 
                     ChatTransmitter.addToQueue(tocheck + " is " + (aBoolean ? "online" : "offline"));
-                }else {
+                } else {
                     ChatTransmitter.addToQueue("NULL");
                 }
 
@@ -480,12 +435,20 @@ public class CommandDgDebug extends CommandBase {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if ("listcosmetics".equals(arg)){
-            DungeonsGuide.getDungeonsGuide().getCosmeticsManager().getActiveCosmeticMap().forEach((uuid, activeCosmetic) ->{
+        } else if ("listcosmetics".equals(arg)) {
+            DungeonsGuide.getDungeonsGuide().getCosmeticsManager().getActiveCosmeticMap().forEach((uuid, activeCosmetic) -> {
                 System.out.println("OWNER UUID: " + uuid);
                 System.out.println("   " + activeCosmetic);
             });
-        } else if ("mockcosmetics".equals(arg)){
+        } else if ("dungeonrmtp".equals(arg)) {
+//            sender.addChatMessage(new ChatComponentText("top of room: " + (new BlockDetector()).getTopOfRoom()));
+
+            BlockDetector a = new BlockDetector();
+
+            a.getCornersSquare(a.getTopOfRoom());
+
+
+        } else if ("mockcosmetics".equals(arg)) {
             toOpen = new GuiScreen() {
 
 
@@ -541,13 +504,12 @@ public class CommandDgDebug extends CommandBase {
                     username.setEnabled(false);
 
 
-
                     super.initGui();
                 }
 
                 @Override
                 protected void actionPerformed(GuiButton button) throws IOException {
-                    if(button.id == 105){
+                    if (button.id == 105) {
                         activityUID.setText("98e445dc-650f-49e1-ba6f-b12086533cf7");
 
                         cosmeticUID.setText("dd99fea2-1f18-49ee-92ae-6e00a7a5b75f");
@@ -621,15 +583,10 @@ public class CommandDgDebug extends CommandBase {
                     this.username.drawTextBox();
 
 
-
-
                     super.drawScreen(mouseX, mouseY, partialTicks);
                 }
 
             };
-
-
-
 
 
         } else {
@@ -641,8 +598,6 @@ public class CommandDgDebug extends CommandBase {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §e/dg saverooms §7-§f Saves usergenerated dungeon roomdata."));
         }
     }
-
-    GuiScreen toOpen;
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent e) {

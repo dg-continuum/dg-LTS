@@ -23,7 +23,6 @@ import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MPopupMenu;
 import kr.syeyoung.dungeonsguide.gui.elements.MTooltip;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -36,8 +35,8 @@ import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class PanelDelegate extends MPanel {
     private final GuiFeature guiFeature;
@@ -374,30 +373,5 @@ public class PanelDelegate extends MPanel {
         if (!guiFeature.isEnabled()) return;
         if (getTooltipsOpen() > 0) return;
 
-        if (selectedPart == -1) {
-            setCursor(EnumCursor.CLOSED_HAND);
-        } else if (selectedPart >= 0) {
-            if (internallyThinking.width < 0 && internallyThinking.height < 0) {
-                setCursor(EnumCursor.RESIZE_TL);
-            } else if (internallyThinking.width < 0 && internallyThinking.height >= 0) {
-                setCursor(EnumCursor.RESIZE_DL);
-            } else if (internallyThinking.width >= 0 && internallyThinking.height >= 0) {
-                setCursor(EnumCursor.RESIZE_DR);
-            } else if (internallyThinking.width >= 0 && internallyThinking.height < 0) {
-                setCursor(EnumCursor.RESIZE_TR);
-            }
-        } else if (lastAbsClip.contains(absMouseX, absMouseY)) {
-            if (relMouseX < 4 && relMouseY < 4) {
-                setCursor(EnumCursor.RESIZE_TL);
-            } else if (relMouseX < 4 && relMouseY > getBounds().height - 4) {
-                setCursor(EnumCursor.RESIZE_DL);
-            } else if (relMouseX > getBounds().width - 4 && relMouseY > getBounds().height - 4) {
-                setCursor(EnumCursor.RESIZE_DR);
-            } else if (relMouseX > getBounds().width - 4 && relMouseY < 4) {
-                setCursor(EnumCursor.RESIZE_TR);
-            } else {
-                setCursor(EnumCursor.OPEN_HAND);
-            }
-        }
     }
 }

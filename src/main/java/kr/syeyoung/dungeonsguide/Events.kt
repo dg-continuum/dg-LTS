@@ -1,6 +1,5 @@
 package kr.syeyoung.dungeonsguide.events.impl
 
-import kr.syeyoung.dungeonsguide.stomp.StompClient
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -12,7 +11,6 @@ import net.minecraft.util.Tuple
 import net.minecraftforge.fml.common.eventhandler.Event
 
 class DungeonStartedEvent : Event()
-class AuthChangedEvent : Event()
 class BossroomEnterEvent : Event()
 class DungeonEndedEvent : Event()
 class DungeonLeftEvent : Event()
@@ -22,7 +20,6 @@ class SkyblockLeftEvent : Event()
 class DungeonContextInitializationEvent : Event()
 class KeyBindPressedEvent(val key: Int) : Event()
 class PlayerListItemPacketEvent(val packetPlayerListItem: S38PacketPlayerListItem?) : Event()
-class StompConnectedEvent(val stompInterface: StompClient?) : Event()
 class TitleEvent(var packetTitle: S45PacketTitle?) : Event()
 class WindowUpdateEvent(var windowItems: S30PacketWindowItems?, var packetSetSlot: S2FPacketSetSlot?) : Event()
 class PlayerInteractEntityEvent(var attack:Boolean = false, var entity: Entity?) : Event() {

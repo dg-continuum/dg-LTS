@@ -24,15 +24,15 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambe
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MazeRightProcessor extends GeneralDefuseChamberProcessor {
-    private final BlockPos center;
-    private final Map<Block, BlockPos> blockToBlockPosMap = new HashMap<Block, BlockPos>();
+    private final Vector3i center;
+    private final Map<Block, Vector3i> blockToBlockPosMap = new HashMap<Block, Vector3i>();
     private Block latestRequest = null;
 
     public MazeRightProcessor(RoomProcessorBombDefuseSolver solver, BDChamber chamber) {
@@ -42,7 +42,7 @@ public class MazeRightProcessor extends GeneralDefuseChamberProcessor {
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 6; y++) {
                 Block b = chamber.getBlock(x, 0, y).getBlock();
-                BlockPos pos = chamber.getBlockPos(x, 0, y);
+                Vector3i pos = chamber.getBlockPos(x, 0, y);
                 blockToBlockPosMap.put(b, pos);
             }
         }
@@ -56,8 +56,8 @@ public class MazeRightProcessor extends GeneralDefuseChamberProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        RenderUtils.drawTextAtWorld(latestRequest == null ? "Request not received yet" : "Requested received " + latestRequest.getLocalizedName(), center.getX() + 0.5f, center.getY(), center.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        BlockPos pos = blockToBlockPosMap.get(latestRequest);
+        RenderUtils.drawTextAtWorld(latestRequest == null ? "Request not received yet" : "Requested received " + latestRequest.getLocalizedName(), center.x + 0.5f, center.y, center.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        Vector3i pos = blockToBlockPosMap.get(latestRequest);
         if (pos == null) return;
         RenderUtils.highlightBlock(pos, new Color(0, 255, 0, 100), partialTicks, false);
     }

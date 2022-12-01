@@ -58,7 +58,7 @@ public class FeaturePenguins extends SimpleFeatureV2 {
     @SubscribeEvent
     public void onTextureStitchEvent(TextureStitchEvent.Pre event) {
         objModel = null;
-        ResourceLocation modelResourceLocation = new ResourceLocation("dungeonsguide:models/penguin.obj");
+        ResourceLocation modelResourceLocation = new ResourceLocation("dg-lts:models/penguin.obj");
         try {
             objModel = (OBJModel) OBJLoader.instance.loadModel(modelResourceLocation);
             objModel = (OBJModel) objModel.process(new ImmutableMap.Builder<String, String>().put("flip-v", "true").build());
@@ -80,6 +80,7 @@ public class FeaturePenguins extends SimpleFeatureV2 {
 
     @SubscribeEvent
     public void onPlyrRender(RenderPlayerEvent.Pre pre) {
+        if(true) return;
         if (!DgOneCongifConfig.penguins) return;
         if (pre.entityPlayer.isInvisible()) return;
         pre.setCanceled(true);

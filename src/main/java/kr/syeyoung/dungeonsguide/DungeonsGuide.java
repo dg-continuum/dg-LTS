@@ -33,25 +33,23 @@ import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistryV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
-import kr.syeyoung.dungeonsguide.utils.*;
-import kr.syeyoung.dungeonsguide.utils.cursor.GLCursors;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.utils.TimeScoreUtil;
+import kr.syeyoung.dungeonsguide.utils.TitleRender;
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourcePack;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class DungeonsGuide {
 
@@ -138,8 +136,6 @@ public class DungeonsGuide {
         MinecraftForge.EVENT_BUS.register(ChatProcessor.INSTANCE);
 //        MinecraftForge.EVENT_BUS.register(StaticResourceCache.INSTANCE);
 
-        MinecraftForge.EVENT_BUS.register(new AhUtils());
-
 
         progressbar.step("Opening connection");
         cosmeticsManager = new CosmeticsManager();
@@ -157,17 +153,12 @@ public class DungeonsGuide {
             ClientCommandHandler.instance.registerCommand(commandReparty);
         }
 
-        if (DgOneCongifConfig.disableDiscd) {
-            System.setProperty("dg.safe", "true");
-        }
 
         TimeScoreUtil.init();
 
         Main.finishUpProgressBar(progressbar);
 
         ProgressManager.pop(progressbar);
-
-        ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(resourceManager -> GLCursors.setupCursors());
     }
 
     private boolean showedStartUpGuide;
@@ -230,14 +221,6 @@ public class DungeonsGuide {
 
         Config.f = configFile;
         Minecraft.getMinecraft().getFramebuffer().enableStencil();
-
-        try {
-            List<IResourcePack> resourcePackList = ReflectionHelper.getPrivateValue(Minecraft.class, Minecraft.getMinecraft(), "defaultResourcePacks", "aA", "field_110449_ao");
-            resourcePackList.add(new DGTexturePack());
-            Minecraft.getMinecraft().refreshResources();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 

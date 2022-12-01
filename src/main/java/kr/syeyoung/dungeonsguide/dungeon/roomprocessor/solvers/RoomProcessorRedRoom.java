@@ -29,26 +29,26 @@ import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
 
 public class RoomProcessorRedRoom extends GeneralRoomProcessor {
-    Vec3 basePt;
+    Vector3d basePt;
     int dir = 0;
     public RoomProcessorRedRoom(DungeonRoom dungeonRoom) {
         super(dungeonRoom);
-        BlockPos basePt = dungeonRoom.getMin().add(dungeonRoom.getMax());
-        this.basePt = new Vec3(basePt.getX() / 2.0f, basePt.getY() / 2.0f, basePt.getZ() / 2.0f);
+        Vector3i basePt = dungeonRoom.getMin().add(dungeonRoom.getMax());
+        this.basePt = new Vector3d(basePt.x / 2.0f, basePt.y / 2.0f, basePt.z / 2.0f);
     }
 
     @Override
     public void tick() {
-        BlockPos basePt = getDungeonRoom().getMin().add(getDungeonRoom().getMax());
-        this.basePt = new Vec3(basePt.getX() / 2.0f, basePt.getY() / 2.0f + 4, basePt.getZ() / 2.0f);
+        Vector3i basePt = getDungeonRoom().getMin().add(getDungeonRoom().getMax());
+        this.basePt = new Vector3d(basePt.x / 2.0f, basePt.y / 2.0f + 4, basePt.z / 2.0f);
         DungeonDoor real = null;
         for (DungeonDoor door : getDungeonRoom().getDoors()) {
             if (door.getType().isExist()) {
@@ -59,16 +59,16 @@ public class RoomProcessorRedRoom extends GeneralRoomProcessor {
         if (real != null) {
             OffsetPoint offsetPoint = new OffsetPoint(getDungeonRoom(), real.getPosition());
             offsetPoint = new OffsetPoint(33 - offsetPoint.getX(), offsetPoint.getY(), 33 - offsetPoint.getZ());
-            BlockPos opposite = offsetPoint.getBlockPos(getDungeonRoom());
-            BlockPos dir = new BlockPos(real.getPosition().subtract(opposite));
-            dir = new BlockPos(MathHelper.clamp_int(dir.getX() / 10, -1, 1), 0, MathHelper.clamp_int(dir.getZ() / 10, -1, 1));
+            Vector3i opposite = offsetPoint.getVector3i(getDungeonRoom());
+            Vector3i dir = new Vector3i(real.getPosition().sub(opposite));
+            dir = new Vector3i(MathHelper.clamp_int(dir.x / 10, -1, 1), 0, MathHelper.clamp_int(dir.z / 10, -1, 1));
 
-            this.basePt = new Vec3(opposite.add(dir.getX() * 6 + dir.getZ(), 3, dir.getZ() * 6 - dir.getX()));
+            this.basePt = new Vector3d(opposite.add(dir.x * 6 + dir.z, 3, dir.z * 6 - dir.x));
 
-            if (dir.getX() > 0) this.dir = 270;
-            else if (dir.getX() < 0) this.dir = 90;
-            else if (dir.getZ() < 0) this.dir = 0;
-            else if (dir.getZ() > 0) this.dir = 180;
+            if (dir.x > 0) this.dir = 270;
+            else if (dir.x < 0) this.dir = 90;
+            else if (dir.z < 0) this.dir = 0;
+            else if (dir.z > 0) this.dir = 180;
             else this.dir = Integer.MIN_VALUE;
         } else {
             dir = Integer.MIN_VALUE;
@@ -85,7 +85,7 @@ public class RoomProcessorRedRoom extends GeneralRoomProcessor {
         {
             RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
 
-            Vector3f renderPos = RenderUtils.getRenderPos((float) basePt.xCoord, (float) basePt.yCoord, (float) basePt.zCoord, partialTicks);
+            Vector3f renderPos = RenderUtils.getRenderPos((float) basePt.x, (float) basePt.y, (float) basePt.z, partialTicks);
 
             GlStateManager.color(1f, 1f, 1f, 0.5f);
             GlStateManager.pushMatrix();

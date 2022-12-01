@@ -22,10 +22,10 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.BlockPos;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -34,8 +34,8 @@ public class RoomProcessorButtonSolver extends GeneralRoomProcessor {
     private final int[] result = new int[12];
     private boolean bugged;
 
-    private BlockPos[] buttons;
-    private BlockPos[] woods;
+    private Vector3i[] buttons;
+    private Vector3i[] woods;
 
     private long clicked;
     private int clickedButton = -1;
@@ -49,10 +49,10 @@ public class RoomProcessorButtonSolver extends GeneralRoomProcessor {
             return;
         }
 
-        buttons = new BlockPos[12];
-        woods = new BlockPos[12];
+        buttons = new Vector3i[12];
+        woods = new Vector3i[12];
         for (int i = 0; i < ops.getOffsetPointList().size(); i++) {
-            buttons[i] = ops.getOffsetPointList().get(i).getBlockPos(dungeonRoom);
+            buttons[i] = ops.getOffsetPointList().get(i).getVector3i(dungeonRoom);
             woods[i] = buttons[i].add(0, -1, 0);
         }
     }
@@ -103,12 +103,12 @@ public class RoomProcessorButtonSolver extends GeneralRoomProcessor {
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
         if (bugged) return;
-        if (Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(woods[6]) > 100) return;
+        if (VectorUtils.getPlayerVector3i().distance(woods[6]) > 100) return;
 
 
         for (int i = 0; i < woods.length; i++) {
             int data = result[i];
-            BlockPos pos = woods[i];
+            Vector3i pos = woods[i];
 
             if (data == 0) {
                 RenderUtils.highlightBlock(pos, new Color(0, 255, 255, 50), partialTicks, false);

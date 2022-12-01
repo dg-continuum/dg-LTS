@@ -20,7 +20,6 @@ package kr.syeyoung.dungeonsguide.gui.elements;
 
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.Gui;
@@ -200,10 +199,5 @@ public class MScrollBar extends MPanel {
 
     @Override
     public void mouseMoved(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0) {
-        if (grabbed)
-            setCursor(EnumCursor.CLOSED_HAND);
-        else if (lastThumbRect.contains(relMouseX0, relMouseY0)) {
-            setCursor(EnumCursor.OPEN_HAND);
-        }
     }
 }

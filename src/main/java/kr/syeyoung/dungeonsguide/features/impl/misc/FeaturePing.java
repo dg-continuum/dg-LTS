@@ -6,7 +6,7 @@ import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.events.PacketListener;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
-import kr.syeyoung.dungeonsguide.utils.SimpleLock;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleLock;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TitleRender;
 import net.minecraft.client.Minecraft;
@@ -36,6 +36,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
+import static kr.syeyoung.dungeonsguide.oneconfig.huds.PingPage.warnAboutServerNotresp;
 
 public class FeaturePing extends SingleTextHud {
 
@@ -76,7 +78,7 @@ public class FeaturePing extends SingleTextHud {
     public void onTick(TickEvent.ClientTickEvent e){
         if(e.phase != TickEvent.Phase.START || e.side != Side.CLIENT) return;
         if(System.currentTimeMillis() - PacketListener.lastPacketReceived > TIMEOUT_THRESHOLD){
-            if(!lastTimeOutStatus && !Minecraft.getMinecraft().isSingleplayer()){
+            if(!lastTimeOutStatus && !Minecraft.getMinecraft().isSingleplayer() && warnAboutServerNotresp){
                 TitleRender.displayTitle("", "§cServer stopped responding", 0,50000, 8);
             }
             lastTimeOutStatus = true;
@@ -102,7 +104,7 @@ public class FeaturePing extends SingleTextHud {
             temp += i;
         }
         averagePing = temp / averagePingStore.size();
-        if(DgOneCongifConfig.DEBUG_MODE) logger.info("Updating ping: {}", ping);
+        if(DgOneCongifConfig.debugMode) logger.info("Updating ping: {}", ping);
     }
 
     @Exclude

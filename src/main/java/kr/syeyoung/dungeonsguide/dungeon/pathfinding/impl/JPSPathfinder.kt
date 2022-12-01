@@ -10,7 +10,7 @@ import org.joml.Vector3d
 import java.util.*
 import kotlin.math.abs
 
-class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStrategy(dungeonRoom) {
+class JPSPathfinder(private val room: DungeonRoomAccessor): PathfinderStrategy(room) {
     private val nodeMap: HashMap<Int, Node> = HashMap()
 
 
@@ -88,9 +88,9 @@ class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStr
             for (i in -1..1) {
                 for (j in -1..1) {
                     if (i == 0 && j == 0) continue
-                    if (dx != 0 && dungeonRoom.isBlocked(x, y + i, z + j)) nexts.add(openNode(nx, y + i, z + j))
-                    if (dy != 0 && dungeonRoom.isBlocked(x + i, y, z + j)) nexts.add(openNode(x + i, ny, z + j))
-                    if (dz != 0 && dungeonRoom.isBlocked(x + i, y + j, z)) nexts.add(openNode(x + i, y + j, nz))
+                    if (dx != 0 && roomAccessor.isBlocked(x, y + i, z + j)) nexts.add(openNode(nx, y + i, z + j))
+                    if (dy != 0 && roomAccessor.isBlocked(x + i, y, z + j)) nexts.add(openNode(x + i, ny, z + j))
+                    if (dz != 0 && roomAccessor.isBlocked(x + i, y + j, z)) nexts.add(openNode(x + i, y + j, nz))
                 }
             }
         } else if (determinant == 2) {
@@ -99,37 +99,37 @@ class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStr
             if (dx != 0) nexts.add(openNode(nx, y, z))
             nexts.add(openNode(nx, ny, nz))
             if (dx == 0) {
-                if (dungeonRoom.isBlocked(x, y, z - dz)) {
+                if (roomAccessor.isBlocked(x, y, z - dz)) {
                     nexts.add(openNode(x, ny, z - dz))
-                    if (dungeonRoom.isBlocked(x + 1, y, z - dz)) nexts.add(openNode(x + 1, ny, z - dz))
-                    if (dungeonRoom.isBlocked(x - 1, y, z - dz)) nexts.add(openNode(x - 1, ny, z - dz))
+                    if (roomAccessor.isBlocked(x + 1, y, z - dz)) nexts.add(openNode(x + 1, ny, z - dz))
+                    if (roomAccessor.isBlocked(x - 1, y, z - dz)) nexts.add(openNode(x - 1, ny, z - dz))
                 }
-                if (dungeonRoom.isBlocked(x, y - dy, z)) {
+                if (roomAccessor.isBlocked(x, y - dy, z)) {
                     nexts.add(openNode(x, y - dy, nz))
-                    if (dungeonRoom.isBlocked(x + 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz))
-                    if (dungeonRoom.isBlocked(x - 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz))
+                    if (roomAccessor.isBlocked(x + 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz))
+                    if (roomAccessor.isBlocked(x - 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz))
                 }
             } else if (dy == 0) {
-                if (dungeonRoom.isBlocked(x, y, z - dz)) {
+                if (roomAccessor.isBlocked(x, y, z - dz)) {
                     nexts.add(openNode(nx, y, z - dz))
-                    if (dungeonRoom.isBlocked(x, y + 1, z - dz)) nexts.add(openNode(nx, y + 1, z - dz))
-                    if (dungeonRoom.isBlocked(x, y - 1, z - dz)) nexts.add(openNode(nx, y - 1, z - dz))
+                    if (roomAccessor.isBlocked(x, y + 1, z - dz)) nexts.add(openNode(nx, y + 1, z - dz))
+                    if (roomAccessor.isBlocked(x, y - 1, z - dz)) nexts.add(openNode(nx, y - 1, z - dz))
                 }
-                if (dungeonRoom.isBlocked(x - dx, y, z)) {
+                if (roomAccessor.isBlocked(x - dx, y, z)) {
                     nexts.add(openNode(x - dx, y, nz))
-                    if (dungeonRoom.isBlocked(x - dx, y + 1, z)) nexts.add(openNode(x - dx, y + 1, nz))
-                    if (dungeonRoom.isBlocked(x - dx, y - 1, z)) nexts.add(openNode(x - dx, y - 1, nz))
+                    if (roomAccessor.isBlocked(x - dx, y + 1, z)) nexts.add(openNode(x - dx, y + 1, nz))
+                    if (roomAccessor.isBlocked(x - dx, y - 1, z)) nexts.add(openNode(x - dx, y - 1, nz))
                 }
             } else if (dz == 0) {
-                if (dungeonRoom.isBlocked(x, y - dy, z)) {
+                if (roomAccessor.isBlocked(x, y - dy, z)) {
                     nexts.add(openNode(nx, y - dy, z))
-                    if (dungeonRoom.isBlocked(x, y - dy, z + 1)) nexts.add(openNode(nx, y - dy, z + 1))
-                    if (dungeonRoom.isBlocked(x, y - dy, z - 1)) nexts.add(openNode(nx, y - dy, z - 1))
+                    if (roomAccessor.isBlocked(x, y - dy, z + 1)) nexts.add(openNode(nx, y - dy, z + 1))
+                    if (roomAccessor.isBlocked(x, y - dy, z - 1)) nexts.add(openNode(nx, y - dy, z - 1))
                 }
-                if (dungeonRoom.isBlocked(x - dx, y, z)) {
+                if (roomAccessor.isBlocked(x - dx, y, z)) {
                     nexts.add(openNode(x - dx, ny, z))
-                    if (dungeonRoom.isBlocked(x - dx, y, z + 1)) nexts.add(openNode(x - dx, ny, z + 1))
-                    if (dungeonRoom.isBlocked(x - dx, y, z - 1)) nexts.add(openNode(x - dx, ny, z - 1))
+                    if (roomAccessor.isBlocked(x - dx, y, z + 1)) nexts.add(openNode(x - dx, ny, z + 1))
+                    if (roomAccessor.isBlocked(x - dx, y, z - 1)) nexts.add(openNode(x - dx, ny, z - 1))
                 }
             }
         } else if (determinant == 3) {
@@ -140,17 +140,17 @@ class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStr
             nexts.add(openNode(x, ny, nz))
             nexts.add(openNode(nx, ny, z))
             nexts.add(openNode(nx, ny, nz))
-            if (dungeonRoom.isBlocked(x, y, z - dz)) {
+            if (roomAccessor.isBlocked(x, y, z - dz)) {
                 nexts.add(openNode(x, ny, z - dz))
                 nexts.add(openNode(nx, ny, z - dz))
                 nexts.add(openNode(nx, y, z - dz))
             }
-            if (dungeonRoom.isBlocked(x - dx, y, z)) {
+            if (roomAccessor.isBlocked(x - dx, y, z)) {
                 nexts.add(openNode(x - dx, ny, nz))
                 nexts.add(openNode(x - dx, ny, z))
                 nexts.add(openNode(x - dx, y, nz))
             }
-            if (dungeonRoom.isBlocked(x, y - dy, z)) {
+            if (roomAccessor.isBlocked(x, y - dy, z)) {
                 nexts.add(openNode(x, y - dy, nz))
                 nexts.add(openNode(nx, y - dy, z))
                 nexts.add(openNode(nx, y - dy, nz))
@@ -167,7 +167,7 @@ class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStr
             val nx = x + dx
             val ny = y + dy
             val nz = z + dz
-            if (dungeonRoom.isBlocked(nx, ny, nz)) return null
+            if (roomAccessor.isBlocked(nx, ny, nz)) return null
             if (nx > destinationBB!!.minX && nx < destinationBB!!.maxX && ny > destinationBB!!.minY && ny < destinationBB!!.maxY && nz > destinationBB!!.minZ && nz < destinationBB!!.maxZ) return openNode(
                 nx,
                 ny,
@@ -178,19 +178,19 @@ class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStr
                 for (i in -1..1) {
                     for (j in -1..1) {
                         if (i == 0 && j == 0) continue
-                        if (dx != 0 && dungeonRoom.isBlocked(nx, ny + i, nz + j) && !dungeonRoom.isBlocked(
+                        if (dx != 0 && roomAccessor.isBlocked(nx, ny + i, nz + j) && !roomAccessor.isBlocked(
                                 nx + dx,
                                 ny + i,
                                 nz + j
                             )
                         ) return openNode(nx, ny, nz)
-                        if (dy != 0 && dungeonRoom.isBlocked(nx + i, ny, nz + j) && !dungeonRoom.isBlocked(
+                        if (dy != 0 && roomAccessor.isBlocked(nx + i, ny, nz + j) && !roomAccessor.isBlocked(
                                 nx + i,
                                 ny + dy,
                                 nz + j
                             )
                         ) return openNode(nx, ny, nz)
-                        if (dz != 0 && dungeonRoom.isBlocked(nx + i, ny + j, nz) && !dungeonRoom.isBlocked(
+                        if (dz != 0 && roomAccessor.isBlocked(nx + i, ny + j, nz) && !roomAccessor.isBlocked(
                                 nx + i,
                                 ny + j,
                                 nz + dz
@@ -204,13 +204,13 @@ class JPSPathfinder(private val dungeonRoom: DungeonRoomAccessor): PathfinderStr
                     val tx = nx + value.frontOffsetX
                     val ty = ny + value.frontOffsetY
                     val tz = nz + value.frontOffsetZ
-                    if (dungeonRoom.isBlocked(tx, ty, tz)) return openNode(nx, ny, nz)
+                    if (roomAccessor.isBlocked(tx, ty, tz)) return openNode(nx, ny, nz)
                 }
                 if (dx != 0 && expand(nx, ny, nz, dx, 0, 0) != null) return openNode(nx, ny, nz)
                 if (dy != 0 && expand(nx, ny, nz, 0, dy, 0) != null) return openNode(nx, ny, nz)
                 if (dz != 0 && expand(nx, ny, nz, 0, 0, dz) != null) return openNode(nx, ny, nz)
             } else if (determinant == 3) {
-                if (dungeonRoom.isBlocked(x, ny, nz) || dungeonRoom.isBlocked(nx, y, nz) || dungeonRoom.isBlocked(
+                if (roomAccessor.isBlocked(x, ny, nz) || roomAccessor.isBlocked(nx, y, nz) || roomAccessor.isBlocked(
                         nx,
                         ny,
                         z

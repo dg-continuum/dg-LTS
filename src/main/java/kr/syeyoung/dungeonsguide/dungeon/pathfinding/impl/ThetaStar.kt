@@ -12,7 +12,7 @@ import java.util.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class ThetaStar(private val roomAccessor: DungeonRoomAccessor): PathfinderStrategy(roomAccessor) {
+class ThetaStar(private val room: DungeonRoomAccessor): PathfinderStrategy(room) {
     private var dx: Int = 0
     private var dy: Int = 0
     private var dz: Int = 0

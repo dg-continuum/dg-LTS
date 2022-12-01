@@ -33,6 +33,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.util.Arrays;
 import java.util.List;
@@ -73,13 +74,13 @@ public class RoomProcessorRiddle extends GeneralRoomProcessor {
         if (foundMatch) {
             ChatTransmitter.addToQueue(ChatTransmitter.PREFIX + "§eRiddle §7:: " + ch2.split(":")[0].trim() + " §fhas the reward!");
             final String name = TextUtils.stripColor(ch2.split(":")[0]).replace("[NPC] ", "").trim();
-            final BlockPos low = getDungeonRoom().getMin();
-            final BlockPos high = getDungeonRoom().getMax();
+            final Vector3i low = getDungeonRoom().getMin();
+            final Vector3i high = getDungeonRoom().getMax();
             World w = getDungeonRoom().getContext().getWorld();
             List<EntityArmorStand> armor = w.getEntities(EntityArmorStand.class, input -> {
                 BlockPos pos = input.getPosition();
-                return low.getX() < pos.getX() && pos.getX() < high.getX()
-                        && low.getZ() < pos.getZ() && pos.getZ() < high.getZ() && TextUtils.stripColor(input.getName()).equalsIgnoreCase(name);
+                return low.x < pos.getX() && pos.getX() < high.x
+                        && low.z < pos.getZ() && pos.getZ() < high.z && TextUtils.stripColor(input.getName()).equalsIgnoreCase(name);
             });
 
             if (armor != null) {

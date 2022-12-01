@@ -19,9 +19,7 @@
 package kr.syeyoung.dungeonsguide.gui.elements;
 
 import kr.syeyoung.dungeonsguide.gui.MPanel;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,12 +47,5 @@ public class MRootPanel extends MPanel {
         mTooltip.setRoot(null);
         tooltips.remove(mTooltip);
         remove(mTooltip);
-    }
-
-    @Getter @Setter
-    private EnumCursor currentCursor = EnumCursor.DEFAULT;
-    @Override
-    public void setCursor(EnumCursor enumCursor) {
-        currentCursor = enumCursor;
     }
 }

@@ -39,7 +39,7 @@ public class ChatTransmitter {
     }
 
     public static void sendDebugChat(IChatComponent iChatComponent) {
-        if (DgOneCongifConfig.DEBUG_MODE)
+        if (DgOneCongifConfig.debugMode)
             addToQueue((ChatComponentText) iChatComponent);
     }
 

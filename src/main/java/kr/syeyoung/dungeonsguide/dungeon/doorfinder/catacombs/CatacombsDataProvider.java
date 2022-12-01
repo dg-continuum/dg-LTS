@@ -2,6 +2,7 @@ package kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -55,9 +56,12 @@ public abstract class CatacombsDataProvider implements DungeonSpecificDataProvid
             for (int i = 0; i < 5; i++) {
                 for (Vector2d vector2d : directions) {
                     BlockPos test = pos.add(vector2d.x * i, 0, vector2d.y * i);
-                    if (w.getChunkFromBlockCoords(test).getBlock(test) == Blocks.iron_bars) {
+                    if(BlockCache.getBlockState(test).getBlock() == Blocks.iron_bars ){
                         return pos.add(vector2d.x * (i + 2), -2, vector2d.y * (i + 2));
                     }
+//                    if (w.getChunkFromBlockCoords(test).getBlock(test) == Blocks.iron_bars) {
+//                        return pos.add(vector2d.x * (i + 2), -2, vector2d.y * (i + 2));
+//                    }
                 }
             }
         }

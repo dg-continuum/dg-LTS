@@ -28,7 +28,7 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class ArrowLeftProcessor extends GeneralDefuseChamberProcessor {
     private static final BiMap<String, Integer> integers = HashBiMap.create(8);
     private static final Map<Integer, String> arrows = new HashMap<Integer, String>();
     private final int[] answers = new int[9];
-    private final BlockPos[] grid = new BlockPos[9];
+    private final Vector3i[] grid = new Vector3i[9];
     private int answer = -1;
 
     {
@@ -99,11 +99,11 @@ public class ArrowLeftProcessor extends GeneralDefuseChamberProcessor {
 
         if (answer == -1) return;
         for (int i = 0; i < 9; i++) {
-            BlockPos pos = grid[i];
+            Vector3i pos = grid[i];
             int direction = answers[i];
             String charac = arrows.get(direction);
 
-            RenderUtils.drawTextAtWorld(charac, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.05F, false, false, partialTicks);
+            RenderUtils.drawTextAtWorld(charac, pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f, 0xFFFFFFFF, 0.05F, false, false, partialTicks);
         }
     }
 

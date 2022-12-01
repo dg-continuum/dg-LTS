@@ -8,8 +8,6 @@ import kr.syeyoung.dungeonsguide.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
-import kr.syeyoung.dungeonsguide.stomp.StompManager;
-import kr.syeyoung.dungeonsguide.stomp.StompPayload;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -35,7 +33,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -69,7 +66,7 @@ public class FeatureTestPepole extends GuiFeature {
 
     @Override
     public boolean isEnabled() {
-        return DgOneCongifConfig.DEBUG_TEST_PEPOLE;
+        return DgOneCongifConfig.debugTestPepole;
     }
 
     public static void handlePartyBroadCast(String playload) {
@@ -114,10 +111,6 @@ public class FeatureTestPepole extends GuiFeature {
         logger.info("Sending self broadcast");
 //        int control = (new Random()).nextInt(1000);
         String actualPayload = "C:" + Minecraft.getMinecraft().getSession().getUsername() + ":" + 222;
-        StompManager.getInstance().send(new StompPayload().header("destination", "/app/party.broadcast").payload(
-                new JSONObject().put("partyID", PartyManager.INSTANCE.getPartyContext().getPartyID())
-                        .put("payload", actualPayload).toString()
-        ));
 //        sentContros.add(new Tuple<>(control, System.currentTimeMillis()));
         broadcastLock = false;
     }
@@ -383,7 +376,7 @@ public class FeatureTestPepole extends GuiFeature {
         if (!PartyManager.INSTANCE.getPartyContext().isPartyExistHypixel()) return;
 //        if(isAloneInParty()) return;
 
-        ResourceLocation logoLoc = new ResourceLocation("dungeonsguide:textures/dglogox32.png");
+        ResourceLocation logoLoc = new ResourceLocation("dg-lts:textures/dglogox32.png");
 
         FontRenderer fr = getFontRenderer();
 
@@ -398,7 +391,7 @@ public class FeatureTestPepole extends GuiFeature {
             GlStateManager.pushMatrix();
 
 
-            GlStateManager.scale(DgOneCongifConfig.DEBUG_TEST_PEPOLE_SCALE, DgOneCongifConfig.DEBUG_TEST_PEPOLE_SCALE, 1F);
+            GlStateManager.scale(DgOneCongifConfig.debugTestPepoleScale, DgOneCongifConfig.debugTestPepoleScale, 1F);
 
             Gui.drawRect(15 + xOffset, 5 + y, fr.getStringWidth(partyRawMember + genPlayerText(partyRawMember)) + 20 + xOffset, 15 + y, getColorTextColor(partyRawMember));
 

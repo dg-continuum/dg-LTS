@@ -19,20 +19,21 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.huds;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonFairySoul;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.joml.Vector2i;
 
-import java.awt.*;
 import java.util.UUID;
 
 public class FeatureSoulRoomWarning extends SingleTextHud {
@@ -52,7 +53,7 @@ public class FeatureSoulRoomWarning extends SingleTextHud {
 
             EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
             if (thePlayer == null) return;
-            Point roomPt = context.getMapProcessor().worldPointToRoomPoint(thePlayer.getPosition());
+            Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
             DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
             if (dungeonRoom == null) return;
             if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;

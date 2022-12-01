@@ -56,7 +56,7 @@ public class MazeLeftProcessor extends GeneralDefuseChamberProcessor {
 
         FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-        String str = "Press " + GameSettings.getKeyDisplayString(DgOneCongifConfig.BOMB_DEFUSE_SOLVER_KEYBIND.getKeyBinds().get(0)) + " to request open " + b.getLocalizedName();
+        String str = "Press " + GameSettings.getKeyDisplayString(DgOneCongifConfig.bombDefuseSolverKeybind.getKeyBinds().get(0)) + " to request open " + b.getLocalizedName();
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);

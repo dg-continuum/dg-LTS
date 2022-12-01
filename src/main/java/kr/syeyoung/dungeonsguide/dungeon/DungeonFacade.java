@@ -7,9 +7,9 @@ import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Setter;
 import lombok.val;
-import net.minecraft.util.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import org.joml.Vector3d;
+import org.joml.Vector3i;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -58,10 +58,10 @@ public class DungeonFacade {
     }
 
 
-    public float calculatePathLenght(BlockPos from, BlockPos to, DungeonRoom r){
+    public float calculatePathLenght(Vector3i from, Vector3i to, DungeonRoom r){
         float distance = -1;
-        Vector3d fromv3 = new Vector3d(from.getX(), from.getY(), from.getZ());
-        Vector3d tov3 = new Vector3d(to.getX(), to.getY(), to.getZ());
+        Vector3d fromv3 = new Vector3d(from.x, from.y, from.z);
+        Vector3d tov3 = new Vector3d(to.x, to.y, to.z);
         val a = genPathfind(fromv3, tov3, r);
         List<Vector3d> b;
         try {

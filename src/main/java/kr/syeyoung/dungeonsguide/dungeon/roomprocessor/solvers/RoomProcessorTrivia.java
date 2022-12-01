@@ -25,16 +25,14 @@ import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.oneconfig.solvers.KahootPage;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.utils.SkyblockUtils;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.json.JSONObject;
+import org.joml.Vector3i;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ public class RoomProcessorTrivia extends GeneralRoomProcessor {
     @Override
     public void chatReceived(IChatComponent chat) {
         super.chatReceived(chat);
-        if (!DgOneCongifConfig.KAHOOT_SOLVER) return;
+        if (!DgOneCongifConfig.kahootSolver) return;
         String ch2 = chat.getUnformattedText();
         if (parseDialog) {
             parseDialog = false;
@@ -93,28 +91,24 @@ public class RoomProcessorTrivia extends GeneralRoomProcessor {
     }
 
     private void match(String question, String a, String b, String c) {
-        StaticResourceCache.INSTANCE.getResource(StaticResourceCache.TRIVIA_ANSWERS).thenAccept(value -> {
-            JSONObject answersJSON = new JSONObject(value.getValue());
-
-            String semi_answers = answersJSON.getString(question.toLowerCase().trim());
-            String theRealAnswer;
-            if (semi_answers == null) theRealAnswer = null;
-            else {
-                semi_answers = takeCareOfPlaceHolders(semi_answers);
-                String[] answers = semi_answers.split(",");
-                if (match(answers, a)) theRealAnswer = "A";
-                else if (match(answers, b)) theRealAnswer = "B";
-                else if (match(answers, c)) theRealAnswer = "C";
-                else theRealAnswer = semi_answers;
-            }
-            if (theRealAnswer == null)
-                ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eTrivia §7:: §cCouldn't determine the answer! (no question found)"));
-            else if (theRealAnswer.length() > 1)
-                ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eTrivia §7:: §cCouldn't determine the answer! (" + theRealAnswer + ")"));
-            else
-                ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eTrivia §7:: " + theRealAnswer + "§f is the correct answer!"));
-            correctAnswer = theRealAnswer;
-        });
+//        String semi_answers = answersJSON.getString(question.toLowerCase().trim());
+//        String theRealAnswer;
+//        if (semi_answers == null) theRealAnswer = null;
+//        else {
+//            semi_answers = takeCareOfPlaceHolders(semi_answers);
+//            String[] answers = semi_answers.split(",");
+//            if (match(answers, a)) theRealAnswer = "A";
+//            else if (match(answers, b)) theRealAnswer = "B";
+//            else if (match(answers, c)) theRealAnswer = "C";
+//            else theRealAnswer = semi_answers;
+//        }
+//        if (theRealAnswer == null)
+//            ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eTrivia §7:: §cCouldn't determine the answer! (no question found)"));
+//        else if (theRealAnswer.length() > 1)
+//            ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eTrivia §7:: §cCouldn't determine the answer! (" + theRealAnswer + ")"));
+//        else
+//            ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: §eTrivia §7:: " + theRealAnswer + "§f is the correct answer!"));
+//        correctAnswer = theRealAnswer;
     }
 
     private String takeCareOfPlaceHolders(String input) {
@@ -144,13 +138,13 @@ public class RoomProcessorTrivia extends GeneralRoomProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        if (!DgOneCongifConfig.KAHOOT_SOLVER) return;
+        if (!DgOneCongifConfig.kahootSolver) return;
         if (correctAnswer == null) return;
 
         OffsetPoint op = (OffsetPoint) getDungeonRoom().getDungeonRoomInfo().getProperties().get(correctAnswer);
         if (op != null) {
-            BlockPos solution = op.getBlockPos(getDungeonRoom());
-            RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(solution.getX(), solution.getY(), solution.getZ(), solution.getX() + 1, solution.getY() + 1, solution.getZ() + 1), new AColor(KahootPage.color.getRed(), KahootPage.color.getBlue(), KahootPage.color.getGreen(), KahootPage.color.getAlpha()), partialTicks, false);
+            Vector3i solution = op.getVector3i(getDungeonRoom());
+            RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(solution.x, solution.y, solution.z, solution.x + 1, solution.y + 1, solution.z + 1), new AColor(KahootPage.color.getRed(), KahootPage.color.getBlue(), KahootPage.color.getGreen(), KahootPage.color.getAlpha()), partialTicks, false);
         }
     }
 

@@ -24,6 +24,7 @@ import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.oneconfig.solvers.TicktackToeSolverPage;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItemFrame;
@@ -31,9 +32,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.MapData;
+import org.joml.Vector3i;
 
 import java.util.List;
 
@@ -57,12 +58,12 @@ public class RoomProcessorTicTacToeSolver extends GeneralRoomProcessor {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 OffsetPoint op = this.board.getOffsetPointList().get(x * 3 + y);
-                BlockPos bpos = op.getBlockPos(getDungeonRoom());
-                Block b = w.getChunkFromBlockCoords(bpos).getBlock(bpos);
+                Vector3i bpos = op.getVector3i(getDungeonRoom());
+                Block b = BlockCache.getBlock(bpos);
                 if (b == Blocks.stone_button) {
                     board[y][x] = 0;
                 } else if (b == Blocks.air) {
-                    AxisAlignedBB abab = AxisAlignedBB.fromBounds(bpos.getX(), bpos.getY(), bpos.getZ(), bpos.getX() + 1, bpos.getY() + 1, bpos.getZ() + 1);
+                    AxisAlignedBB abab = AxisAlignedBB.fromBounds(bpos.x, bpos.y, bpos.z, bpos.x + 1, bpos.y + 1, bpos.z + 1);
                     List<EntityItemFrame> frames = getDungeonRoom().getContext().getWorld().getEntitiesWithinAABB(EntityItemFrame.class, abab);
                     if (frames.isEmpty()) board[y][x] = 0;
                     else {
@@ -186,7 +187,7 @@ public class RoomProcessorTicTacToeSolver extends GeneralRoomProcessor {
         super.drawWorld(partialTicks);
         if (!DgOneCongifConfig.ticktaktoeSolver) return;
         if (chosePos != -1) {
-            BlockPos block = board.getOffsetPointList().get(chosePos).getBlockPos(getDungeonRoom());
+            Vector3i block = board.getOffsetPointList().get(chosePos).getVector3i(getDungeonRoom());
             boolean whoseturn = false; // false => hype true => me
             if (lastBoard != null) {
                 int ones = 0;
@@ -199,7 +200,7 @@ public class RoomProcessorTicTacToeSolver extends GeneralRoomProcessor {
                 }
                 whoseturn = ones < negativeones;
             }
-            RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(block.getX(), block.getY(), block.getZ(), block.getX() + 1, block.getY() + 1, block.getZ() + 1),
+            RenderUtils.highlightBoxAColor(AxisAlignedBB.fromBounds(block.x, block.y, block.z, block.x + 1, block.y + 1, block.z + 1),
                     whoseturn ? DgOneCongifConfig.oneconftodgcolor(TicktackToeSolverPage.solutionColor)
                             : DgOneCongifConfig.oneconftodgcolor(TicktackToeSolverPage.predictColor), partialTicks, true);
         }

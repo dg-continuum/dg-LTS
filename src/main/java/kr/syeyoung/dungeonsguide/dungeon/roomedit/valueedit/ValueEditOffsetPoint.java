@@ -27,10 +27,11 @@ import kr.syeyoung.dungeonsguide.gui.elements.MIntegerSelectionButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabel;
 import kr.syeyoung.dungeonsguide.gui.elements.MLabelAndElement;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 
@@ -108,8 +109,7 @@ public class ValueEditOffsetPoint extends MPanel implements ValueEdit<String> {
                 @Override
                 public void run() {
                     EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-                    BlockPos pos = new BlockPos(player.posX, player.posY, player.posZ);
-                    ((OffsetPoint) parameter2.getNewData()).setPosInWorld(EditingContext.getEditingContext().getRoom(), pos);
+                    ((OffsetPoint) parameter2.getNewData()).setPosInWorld(EditingContext.getEditingContext().getRoom(), new Vector3i((int) player.posX, (int) player.posY, (int) player.posZ));
                 }
             });
             MLabelAndElement mLabelAndElement = new MLabelAndElement("set", setToHEre2);
@@ -120,8 +120,8 @@ public class ValueEditOffsetPoint extends MPanel implements ValueEdit<String> {
 
     @Override
     public void renderWorld(float partialTicks) {
-        RenderUtils.highlightBlock(((OffsetPoint) parameter.getPreviousData()).getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(255, 0, 0, 150), partialTicks);
-        RenderUtils.highlightBlock(((OffsetPoint) parameter.getNewData()).getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 0, 150), partialTicks);
+        RenderUtils.highlightBlock(((OffsetPoint) parameter.getPreviousData()).getVector3i(EditingContext.getEditingContext().getRoom()), new Color(255, 0, 0, 150), partialTicks);
+        RenderUtils.highlightBlock(((OffsetPoint) parameter.getNewData()).getVector3i(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 0, 150), partialTicks);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class ValueEditOffsetPoint extends MPanel implements ValueEdit<String> {
 
         @Override
         public Object createDefaultValue(Parameter parameter) {
-            return new OffsetPoint(EditingContext.getEditingContext().getRoom(), Minecraft.getMinecraft().thePlayer.getPosition());
+            return new OffsetPoint(EditingContext.getEditingContext().getRoom(), VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
         }
 
         @Override

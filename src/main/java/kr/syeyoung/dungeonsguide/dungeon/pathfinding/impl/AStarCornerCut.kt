@@ -10,7 +10,7 @@ import org.joml.Vector3d
 import java.util.*
 import kotlin.math.roundToInt
 
-class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): PathfinderStrategy(roomAccessor) {
+class AStarCornerCut(private val room: DungeonRoomAccessor): PathfinderStrategy(room) {
     private var dx: Int = 0
     private var dy: Int = 0
     private var dz: Int = 0
@@ -22,9 +22,9 @@ class AStarCornerCut(private val roomAccessor: DungeonRoomAccessor): PathfinderS
 
     private val open = PriorityQueue(
         Comparator.comparing { a: Node? -> a?.f ?: Float.MAX_VALUE }
-        .thenComparing { _, a: Node? -> if (a == null) Int.MAX_VALUE else a.coordinate.x }
-        .thenComparing { _, a: Node? -> if (a == null) Int.MAX_VALUE else a.coordinate.y }
-        .thenComparing { _, a: Node? -> if (a == null) Int.MAX_VALUE else a.coordinate.z }
+        .thenComparing { _, a: Node? -> a?.coordinate?.x ?: Int.MAX_VALUE }
+        .thenComparing { _, a: Node? -> a?.coordinate?.y ?: Int.MAX_VALUE }
+        .thenComparing { _, a: Node? -> a?.coordinate?.z ?: Int.MAX_VALUE }
     )
 
 

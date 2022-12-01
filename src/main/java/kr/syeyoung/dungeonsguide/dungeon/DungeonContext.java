@@ -22,20 +22,17 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.events.DungeonEvent;
-import kr.syeyoung.dungeonsguide.dungeon.events.DungeonEventData;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonNodataEvent;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
-import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.List;
@@ -43,7 +40,7 @@ import java.util.*;
 
 public class DungeonContext {
 
-    private final Map<Integer, Vec3> batSpawnedLocations = new HashMap<>();
+    private final Map<Integer, Vector3i> batSpawnedLocations = new HashMap<>();
 
     private final List<Integer> killedBats = new ArrayList<>();
     /**
@@ -64,7 +61,7 @@ public class DungeonContext {
 
     private final MapProcessor mapProcessor;
     @Getter
-    private final Map<Point, DungeonRoom> roomMapper = new HashMap<>();
+    private final Map<Vector2i, DungeonRoom> roomMapper = new HashMap<>();
     @Getter
     private final List<DungeonRoom> dungeonRoomList = new ArrayList<>();
     @Getter
@@ -75,8 +72,6 @@ public class DungeonContext {
     private final List<String[]> milestoneReached = new ArrayList<>();
     @Getter
     private final Set<String> players = new HashSet<>();
-    @Getter
-    private final List<DungeonEvent> events = new ArrayList<>();
     public static final Rectangle roomBoundary = new Rectangle(-10, -10, 138, 138);
     @Getter
     @Setter
@@ -92,7 +87,7 @@ public class DungeonContext {
     private long BossRoomEnterSeconds = -1;
     @Getter
     @Setter
-    private long init = -1;
+    private long init;
     @Getter
     @Setter
     private BlockPos bossroomSpawnPos = null;
@@ -128,7 +123,6 @@ public class DungeonContext {
 
     public DungeonContext(World world) {
         this.world = world;
-        createEvent(new DungeonNodataEvent("DUNGEON_CONTEXT_CREATION"));
         mapProcessor = new MapProcessor(this);
 
         dataProvider = DungeonSpecificDataProviderRegistry.getDoorFinder(getDungeonName());
@@ -149,7 +143,7 @@ public class DungeonContext {
         return System.currentTimeMillis() - ctx.started;
     }
 
-    public Map<Integer, Vec3> getBatSpawnedLocations() {
+    public Map<Integer, Vector3i> getBatSpawnedLocations() {
         return batSpawnedLocations;
     }
 
@@ -159,14 +153,19 @@ public class DungeonContext {
 
     public void setGotMimic(boolean gotMimic) {
         this.gotMimic = gotMimic;
-        createEvent(new DungeonNodataEvent("MIMIC_KILLED"));
     }
 
-    static final Logger logger = LogManager.getLogger("DungeonContext");
 
-    public void createEvent(DungeonEventData eventData) {
-        if(DgOneCongifConfig.DEBUG_MODE) logger.info(eventData.getEventName(), eventData.toString());
-//        events.add(new DungeonEvent(eventData));
+    @Nullable
+    public RoomProcessor getCurrentRoomProcessor(){
+        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
+                .map(a -> DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a));
+
+
+        DungeonRoom dungeonRoom = dungeonRoomOpt.orElse(null);
+        if (dungeonRoom == null) return null;
+        return dungeonRoom.getRoomProcessor();
     }
 
 }

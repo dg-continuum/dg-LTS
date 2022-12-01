@@ -25,10 +25,7 @@ import kr.syeyoung.dungeonsguide.cosmetics.CosmeticsManager;
 import kr.syeyoung.dungeonsguide.features.impl.misc.playerpreview.FeatureViewPlayerStatsOnJoin;
 import kr.syeyoung.dungeonsguide.features.impl.misc.playerpreview.api.ApiFetcher;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
-import kr.syeyoung.dungeonsguide.stomp.StompManager;
-import kr.syeyoung.dungeonsguide.stomp.StompPayload;
-import kr.syeyoung.dungeonsguide.utils.SimpleLock;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleLock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -36,7 +33,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.json.JSONObject;
 
 public class CommandDungeonsGuide extends CommandBase {
     private boolean openConfig = false;
@@ -94,23 +90,8 @@ public class CommandDungeonsGuide extends CommandBase {
             cosmeticsManager.requestPerms();
             cosmeticsManager.requestCosmeticsList();
             cosmeticsManager.requestActiveCosmetics();
-            StaticResourceCache.INSTANCE.purgeCache();
 
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully purged API Cache!"));
-        } else if (args[0].equals("pbroadcast")) {
-            try {
-                String[] payload = new String[args.length - 1];
-                System.arraycopy(args, 1, payload, 0, payload.length);
-                String actualPayload = String.join(" ", payload).replace("$C$", "§");
-                StompManager.getInstance().send(new StompPayload().header("destination", "/app/party.broadcast").payload(
-                        new JSONObject().put("partyID", PartyManager.INSTANCE.getPartyContext().getPartyID())
-                                .put("payload", actualPayload).toString()
-                ));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
         } else if (args[0].equals("partymax") || args[0].equals("pm")) {
             if (args.length == 1) {
                 sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fCurrent party max is §e" + PartyManager.INSTANCE.getMaxParty()));

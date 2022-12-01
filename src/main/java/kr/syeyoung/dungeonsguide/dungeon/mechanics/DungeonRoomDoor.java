@@ -20,13 +20,13 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMove;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -69,10 +69,10 @@ public class DungeonRoomDoor implements DungeonMechanic {
 
     @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
-        BlockPos pos = offsetPoint.getBlockPos(dungeonRoom);
+        Vector3i pos = offsetPoint.getVector3i(dungeonRoom);
         RenderUtils.highlightBlock(pos, color, partialTicks);
-        RenderUtils.drawTextAtWorld(name, pos.getX() + 0.5f, pos.getY() + 0.75f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0.25f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.x + 0.5f, pos.y + 0.25f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
     @Override

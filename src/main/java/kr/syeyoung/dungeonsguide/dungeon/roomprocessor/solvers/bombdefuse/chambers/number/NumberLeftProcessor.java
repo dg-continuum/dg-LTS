@@ -28,14 +28,14 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 public class NumberLeftProcessor extends GeneralDefuseChamberProcessor {
     private static final BiMap<String, Integer> integers = HashBiMap.create(10);
-    private final BlockPos d1p;
-    private final BlockPos d2p;
-    private final BlockPos d3p;
-    private final BlockPos d4p;
+    private final Vector3i d1p;
+    private final Vector3i d2p;
+    private final Vector3i d3p;
+    private final Vector3i d4p;
     private int answer = -1, d1, d2, d3, d4;
 
     {
@@ -87,10 +87,10 @@ public class NumberLeftProcessor extends GeneralDefuseChamberProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        RenderUtils.drawTextAtWorld(d1 + "", d1p.getX() + 0.5f, d1p.getY() + 0.5f, d1p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(d2 + "", d2p.getX() + 0.5f, d2p.getY() + 0.5f, d2p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(d3 + "", d3p.getX() + 0.5f, d3p.getY() + 0.5f, d3p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(d4 + "", d4p.getX() + 0.5f, d4p.getY() + 0.5f, d4p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(d1 + "", d1p.x + 0.5f, d1p.y + 0.5f, d1p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(d2 + "", d2p.x + 0.5f, d2p.y + 0.5f, d2p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(d3 + "", d3p.x + 0.5f, d3p.y + 0.5f, d3p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(d4 + "", d4p.x + 0.5f, d4p.y + 0.5f, d4p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
 
     }
 

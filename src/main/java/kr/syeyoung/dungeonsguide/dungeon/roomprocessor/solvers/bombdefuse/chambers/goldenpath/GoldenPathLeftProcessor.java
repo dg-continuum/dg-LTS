@@ -29,6 +29,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.List;
@@ -42,7 +43,7 @@ public class GoldenPathLeftProcessor extends GeneralDefuseChamberProcessor {
             new Point(0, -1),
             new Point(1, 0)
     };
-    private final LinkedList<BlockPos> blocksolution = new LinkedList<BlockPos>();
+    private final LinkedList<Vector3i> blocksolution = new LinkedList<Vector3i>();
     private String goldenPathsolution;
 
     public GoldenPathLeftProcessor(RoomProcessorBombDefuseSolver solver, BDChamber chamber) {

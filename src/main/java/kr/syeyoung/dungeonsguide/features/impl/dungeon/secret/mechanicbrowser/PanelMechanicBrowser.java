@@ -30,6 +30,7 @@ import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MList;
 import kr.syeyoung.dungeonsguide.gui.elements.MPanelScaledGUI;
 import kr.syeyoung.dungeonsguide.gui.elements.MScrollablePanel;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -82,7 +83,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
 
 
         Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
                 .map(a -> {
 
                     return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
@@ -154,7 +155,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -167,7 +168,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -180,7 +181,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -193,7 +194,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -206,7 +207,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -219,7 +220,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -233,7 +234,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                     }
                     mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
                             (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
@@ -246,7 +247,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
     public void onElementClick(String id, DungeonMechanic dungeonMechanic, Point pt, MechanicBrowserElement mechanicBrowserElement) {
 
         Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
                 .map(a -> {
 
                     return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
@@ -290,7 +291,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
     public void cancel(MechanicBrowserElement mechanicBrowserElement) {
 
         Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(Minecraft.getMinecraft().thePlayer.getPosition()))
+                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
                 .map(a -> {
 
                     return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);

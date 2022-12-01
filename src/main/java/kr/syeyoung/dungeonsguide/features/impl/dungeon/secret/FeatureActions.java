@@ -25,12 +25,12 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.val;
 import lombok.var;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import org.joml.Vector2i;
 
-import java.awt.*;
 import java.util.List;
 
 public class FeatureActions extends TextHud {
@@ -45,8 +45,7 @@ public class FeatureActions extends TextHud {
         if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().isInitialized()) return false;
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
 
-        EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
-        Point roomPt = context.getMapProcessor().worldPointToRoomPoint(thePlayer.getPosition());
+        Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
         DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
         if (dungeonRoom == null) return false;
         return dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor;
@@ -70,7 +69,7 @@ public class FeatureActions extends TextHud {
         val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
         if(context == null) return;
 
-        val roomPt = context.getMapProcessor().worldPointToRoomPoint(thePlayer.getPosition());
+        val roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
 
         val dungeonRoom = context.getRoomMapper().get(roomPt);
         if(!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;

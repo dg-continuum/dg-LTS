@@ -18,7 +18,6 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers;
 
-import com.google.common.base.Predicate;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
@@ -32,16 +31,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
+import org.joml.Vector3i;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class RoomProcessorIcePath extends GeneralRoomProcessor {
 
-    private final Set<OffsetPoint> endNode = new HashSet<OffsetPoint>();
-    private final List<BlockPos> solution = new ArrayList<BlockPos>();
+    private final Set<OffsetPoint> endNode = new HashSet<>();
+    private final List<Vector3i> solution = new ArrayList<>();
     private int[][] map;
     private OffsetPoint[][] map2;
     private BlockPos lastSilverfishLoc;
@@ -58,25 +57,25 @@ public class RoomProcessorIcePath extends GeneralRoomProcessor {
 
     // Taken from https://stackoverflow.com/a/55271133 and modified to suit our needs
     // Answer by ofekp (https://stackoverflow.com/users/4295037/ofekp)
-    public static List<Point> solve(int[][] board, int startX, int startY, Predicate<Point> finishLinePredicate) {
-        Point startPoint = new Point(startX, startY);
+    public static List<Vector2i> solve(int[][] board, int startX, int startY, Predicate<Vector2i> finishLinePredicate) {
+        Vector2i startPoint = new Vector2i(startX, startY);
 
-        LinkedList<Point> queue = new LinkedList<Point>();
-        Point[][] boardSearch = new Point[board.length][board[0].length];
+        LinkedList<Vector2i> queue = new LinkedList<>();
+        Vector2i[][] boardSearch = new Vector2i[board.length][board[0].length];
 
-        queue.addLast(new Point(startX, startY));
+        queue.addLast(new Vector2i(startX, startY));
         boardSearch[startY][startX] = startPoint;
 
-        while (queue.size() != 0) {
-            Point currPos = queue.pollFirst();
+        while (!queue.isEmpty()) {
+            Vector2i currPos = queue.pollFirst();
             for (Direction dir : Direction.values()) {
-                Point nextPos = move(board, boardSearch, currPos, dir);
+                Vector2i nextPos = move(board, boardSearch, currPos, dir);
                 if (nextPos != null) {
                     queue.addLast(nextPos);
-                    boardSearch[nextPos.y][nextPos.x] = new Point(currPos.x, currPos.y);
-                    if (finishLinePredicate.apply(nextPos)) {
-                        List<Point> route = new ArrayList<Point>();
-                        Point tmp = currPos;
+                    boardSearch[nextPos.y][nextPos.x] = new Vector2i(currPos.x, currPos.y);
+                    if (finishLinePredicate.test(nextPos)) {
+                        List<Vector2i> route = new ArrayList<>();
+                        Vector2i tmp = currPos;
                         route.add(nextPos);
                         route.add(currPos);
                         while (tmp != startPoint) {
@@ -91,7 +90,7 @@ public class RoomProcessorIcePath extends GeneralRoomProcessor {
         return Collections.emptyList();
     }
 
-    public static Point move(int[][] board, Point[][] boardSearch, Point currPos, Direction dir) {
+    public static Vector2i move(int[][] board, Vector2i[][] boardSearch, Vector2i currPos, Direction dir) {
         int x = currPos.x;
         int y = currPos.y;
 
@@ -110,20 +109,17 @@ public class RoomProcessorIcePath extends GeneralRoomProcessor {
             return null;
         }
 
-        return new Point(x + i * diffX, y + i * diffY);
+        return new Vector2i(x + i * diffX, y + i * diffY);
     }
 
     public void findSilverFishanddoStuff() {
-        final BlockPos low = getDungeonRoom().getMin();
-        final BlockPos high = getDungeonRoom().getMax();
-        List<EntitySilverfish> silverfishs = getDungeonRoom().getContext().getWorld().getEntities(EntitySilverfish.class, new Predicate<EntitySilverfish>() {
-            @Override
-            public boolean apply(@Nullable EntitySilverfish input) {
-                if (input.isInvisible()) return false;
-                BlockPos pos = input.getPosition();
-                return low.getX() < pos.getX() && pos.getX() < high.getX()
-                        && low.getZ() < pos.getZ() && pos.getZ() < high.getZ();
-            }
+        final Vector3i low = getDungeonRoom().getMin();
+        final Vector3i high = getDungeonRoom().getMax();
+        List<EntitySilverfish> silverfishs = getDungeonRoom().getContext().getWorld().getEntities(EntitySilverfish.class, input -> {
+            if (input.isInvisible()) return false;
+            BlockPos pos = input.getPosition();
+            return low.x < pos.getX() && pos.getX() < high.x
+                    && low.z < pos.getZ() && pos.getZ() < high.z;
         });
 
         if (!silverfishs.isEmpty()) silverfish = silverfishs.get(0);
@@ -169,17 +165,12 @@ public class RoomProcessorIcePath extends GeneralRoomProcessor {
                 return;
             } else if (sameTick == 10) {
                 sameTick++;
-                Point silverfish = getPointOfSilverFishOnMap(this.silverfish.getPosition());
-                List<Point> tempSol = solve(map, silverfish.x, silverfish.y, new Predicate<Point>() {
-                    @Override
-                    public boolean apply(@Nullable Point input) {
-                        return endNode.contains(map2[input.y][input.x]);
-                    }
-                });
-                {
+                if(map != null) {
+                    Vector2i silverfish = getPointOfSilverFishOnMap(this.silverfish.getPosition());
+                    List<Vector2i> tempSol = solve(map, silverfish.x, silverfish.y, input -> endNode.contains(map2[input.y][input.x]));
                     solution.clear();
-                    for (Point point : tempSol) {
-                        solution.add(map2[point.y][point.x].getBlockPos(getDungeonRoom()));
+                    for (Vector2i point : tempSol) {
+                        solution.add(map2[point.y][point.x].getVector3i(getDungeonRoom()));
                     }
                 }
 
@@ -199,11 +190,11 @@ public class RoomProcessorIcePath extends GeneralRoomProcessor {
             RenderUtils.drawLines(solution, DgOneCongifConfig.oneconftodgcolor(SilverfishPage.color), SilverfishPage.width, partialTicks, true);
     }
 
-    public Point getPointOfSilverFishOnMap(BlockPos blockPos) {
+    public Vector2i getPointOfSilverFishOnMap(BlockPos blockPos) {
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[0].length; x++) {
-                if (map2[y][x].getBlockPos(getDungeonRoom()).equals(blockPos))
-                    return new Point(x, y);
+                if (map2[y][x].getVector3i(getDungeonRoom()).equals(blockPos))
+                    return new Vector2i(x, y);
             }
         }
         return null;

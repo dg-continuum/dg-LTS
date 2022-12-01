@@ -23,6 +23,7 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import lombok.val;
 import net.minecraft.client.Minecraft;
+import org.joml.Vector3i;
 
 public class FeatureDungeonRoomName extends SingleTextHud {
     public FeatureDungeonRoomName() {
@@ -46,7 +47,7 @@ public class FeatureDungeonRoomName extends SingleTextHud {
 
         val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
         if(context == null || context.getMapProcessor() == null) return "";
-        val roomPt = context.getMapProcessor().worldPointToRoomPoint(player.getPosition());
+        val roomPt = context.getMapProcessor().worldPointToRoomPoint(new Vector3i(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ()));
         if(roomPt == null) return "";
 
         val dungeonRoom = context.getRoomMapper().get(roomPt);

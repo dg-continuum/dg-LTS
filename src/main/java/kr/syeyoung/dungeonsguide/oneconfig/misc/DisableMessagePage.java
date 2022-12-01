@@ -1,9 +1,15 @@
 package kr.syeyoung.dungeonsguide.oneconfig.misc;
 
 import cc.polyfrost.oneconfig.config.annotations.Checkbox;
+import cc.polyfrost.oneconfig.config.annotations.Switch;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 
 public class DisableMessagePage {
+    @Switch(
+            name = "Enabled",
+            size = 2
+    )
+    public static boolean disableMessages = true;
     @Checkbox(
             name = "Aote block message",
             description = "\"There are blocks in the way!\"",
@@ -79,4 +85,5 @@ public class DisableMessagePage {
             size = OptionSize.DUAL
     )
     public static boolean voodotarget = true;
+
 }

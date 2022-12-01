@@ -135,7 +135,7 @@ public class FeatureEpicCountdown extends SimpleFeatureV2 {
 
         if(!Objects.equals(string, lastSec)){
             if(actualSecondsLeft == 3   && epicCountdownPage.sfxenabled){
-                Minecraft.getMinecraft().thePlayer.playSound("skyblock_dungeons_guide:readysetgo", 1F, 1F);
+                Minecraft.getMinecraft().thePlayer.playSound("dg-lts:readysetgo", 1F, 1F);
             }
             if(actualSecondsLeft > 5){
                 TitleRender.displayTitle(string, "", 1, 10, 8);

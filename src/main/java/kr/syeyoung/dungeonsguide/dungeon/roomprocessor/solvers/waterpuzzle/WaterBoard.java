@@ -18,18 +18,19 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.nodes.*;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLever;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.util.*;
 
@@ -55,7 +56,7 @@ public class WaterBoard {
     @Getter
     private Route currentRoute;
     @Getter
-    private List<BlockPos> target;
+    private List<Vector3i> target;
     @Getter
     private List<String> target2;
 
@@ -74,14 +75,14 @@ public class WaterBoard {
     private void buildLeverStates() {
         for (OffsetPoint offsetPoint : levers.getOffsetPointList()) {
             if (offsetPoint.getBlock(waterPuzzle.getDungeonRoom()) == Blocks.lever) {
-                BlockPos pos = offsetPoint.getBlockPos(waterPuzzle.getDungeonRoom());
+                Vector3i pos = offsetPoint.getVector3i(waterPuzzle.getDungeonRoom());
                 World w = waterPuzzle.getDungeonRoom().getContext().getWorld();
-                BlockLever.EnumOrientation enumOrientation = w.getBlockState(pos).getValue(BlockLever.FACING);
+                BlockLever.EnumOrientation enumOrientation = BlockCache.getBlockState(pos).getValue(BlockLever.FACING);
                 EnumFacing enumFacing = enumOrientation.getFacing();
-                BlockPos newPos = pos.add(-enumFacing.getDirectionVec().getX(), 0, -enumFacing.getDirectionVec().getZ());
+                Vector3i newPos = pos.add(-enumFacing.getDirectionVec().getX(), 0, -enumFacing.getDirectionVec().getZ());
 
-                int id = Block.getIdFromBlock(w.getChunkFromBlockCoords(newPos).getBlock(newPos));
-                int data = w.getChunkFromBlockCoords(newPos).getBlockMetadata(newPos);
+                int id = Block.getIdFromBlock(BlockCache.getBlockState(newPos).getBlock());
+                int data = w.getChunkFromBlockCoords(VectorUtils.Vec3iToBlockPos(newPos)).getBlockMetadata(VectorUtils.Vec3iToBlockPos(newPos));
 
                 SwitchData sw;
                 switchData.add(sw = new SwitchData(this, pos, newPos, id + ":" + data));
@@ -89,7 +90,7 @@ public class WaterBoard {
             }
         }
         SwitchData sw;
-        switchData.add(sw = new SwitchData(this, lever.getBlockPos(waterPuzzle.getDungeonRoom()), lever.getBlockPos(waterPuzzle.getDungeonRoom()).add(0, -1, 0), "mainStream"));
+        switchData.add(sw = new SwitchData(this, lever.getVector3i(waterPuzzle.getDungeonRoom()), lever.getVector3i(waterPuzzle.getDungeonRoom()).add(0, -1, 0), "mainStream"));
         validSwitches.put("mainStream", sw);
     }
 
@@ -119,7 +120,7 @@ public class WaterBoard {
 //                    currentRoute = simulate(currentState);
 //                }
 
-            target = new ArrayList<BlockPos>();
+            target = new ArrayList<Vector3i>();
             target2 = new ArrayList<String>();
             if (currentRoute != null) {
                 for (WaterNodeEnd endingNode : currentRoute.getEndingNodes()) {
@@ -375,12 +376,12 @@ public class WaterBoard {
                 WaterNode node;
                 if (validSwitches.containsKey(backId + ":" + backData)) {
                     String resId = backId + ":" + backData;
-                    node = new WaterNodeToggleable(front.getBlockPos(waterPuzzle.getDungeonRoom()), resId, isSwitchActive(validSwitches.get(resId)), x, y);
+                    node = new WaterNodeToggleable(front.getVector3i(waterPuzzle.getDungeonRoom()), resId, isSwitchActive(validSwitches.get(resId)), x, y);
 
                     toggleableMap.put(resId, node);
                 } else if (validSwitches.containsKey(frontId + ":" + frontData)) {
                     String resId = frontId + ":" + frontData;
-                    node = new WaterNodeToggleable(front.getBlockPos(waterPuzzle.getDungeonRoom()), resId, !isSwitchActive(validSwitches.get(resId)), x, y);
+                    node = new WaterNodeToggleable(front.getVector3i(waterPuzzle.getDungeonRoom()), resId, !isSwitchActive(validSwitches.get(resId)), x, y);
 
                     toggleableMap.put(resId, node);
                 } else if (frontId == 0 || frontId == 8 || frontId == 9) {
@@ -394,16 +395,16 @@ public class WaterBoard {
 
                         int id = Block.getIdFromBlock(pos.getBlock(waterPuzzle.getDungeonRoom()));
                         int data = pos.getData(waterPuzzle.getDungeonRoom());
-                        node = new WaterNodeEnd(front.getBlockPos(waterPuzzle.getDungeonRoom()), id + ":" + data, x, y);
+                        node = new WaterNodeEnd(front.getVector3i(waterPuzzle.getDungeonRoom()), id + ":" + data, x, y);
                         waterNodeEndMap.put(id + ":" + data, (WaterNodeEnd) node);
                     } else if (y == 2 && x == 9) {
-                        waterNodeStart = (WaterNodeStart) (node = new WaterNodeStart(front.getBlockPos(waterPuzzle.getDungeonRoom()),
+                        waterNodeStart = (WaterNodeStart) (node = new WaterNodeStart(front.getVector3i(waterPuzzle.getDungeonRoom()),
                                 frontId != 0 ^ isSwitchActive(validSwitches.get("mainStream")), x, y));
                     } else {
-                        node = new WaterNodeAir(front.getBlockPos(waterPuzzle.getDungeonRoom()), x, y);
+                        node = new WaterNodeAir(front.getVector3i(waterPuzzle.getDungeonRoom()), x, y);
                     }
                 } else {
-                    node = new WaterNodeWall(front.getBlockPos(waterPuzzle.getDungeonRoom()), x, y);
+                    node = new WaterNodeWall(front.getVector3i(waterPuzzle.getDungeonRoom()), x, y);
                 }
                 board[y][x] = node;
             }
@@ -412,10 +413,8 @@ public class WaterBoard {
     }
 
     private boolean isSwitchActive(SwitchData switchData) {
-        BlockPos switch2 = switchData.getSwitchLoc();
-        World w = waterPuzzle.getDungeonRoom().getContext().getWorld();
-        boolean bool = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(switch2).getValue(BlockLever.POWERED);
-        return bool;
+        Vector3i switch2 = switchData.getSwitchLoc();
+        return BlockCache.getBlockState(switch2).getValue(BlockLever.POWERED);
     }
 
 

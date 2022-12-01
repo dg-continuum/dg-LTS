@@ -20,10 +20,14 @@ package kr.syeyoung.dungeonsguide.dungeon.actions.tree;
 
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.actions.*;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.Getter;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
@@ -116,15 +120,15 @@ public class ActionRoute {
 
         if (current - 1 >= 0) {
             AbstractAction abstractAction = actions.get(current - 1);
-            if (((abstractAction instanceof ActionMove && ((ActionMove) abstractAction).getTarget().getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) >= 25)
-                    || (abstractAction instanceof ActionMoveNearestAir && ((ActionMoveNearestAir) abstractAction).getTarget().getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()) >= 25))) {
+            if (((abstractAction instanceof ActionMove && ((ActionMove) abstractAction).getTarget().getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) >= 5)
+                    || (abstractAction instanceof ActionMoveNearestAir && ((ActionMoveNearestAir) abstractAction).getTarget().getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) >= 5))) {
                 abstractAction.onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
             }
         }
+
         getCurrentAction().onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
 
 
-        getCurrentAction().onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
     }
 
     public void onRenderScreen(float partialTicks) {

@@ -50,7 +50,7 @@ public class FeatureDebuggableMap extends GuiFeature  {
     SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
     @Override
     public void drawHUD(float partialTicks) {
-        if(!DgOneCongifConfig.DEBUG_MODE || !DgOneCongifConfig.DEBUGABLE_MAP) return;
+        if(!DgOneCongifConfig.debugMode || !DgOneCongifConfig.debugableMap) return;
 
 //        if (!skyblockStatus.isOnDungeon()) return;
 //        DungeonContext context = skyblockStatus.getContext();

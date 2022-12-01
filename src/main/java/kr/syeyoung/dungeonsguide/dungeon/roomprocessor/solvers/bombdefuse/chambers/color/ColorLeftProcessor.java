@@ -24,14 +24,14 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.RoomPr
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambers.BDChamber;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chambers.GeneralDefuseChamberProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,10 +100,10 @@ public class ColorLeftProcessor extends GeneralDefuseChamberProcessor {
         colors.put(20, "yellow");
     }
 
-    private final BlockPos center;
-    private final BlockPos b1p;
-    private final BlockPos b2p;
-    private final BlockPos b3p;
+    private final Vector3i center;
+    private final Vector3i b1p;
+    private final Vector3i b2p;
+    private final Vector3i b3p;
     private Block w1, w2, w3, c1, c2, c3;
     private int s1, s2, s3;
     private int s1t, s2t, s3t;
@@ -126,8 +126,7 @@ public class ColorLeftProcessor extends GeneralDefuseChamberProcessor {
     public void tick() {
         super.tick();
         if (solutionBuilt) return;
-        World w = getChamber().getRoom().getContext().getWorld();
-        if ((c1 = w.getBlockState(b1p).getBlock()) == w1 && s1t < 7) {
+        if ((c1 = BlockCache.getBlockState(b1p).getBlock()) == w1 && s1t < 7) {
             int semi = match(getChamber().getEntityAt(EntityArmorStand.class, b1p.add(0, 1, 0)));
             if (s1 == semi) {
                 s1t++;
@@ -136,7 +135,7 @@ public class ColorLeftProcessor extends GeneralDefuseChamberProcessor {
                 s1t = 0;
             }
         }
-        if ((c2 = w.getBlockState(b2p).getBlock()) == w2 && s2t < 7) {
+        if ((c2 = BlockCache.getBlockState(b2p).getBlock()) == w2 && s2t < 7) {
             int semi = match(getChamber().getEntityAt(EntityArmorStand.class, b2p.add(0, 2, 0)));
             if (s2 == semi) {
                 s2t++;
@@ -145,7 +144,7 @@ public class ColorLeftProcessor extends GeneralDefuseChamberProcessor {
                 s2t = 0;
             }
         }
-        if ((c3 = w.getBlockState(b3p).getBlock()) == w3 && s3t < 7) {
+        if ((c3 = BlockCache.getBlockState(b3p).getBlock()) == w3 && s3t < 7) {
             int semi = match(getChamber().getEntityAt(EntityArmorStand.class, b3p.add(0, 1, 0)));
             if (s3 == semi) {
                 s3t++;
@@ -170,29 +169,29 @@ public class ColorLeftProcessor extends GeneralDefuseChamberProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        RenderUtils.drawTextAtWorld(w1 == null ? "Request Not Received Yet" : "Building- " + w1.getLocalizedName() + " / " + w2.getLocalizedName() + " / " + w3.getLocalizedName(), center.getX() + 0.5f, center.getY(), center.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(w1 == null ? "Request Not Received Yet" : "Building- " + w1.getLocalizedName() + " / " + w2.getLocalizedName() + " / " + w3.getLocalizedName(), center.x + 0.5f, center.y, center.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
 
-        RenderUtils.drawTextAtWorld(w1 == null ? "null" : w1.getLocalizedName(), b1p.getX() + 0.5f, b1p.getY() + 0.2f, b1p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(w2 == null ? "null" : w2.getLocalizedName(), b2p.getX() + 0.5f, b2p.getY() + 0.2f, b2p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(w3 == null ? "null" : w3.getLocalizedName(), b3p.getX() + 0.5f, b3p.getY() + 0.2f, b3p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(c1 == null ? "null" : c1.getLocalizedName(), b1p.getX() + 0.5f, b1p.getY() + 0.6f, b1p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(c2 == null ? "null" : c2.getLocalizedName(), b2p.getX() + 0.5f, b2p.getY() + 0.6f, b2p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(c3 == null ? "null" : c3.getLocalizedName(), b3p.getX() + 0.5f, b3p.getY() + 0.6f, b3p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(w1 == null ? "null" : w1.getLocalizedName(), b1p.x + 0.5f, b1p.y + 0.2f, b1p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(w2 == null ? "null" : w2.getLocalizedName(), b2p.x + 0.5f, b2p.y + 0.2f, b2p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(w3 == null ? "null" : w3.getLocalizedName(), b3p.x + 0.5f, b3p.y + 0.2f, b3p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(c1 == null ? "null" : c1.getLocalizedName(), b1p.x + 0.5f, b1p.y + 0.6f, b1p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(c2 == null ? "null" : c2.getLocalizedName(), b2p.x + 0.5f, b2p.y + 0.6f, b2p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(c3 == null ? "null" : c3.getLocalizedName(), b3p.x + 0.5f, b3p.y + 0.6f, b3p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
 
-        if (DgOneCongifConfig.DEBUG_MODE) {
-            RenderUtils.drawTextAtWorld(s1 + "", b1p.getX() + 0.5f, b1p.getY() + 2.6f, b1p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-            RenderUtils.drawTextAtWorld(s2 + "", b2p.getX() + 0.5f, b2p.getY() + 3.6f, b2p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-            RenderUtils.drawTextAtWorld(s3 + "", b3p.getX() + 0.5f, b3p.getY() + 2.6f, b3p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        if (DgOneCongifConfig.debugMode) {
+            RenderUtils.drawTextAtWorld(s1 + "", b1p.x + 0.5f, b1p.y + 2.6f, b1p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+            RenderUtils.drawTextAtWorld(s2 + "", b2p.x + 0.5f, b2p.y + 3.6f, b2p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+            RenderUtils.drawTextAtWorld(s3 + "", b3p.x + 0.5f, b3p.y + 2.6f, b3p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
         }
 
-        RenderUtils.drawTextAtWorld(colors.get(s1), b1p.getX() + 0.5f, b1p.getY() + 2.2f, b1p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get(s2), b2p.getX() + 0.5f, b2p.getY() + 3.2f, b2p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get(s3), b3p.getX() + 0.5f, b3p.getY() + 2.2f, b3p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get(s1), b1p.x + 0.5f, b1p.y + 2.2f, b1p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get(s2), b2p.x + 0.5f, b2p.y + 3.2f, b2p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get(s3), b3p.x + 0.5f, b3p.y + 2.2f, b3p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
 
-        if (DgOneCongifConfig.DEBUG_MODE) {
-            RenderUtils.drawTextAtWorld(s1t + "", b1p.getX() + 0.5f, b1p.getY() + 1.5f, b1p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-            RenderUtils.drawTextAtWorld(s2t + "", b2p.getX() + 0.5f, b2p.getY() + 2f, b2p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-            RenderUtils.drawTextAtWorld(s3t + "", b3p.getX() + 0.5f, b3p.getY() + 1.5f, b3p.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        if (DgOneCongifConfig.debugMode) {
+            RenderUtils.drawTextAtWorld(s1t + "", b1p.x + 0.5f, b1p.y + 1.5f, b1p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+            RenderUtils.drawTextAtWorld(s2t + "", b2p.x + 0.5f, b2p.y + 2f, b2p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+            RenderUtils.drawTextAtWorld(s3t + "", b3p.x + 0.5f, b3p.y + 1.5f, b3p.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
         }
     }
 

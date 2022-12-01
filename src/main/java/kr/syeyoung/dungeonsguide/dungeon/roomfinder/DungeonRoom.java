@@ -25,7 +25,6 @@ import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
-import kr.syeyoung.dungeonsguide.dungeon.events.impl.DungeonStateChangeEvent;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.DungeonRoomAccessor;
@@ -46,10 +45,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
+import org.joml.Vector3i;
 
 import javax.vecmath.Vector2d;
-import java.awt.*;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.Future;
 
@@ -61,7 +60,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
     public static final IBlockState preBuilt = Blocks.stone.getStateFromMeta(2);
     private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 16), new Vector2d(0, -16), new Vector2d(16, 0), new Vector2d(-16, 0));
     private static final float playerWidth = 0.3f;
-    private final List<Point> unitPoints;
+    private final List<Vector2i> unitPoints;
     private final short shape;
     private final byte color;
 
@@ -69,13 +68,13 @@ public class DungeonRoom implements DungeonRoomAccessor {
         return state.equals(preBuilt) || allowed.contains(state.getBlock());
     }
 
-    public BlockPos getMin() {
+    public Vector3i getMin() {
         return min;
     }
 
-    private final BlockPos min;
-    private final BlockPos max;
-    private final Point minRoomPt;
+    private final Vector3i min;
+    private final Vector3i max;
+    private final Vector2i minRoomPt;
 
     public DungeonContext getContext() {
         return context;
@@ -128,7 +127,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
     private RoomProcessor roomProcessor;
     private RoomMatcher roomMatcher = null;
 
-    public DungeonRoom(List<Point> points, short shape, byte color, BlockPos min, BlockPos max, DungeonContext context, Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
+    public DungeonRoom(List<Vector2i> points, short shape, byte color, Vector3i min, Vector3i max, DungeonContext context, Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
         this.unitPoints = points;
         this.shape = shape;
         this.color = color;
@@ -136,20 +135,20 @@ public class DungeonRoom implements DungeonRoomAccessor {
         this.max = max;
         this.context = context;
 
-        minRoomPt = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        for (Point pt : unitPoints) {
+        minRoomPt = new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        for (Vector2i pt : unitPoints) {
             if (pt.x < minRoomPt.x) minRoomPt.x = pt.x;
             if (pt.y < minRoomPt.y) minRoomPt.y = pt.y;
         }
-        unitWidth = (int) Math.ceil(max.getX() - min.getX() / 32.0);
-        unitHeight = (int) Math.ceil(max.getZ() - min.getZ() / 32.0);
+        unitWidth = (int) Math.ceil(max.x - min.x / 32.0);
+        unitHeight = (int) Math.ceil(max.z - min.z / 32.0);
 
-        minx = min.getX() * 2;
+        minx = min.x * 2;
         miny = 0;
-        minz = min.getZ() * 2;
-        maxx = max.getX() * 2 + 2;
+        minz = min.z * 2;
+        maxx = max.x * 2 + 2;
         maxy = 255 * 2 + 2;
-        maxz = max.getZ() * 2 + 2;
+        maxz = max.z * 2 + 2;
 
         lenx = maxx - minx;
         leny = maxy - miny;
@@ -174,19 +173,17 @@ public class DungeonRoom implements DungeonRoomAccessor {
     }
 
     public void setCurrentState(RoomState currentState) {
-        context.createEvent(new DungeonStateChangeEvent(unitPoints.get(0), dungeonRoomInfo.getName(), this.currentState, currentState));
         this.currentState = currentState;
     }
 
-    public Future<List<org.joml.Vector3d>> createEntityPathTo(Entity entityIn, BlockPos targetPos) {
+    public Future<List<org.joml.Vector3d>> createEntityPathTo(Entity entityIn, Vector3i targetPos) {
 
         return DungeonFacade.INSTANCE.ex.submit(() -> {
             try {
-                Vec3 positionVector = entityIn.getPositionVector();
 
                 val pfjob = new PfJob(
-                        new org.joml.Vector3d(positionVector.xCoord, positionVector.yCoord, positionVector.zCoord),
-                        new org.joml.Vector3d(targetPos.getX(), targetPos.getY(), targetPos.getZ()).add(.5, .5, .5),
+                        VectorUtils.vec3ToVec3d(entityIn.getPositionVector()),
+                        new org.joml.Vector3d(targetPos).add(.5, .5, .5),
                         this
                 );
 
@@ -201,15 +198,15 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
 
     private void buildDoors(Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
-        Set<Tuple<BlockPos, EDungeonDoorType>> positions = new HashSet<>();
-        BlockPos pos = context.getMapProcessor().roomPointToWorldPoint(minRoomPt).add(16, 0, 16);
+        Set<Tuple<Vector3i, EDungeonDoorType>> positions = new HashSet<>();
+        Vector3i pos = context.getMapProcessor().roomPointToWorldPoint(minRoomPt).add(16, 0, 16);
         for (Tuple<Vector2d, EDungeonDoorType> doorsAndState : doorsAndStates) {
             Vector2d vector2d = doorsAndState.getFirst();
-            BlockPos neu = pos.add(vector2d.x * 32, 0, vector2d.y * 32);
+            Vector3i neu = pos.add((int) (vector2d.x * 32), 0, (int) (vector2d.y * 32));
             positions.add(new Tuple<>(neu, doorsAndState.getSecond()));
         }
 
-        for (Tuple<BlockPos, EDungeonDoorType> door : positions) {
+        for (Tuple<Vector3i, EDungeonDoorType> door : positions) {
             doors.add(new DungeonDoor(context.getWorld(), door.getFirst(), door.getSecond()));
         }
     }
@@ -233,30 +230,30 @@ public class DungeonRoom implements DungeonRoomAccessor {
     public Block getRelativeBlockAt(int x, int y, int z) {
         // validate x y z's
         if (canAccessRelative(x, z)) {
-            BlockPos pos = new BlockPos(x, y, z).add(min.getX(), min.getY(), min.getZ());
+            BlockPos pos = new BlockPos(x, y, z).add(min.x, min.y, min.z);
             return BlockCache.getBlockState(pos).getBlock();
         }
         return null;
     }
 
-    public BlockPos getRelativeBlockPosAt(int x, int y, int z) {
-        return new BlockPos(x, y, z).add(min.getX(), min.getY(), min.getZ());
+    public Vector3i getRelativeBlockPosAt(int x, int y, int z) {
+        return new Vector3i(x, y, z).add(min.x, min.y, min.z);
     }
 
     public int getRelativeBlockDataAt(int x, int y, int z) {
         // validate x y z's
         if (canAccessRelative(x, z)) {
-            BlockPos pos = new BlockPos(x, y, z).add(min.getX(), min.getY(), min.getZ());
+            BlockPos pos = new BlockPos(x, y, z).add(min.x, min.y, min.z);
             IBlockState iBlockState = BlockCache.getBlockState(pos);
             return iBlockState.getBlock().getMetaFromState(iBlockState);
         }
         return -1;
     }
 
-    public boolean canAccessAbsolute(BlockPos pos) {
+    public boolean canAccessAbsolute(Vector3i pos) {
         MapProcessor mapProcessor = this.context.getMapProcessor();
-        Point roomPt = mapProcessor.worldPointToRoomPoint(pos);
-        roomPt.translate(-minRoomPt.x, -minRoomPt.y);
+        Vector2i roomPt = mapProcessor.worldPointToRoomPoint(pos);
+        roomPt.add(-minRoomPt.x, -minRoomPt.y);
 
         return (shape >> (roomPt.y * 4 + roomPt.x) & 0x1) > 0;
     }

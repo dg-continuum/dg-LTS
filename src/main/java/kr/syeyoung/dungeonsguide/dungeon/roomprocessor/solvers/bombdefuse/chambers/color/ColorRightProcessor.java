@@ -31,7 +31,7 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,10 +100,10 @@ public class ColorRightProcessor extends GeneralDefuseChamberProcessor {
         colors.put(20, "yellow");
     }
 
-    private final BlockPos center;
-    private final BlockPos b1;
-    private final BlockPos b2;
-    private final BlockPos b3;
+    private final Vector3i center;
+    private final Vector3i b1;
+    private final Vector3i b2;
+    private final Vector3i b3;
     private byte b1b = 0, b2b = 0, b3b = 0, c1b, c2b, c3b;
     private int answer = -1;
 
@@ -131,14 +131,14 @@ public class ColorRightProcessor extends GeneralDefuseChamberProcessor {
     @Override
     public void drawWorld(float partialTicks) {
         super.drawWorld(partialTicks);
-        RenderUtils.drawTextAtWorld(answer == -1 ? "Press " + GameSettings.getKeyDisplayString(DgOneCongifConfig.BOMB_DEFUSE_SOLVER_KEYBIND.getKeyBinds().get(0)) + " to request solution" : "", center.getX() + 0.5f, center.getY(), center.getZ() + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get((int) c1b), b1.getX() + 0.5f, b1.getY() + 0.6f, b1.getZ() + 0.5f, c1b == b1b ? 0xFF00FF00 : 0xFFFF0000, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get((int) c2b), b2.getX() + 0.5f, b2.getY() + 0.6f, b2.getZ() + 0.5f, c2b == b2b ? 0xFF00FF00 : 0xFFFF0000, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get((int) c3b), b3.getX() + 0.5f, b3.getY() + 0.6f, b3.getZ() + 0.5f, c3b == b3b ? 0xFF00FF00 : 0xFFFF0000, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(answer == -1 ? "Press " + GameSettings.getKeyDisplayString(DgOneCongifConfig.bombDefuseSolverKeybind.getKeyBinds().get(0)) + " to request solution" : "", center.x + 0.5f, center.y, center.z + 0.5f, 0xFFFFFFFF, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get((int) c1b), b1.x + 0.5f, b1.y + 0.6f, b1.z + 0.5f, c1b == b1b ? 0xFF00FF00 : 0xFFFF0000, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get((int) c2b), b2.x + 0.5f, b2.y + 0.6f, b2.z + 0.5f, c2b == b2b ? 0xFF00FF00 : 0xFFFF0000, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get((int) c3b), b3.x + 0.5f, b3.y + 0.6f, b3.z + 0.5f, c3b == b3b ? 0xFF00FF00 : 0xFFFF0000, 0.03F, false, false, partialTicks);
 
-        RenderUtils.drawTextAtWorld(colors.get((int) b1b), b1.getX() + 0.5f, b1.getY() + 0.2f, b1.getZ() + 0.5f, 0xFFFFFF00, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get((int) b2b), b2.getX() + 0.5f, b2.getY() + 0.2f, b2.getZ() + 0.5f, 0xFFFFFF00, 0.03F, false, false, partialTicks);
-        RenderUtils.drawTextAtWorld(colors.get((int) b3b), b3.getX() + 0.5f, b3.getY() + 0.2f, b3.getZ() + 0.5f, 0xFFFFFF00, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get((int) b1b), b1.x + 0.5f, b1.y + 0.2f, b1.z + 0.5f, 0xFFFFFF00, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get((int) b2b), b2.x + 0.5f, b2.y + 0.2f, b2.z + 0.5f, 0xFFFFFF00, 0.03F, false, false, partialTicks);
+        RenderUtils.drawTextAtWorld(colors.get((int) b3b), b3.x + 0.5f, b3.y + 0.2f, b3.z + 0.5f, 0xFFFFFF00, 0.03F, false, false, partialTicks);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionComplete
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret

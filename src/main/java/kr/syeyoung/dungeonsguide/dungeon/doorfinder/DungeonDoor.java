@@ -19,11 +19,12 @@
 package kr.syeyoung.dungeonsguide.dungeon.doorfinder;
 
 import com.google.common.collect.Sets;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.util.Set;
 
@@ -31,7 +32,7 @@ import java.util.Set;
 public class DungeonDoor {
     private static final Set<Block> legalBlocks = Sets.newHashSet(Blocks.coal_block, Blocks.barrier, Blocks.monster_egg, Blocks.air, Blocks.stained_hardened_clay);
     private final World w;
-    private final BlockPos position;
+    private final Vector3i position;
 
     public EDungeonDoorType getType() {
         return type;
@@ -40,35 +41,33 @@ public class DungeonDoor {
     private final EDungeonDoorType type;
     private boolean isZDir;
 
-    public DungeonDoor(World world, BlockPos pos, EDungeonDoorType type) {
+    public DungeonDoor(World world, Vector3i pos, EDungeonDoorType type) {
         this.w = world;
         this.position = pos;
-        Block itshouldbeall = world.getChunkFromBlockCoords(pos).getBlock(pos);
 
-        if (type == EDungeonDoorType.WITHER && itshouldbeall == Blocks.air) type = EDungeonDoorType.WITHER_FAIRY;
+        if (type == EDungeonDoorType.WITHER && BlockCache.getBlockState(pos).getBlock() == Blocks.air) type = EDungeonDoorType.WITHER_FAIRY;
         this.type = type;
         boolean exist = type.isExist();
 
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    BlockPos pos2 = pos.add(x, y, z);
-                    Block block = world.getChunkFromBlockCoords(pos2).getBlock(pos2);
-                    if (itshouldbeall != block) exist = false;
+                    Vector3i pos2 = pos.add(x, y, z);
+                    Block block = BlockCache.getBlockState(pos2).getBlock();
+                    if (BlockCache.getBlockState(pos).getBlock() != block) exist = false;
                 }
             }
         }
         if (exist) {
-            BlockPos ZCheck = pos.add(0, 0, 2);
-            isZDir = world.getChunkFromBlockCoords(ZCheck).getBlock(ZCheck) == Blocks.air;
+            Vector3i ZCheck = pos.add(0, 0, 2);
+            isZDir = BlockCache.getBlockState(ZCheck).getBlock() == Blocks.air;
 
             if (isZDir) {
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -2; z <= 2; z += 4) {
-                            BlockPos pos2 = pos.add(x, y, z);
-                            Block block = world.getChunkFromBlockCoords(pos2).getBlock(pos2);
-                            if (block != Blocks.air) exist = false;
+                            Vector3i pos2 = pos.add(x, y, z);
+                            if (BlockCache.getBlockState(pos2).getBlock() != Blocks.air) exist = false;
                         }
                     }
                 }
@@ -76,9 +75,8 @@ public class DungeonDoor {
                 for (int x = -2; x <= 2; x += 4) {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -1; z <= 1; z++) {
-                            BlockPos pos2 = pos.add(x, y, z);
-                            Block block = world.getChunkFromBlockCoords(pos2).getBlock(pos2);
-                            if (block != Blocks.air) exist = false;
+                            Vector3i pos2 = pos.add(x, y, z);
+                            if (BlockCache.getBlockState(pos2).getBlock() != Blocks.air) exist = false;
                         }
                     }
                 }

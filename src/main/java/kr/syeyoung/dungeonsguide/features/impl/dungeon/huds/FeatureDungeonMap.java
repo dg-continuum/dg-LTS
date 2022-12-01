@@ -27,7 +27,6 @@ import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
@@ -37,6 +36,7 @@ import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TabListUtil;
 import lombok.val;
 import net.minecraft.block.material.MapColor;
@@ -62,11 +62,11 @@ import net.minecraft.world.storage.MapData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import javax.vecmath.Vector2d;
-import java.awt.*;
 import java.util.List;
 
 public class FeatureDungeonMap extends BasicHud {
@@ -260,15 +260,15 @@ public class FeatureDungeonMap extends BasicHud {
         }
 
 
-        if (this.showSecretCount) {
+        if (showSecretCount) {
             FontRenderer fr = getFontRenderer();
             for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
                 GlStateManager.pushMatrix();
 
-                Point mapPt = mapProcessor.roomPointToMapPoint(dungeonRoom.getUnitPoints().get(0));
+                Vector2i mapPt = mapProcessor.roomPointToMapPoint(dungeonRoom.getUnitPoints().get(0));
                 GlStateManager.translate(mapPt.x + mapProcessor.getUnitRoomDimension().width / 2d, mapPt.y + mapProcessor.getUnitRoomDimension().height / 2d, 0);
 
-                if (this.centerMapOnPlayer && this.shouldRotateWithPlayer) {
+                if (centerMapOnPlayer && shouldRotateWithPlayer) {
                     GlStateManager.rotate((float) ((double) p.rotationYaw - 180), 0, 0, 1);
                 }
                 GlStateManager.scale(1 / scale, 1 / scale, 0);
@@ -357,7 +357,7 @@ public class FeatureDungeonMap extends BasicHud {
 
         if (this.showSecretCount) {
             for (DungeonRoom dungeonRoom : dungeonRooms) {
-                for (Point pt : dungeonRoom.getUnitPoints()) {
+                for (Vector2i pt : dungeonRoom.getUnitPoints()) {
                     for (int y1 = 0; y1 < mapProcessor.getUnitRoomDimension().height; y1++) {
                         for (int x1 = 0; x1 < mapProcessor.getUnitRoomDimension().width; x1++) {
                             int x = MathHelper.clamp_int(pt.x * (mapProcessor.getUnitRoomDimension().width + mapProcessor.getDoorDimensions().height) + x1 + mapProcessor.getTopLeftMapPoint().x, 0, 128);

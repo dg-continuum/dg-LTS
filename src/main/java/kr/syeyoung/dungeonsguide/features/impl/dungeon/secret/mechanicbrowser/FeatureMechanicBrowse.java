@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret.mechanicbrowser;
 
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.config.guiconfig.location.GuiGuiLocationConfig;
 import kr.syeyoung.dungeonsguide.config.types.GUIRectangle;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
@@ -30,8 +29,9 @@ import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MFloatSelectionButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MPassiveLabelAndElement;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -42,6 +42,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.joml.Vector2i;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
@@ -153,8 +154,7 @@ public class FeatureMechanicBrowse extends GuiFeature {
             return;
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
 
-        EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
-        Point roomPt = context.getMapProcessor().worldPointToRoomPoint(thePlayer.getPosition());
+        Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
         DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
         if (dungeonRoom == null) return;
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
@@ -164,7 +164,7 @@ public class FeatureMechanicBrowse extends GuiFeature {
                     .ifPresent(a -> {
                         a.highlight(new Color(0, 255, 255, 50), id + " (" + (
                                 dungeonRoom.getMechanics().get(id).getRepresentingPoint(dungeonRoom) != null ?
-                                        String.format("%.1f", MathHelper.sqrt_double((dungeonRoom.getMechanics().get(id)).getRepresentingPoint(dungeonRoom).getBlockPos(dungeonRoom).distanceSq(Minecraft.getMinecraft().thePlayer.getPosition()))) : "")
+                                        String.format("%.1f", MathHelper.sqrt_double((dungeonRoom.getMechanics().get(id)).getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distanceSquared(VectorUtils.getPlayerVector3i()))) : "")
                                 + "m)", dungeonRoom, postRender.partialTicks);
                     });
         }

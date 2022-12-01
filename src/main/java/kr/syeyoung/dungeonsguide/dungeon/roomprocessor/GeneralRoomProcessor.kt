@@ -20,8 +20,8 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor
 import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMove
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMoveNearestAir
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
@@ -38,9 +38,9 @@ import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import kr.syeyoung.dungeonsguide.oneconfig.secrets.AutoPathfindPage
-import kr.syeyoung.dungeonsguide.utils.SimpleFuse
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleFuse
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -50,12 +50,13 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import org.apache.logging.log4j.LogManager
+import org.joml.Vector3d
+import org.joml.Vector3i
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
@@ -69,7 +70,8 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
 
     val context: DungeonContext = DungeonsGuide.getDungeonsGuide().dungeonFacade.context
 
-    val strategy: SecretGuideStrategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, this)
+    var strategy: SecretGuideStrategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, this)
+
     private val tickedFuse = SimpleFuse()
     override fun tick() {
         if (!tickedFuse.isBlown) {
@@ -84,7 +86,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         for (a in strategy.actionPath.values) {
             a.onRenderScreen(partialTicks)
         }
-        if (DgOneCongifConfig.DEBUG_ROOM_EDIT && DgOneCongifConfig.DEBUG_MODE) {
+        if (DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
             if (Minecraft.getMinecraft().objectMouseOver == null) return
             val en = Minecraft.getMinecraft().objectMouseOver.entityHit ?: return
             val sr = ScaledResolution(Minecraft.getMinecraft())
@@ -120,7 +122,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         for ((_, value) in strategy.actionPath) {
             value.onRenderWorld(partialTicks, finalSmallest === value)
         }
-        if (DgOneCongifConfig.DEBUG_MODE && EditingContext.getEditingContext() != null && EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
+        if (DgOneCongifConfig.debugMode && EditingContext.getEditingContext() != null && EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
             for ((key, value1) in dungeonRoom.mechanics) {
                 value1?.highlight(Color(0, 255, 255, 50), key, dungeonRoom, partialTicks)
             }
@@ -129,7 +131,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
 
     override fun chatReceived(chat: IChatComponent) {
         if (lastChest != null && chat.formattedText == "§r§cThis chest has already been searched!§r") {
-            dungeonRoom.getRoomContext().put("c-" + lastChest.toString(), 2)
+            dungeonRoom.roomContext["c-" + lastChest.toString()] = 2
             lastChest = null
         }
     }
@@ -141,8 +143,8 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         }
         if (!chat.formattedText.contains("/")) return
         val pos = Minecraft.getMinecraft().thePlayer.position
-        val pt1 = context.mapProcessor.worldPointToRoomPoint(pos.add(2, 0, 2))
-        val pt2 = context.mapProcessor.worldPointToRoomPoint(pos.add(-2, 0, -2))
+        val pt1 = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(pos.add(2, 0, 2)))
+        val pt2 = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(pos.add(-2, 0, -2)))
         if (pt1 != pt2) {
             stack = 0
             secrets2 = -1
@@ -189,7 +191,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     override fun onKeybindPress(keyInputEvent: KeyBindPressedEvent) {
         if (AutoPathfindPage.keybind.keyBinds[0] == keyInputEvent.key) {
             if (AutoPathfindPage.autoBrowseToNext && strategy is AutoFinderStrategy) {
-                strategy.searchForNextTarget()
+                (strategy as AutoFinderStrategy).searchForNextTarget()
             }
             return
         }
@@ -243,16 +245,19 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         }
         if (event.entityPlayer.heldItem != null &&
             event.entityPlayer.heldItem.item === Items.stick &&
-            DgOneCongifConfig.DEBUG_ROOM_EDIT &&
-            DgOneCongifConfig.DEBUG_MODE
+            DgOneCongifConfig.debugRoomEdit &&
+            DgOneCongifConfig.debugMode
         ) {
             val ec = EditingContext.getEditingContext() ?: return
             if (ec.current !is GuiDungeonAddSet) return
             val gdas = ec.current as GuiDungeonAddSet
             if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-                if (last) gdas.end.setPosInWorld(dungeonRoom, event.pos) else gdas.start.setPosInWorld(
+                if (last) gdas.end.setPosInWorld(
                     dungeonRoom,
-                    event.pos
+                    VectorUtils.BlockPosToVec3i(event.pos)
+                ) else gdas.start.setPosInWorld(
+                    dungeonRoom,
+                    VectorUtils.BlockPosToVec3i(event.pos)
                 )
                 last = !last
             }
@@ -270,17 +275,17 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                 continue
             }
             val currentAction = value.currentAction
-            var target: BlockPos? = if (currentAction is ActionMove) {
-                currentAction.target?.getBlockPos(dungeonRoom)
+            var target: Vector3i? = if (currentAction is ActionMove) {
+                currentAction.target?.getVector3i(dungeonRoom)
             } else if (currentAction is ActionMoveNearestAir) {
-                currentAction.target?.getBlockPos(dungeonRoom)
+                currentAction.target?.getVector3i(dungeonRoom)
             } else {
                 if (value.current >= 1) {
                     val abstractAction = value.actions[value.current - 1]
                     if (abstractAction is ActionMove) {
-                        abstractAction.target.getBlockPos(dungeonRoom)
+                        abstractAction.target.getVector3i(dungeonRoom)
                     } else if (abstractAction is ActionMoveNearestAir) {
-                        abstractAction.target.getBlockPos(dungeonRoom)
+                        abstractAction.target.getVector3i(dungeonRoom)
                     } else {
                         continue
                     }
@@ -289,9 +294,9 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                 }
             }
             val vectorV = VectorUtils.distSquared(
-                Minecraft.getMinecraft().renderViewEntity.getLook(partialTicks),
-                Minecraft.getMinecraft().renderViewEntity.getPositionEyes(partialTicks),
-                Vec3(target).addVector(0.5, 0.5, 0.5)
+                VectorUtils.vec3ToVec3d(Minecraft.getMinecraft().renderViewEntity.getLook(partialTicks)),
+                VectorUtils.vec3ToVec3d(Minecraft.getMinecraft().renderViewEntity.getPositionEyes(partialTicks)),
+                Vector3d(target).add(0.5, 0.5, 0.5)
             )
             if (vectorV < smallestTan) {
                 smallest = value
@@ -343,6 +348,10 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
             if (updatedBlock.second == DungeonRoom.preBuilt) continue
             dungeonRoom.resetBlock(updatedBlock.first)
         }
+    }
+
+    fun updateStrategy() {
+        strategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, this)
     }
 
     companion object {

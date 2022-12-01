@@ -48,7 +48,7 @@ public class RoomProcessorTeleportMazeSolver extends GeneralRoomProcessor {
     private BlockPos intersection;
     public RoomProcessorTeleportMazeSolver(DungeonRoom dungeonRoom) {
         super(dungeonRoom);
-        yLevel = dungeonRoom.getMin().getY() - 1;
+        yLevel = dungeonRoom.getMin().y - 1;
     }
 
     @Override

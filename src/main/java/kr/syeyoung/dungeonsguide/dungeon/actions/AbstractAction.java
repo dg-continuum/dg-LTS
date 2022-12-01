@@ -26,6 +26,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import java.util.Set;
 
+/**
+ * THIS IS A ABSTRACT CLASS CUZ I DONT WANT SO MANY EMPTY OVERRIDES
+ */
 public abstract class AbstractAction {
     public void onPlayerInteract(DungeonRoom dungeonRoom, PlayerInteractEvent event, ActionRouteProperties actionRouteProperties) {
 

@@ -27,7 +27,7 @@ import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.oneconfig.solvers.IceFillPage;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RoomProcessorIcePath2 extends GeneralRoomProcessor {
     private static final List<Point> directions = Arrays.asList(new Point(0, -1), new Point(-1, 0), new Point(1, 0), new Point(0, 1));
-    private final List<List<BlockPos>> solution = new CopyOnWriteArrayList<List<BlockPos>>();
+    private final List<List<Vector3i>> solution = new CopyOnWriteArrayList<List<Vector3i>>();
 
     public RoomProcessorIcePath2(DungeonRoom dungeonRoom) {
 
@@ -60,10 +60,10 @@ public class RoomProcessorIcePath2 extends GeneralRoomProcessor {
                 final int endY = Integer.parseInt(data.split(":")[5]);
 
                 final int[][] map = new int[height][width];
-                final BlockPos[][] map2 = new BlockPos[height][width];
+                final Vector3i[][] map2 = new Vector3i[height][width];
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
-                        map2[y][x] = level.getOffsetPointList().get(y * width + x).getBlockPos(dungeonRoom);
+                        map2[y][x] = level.getOffsetPointList().get(y * width + x).getVector3i(dungeonRoom);
                         map[y][x] = level.getOffsetPointList().get(y * width + x).getBlock(dungeonRoom) == Blocks.air ? 0 : 1;
                     }
                 }
@@ -76,7 +76,7 @@ public class RoomProcessorIcePath2 extends GeneralRoomProcessor {
                             return;
                         }
                         hamiltonianPath.add(0, new Point(startX, startY));
-                        List<BlockPos> poses = new LinkedList<BlockPos>();
+                        List<Vector3i> poses = new LinkedList<Vector3i>();
                         for (int i = 0; i < hamiltonianPath.size(); i++) {
                             Point p = hamiltonianPath.get(i);
                             poses.add(map2[p.y][p.x]);
@@ -134,8 +134,8 @@ public class RoomProcessorIcePath2 extends GeneralRoomProcessor {
 
     @Override
     public void drawWorld(float partialTicks) {
-        if (!DgOneCongifConfig.ICE_FILL) return;
-        for (List<BlockPos> solution : this.solution)
+        if (!DgOneCongifConfig.iceFill) return;
+        for (List<Vector3i> solution : this.solution)
             RenderUtils.drawLines(solution, new AColor(IceFillPage.ICE_FILL_LINECOLOR.getRed(), IceFillPage.ICE_FILL_LINECOLOR.getBlue(), IceFillPage.ICE_FILL_LINECOLOR.getGreen(), IceFillPage.ICE_FILL_LINECOLOR.getAlpha()), IceFillPage.ICE_FILL_LINEWIDTH, partialTicks, true);
     }
 }

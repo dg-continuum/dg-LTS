@@ -22,7 +22,9 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
@@ -30,6 +32,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -38,7 +41,7 @@ import java.util.List;
 public class RoomProcessorCreeperSolver extends GeneralRoomProcessor {
 
     private static final Color[] colors = new Color[]{Color.red, Color.orange, Color.green, Color.cyan, Color.blue, Color.pink, Color.yellow, Color.darkGray, Color.lightGray};
-    private final List<BlockPos[]> poses = new ArrayList<BlockPos[]>();
+    private final List<Vector3i[]> poses = new ArrayList<>();
     private final boolean bugged = false;
 
     public RoomProcessorCreeperSolver(DungeonRoom dungeonRoom) {
@@ -54,20 +57,20 @@ public class RoomProcessorCreeperSolver extends GeneralRoomProcessor {
 
     private void findCreeperAndDoPoses() {
         World w = getDungeonRoom().getContext().getWorld();
-        List<BlockPos> prismarines = new ArrayList<BlockPos>();
-        final BlockPos low = getDungeonRoom().getMin().add(0, -2, 0);
-        final BlockPos high = getDungeonRoom().getMax().add(0, 20, 0);
+        List<Vector3i> prismarines = new ArrayList<>();
+        final Vector3i low = getDungeonRoom().getMin().add(0, -2, 0);
+        final Vector3i high = getDungeonRoom().getMax().add(0, 20, 0);
         final AxisAlignedBB axis = AxisAlignedBB.fromBounds(
-                low.getX() + 17, low.getY() + 7, low.getZ() + 17,
-                low.getX() + 16, low.getY() + 10.5, low.getZ() + 16
+                low.x + 17, low.y + 7, low.z + 17,
+                low.x + 16, low.y + 10.5, low.z + 16
         );
 
-        for (BlockPos pos : BlockPos.getAllInBox(low, high)) {
+        for (BlockPos pos : BlockPos.getAllInBox(VectorUtils.Vec3iToBlockPos(low), VectorUtils.Vec3iToBlockPos(high) )) {
             Block b = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos).getBlock();
             if (b == Blocks.prismarine || b == Blocks.sea_lantern) {
                 for (EnumFacing face : EnumFacing.VALUES) {
                     if (w.getBlockState(pos.offset(face)).getBlock() == Blocks.air) {
-                        prismarines.add(pos);
+                        prismarines.add(VectorUtils.BlockPosToVec3i(pos));
                         break;
                     }
                 }
@@ -76,23 +79,23 @@ public class RoomProcessorCreeperSolver extends GeneralRoomProcessor {
         double offset = 0.1;
 
         while (prismarines.size() > 1) {
-            BlockPos first = prismarines.get(0);
-            BlockPos highestMatch = null;
+            Vector3i first = prismarines.get(0);
+            Vector3i highestMatch = null;
             int highestDist = 0;
             for (int i = 1; i < prismarines.size(); i++) {
-                BlockPos second = prismarines.get(i);
+                Vector3i second = prismarines.get(i);
 
-                if (second.distanceSq(first) < highestDist) continue;
+                if (second.distanceSquared(first) < highestDist) continue;
 
-                Vec3 startLoc = new Vec3(first).addVector(0.5, 0.5, 0.5);
-                Vec3 dest = new Vec3(second).addVector(0.5, 0.5, 0.5);
+                Vec3 startLoc = new Vec3(VectorUtils.Vec3iToBlockPos(first)).addVector(0.5, 0.5, 0.5);
+                Vec3 dest = new Vec3(VectorUtils.Vec3iToBlockPos(second)).addVector(0.5, 0.5, 0.5);
                 if (check(axis, startLoc.getIntermediateWithYValue(dest, axis.minY + offset)) ||
                         check(axis, startLoc.getIntermediateWithYValue(dest, axis.maxY - offset)) ||
                         check(axis, startLoc.getIntermediateWithXValue(dest, axis.minX + offset)) ||
                         check(axis, startLoc.getIntermediateWithXValue(dest, axis.maxX - offset)) ||
                         check(axis, startLoc.getIntermediateWithZValue(dest, axis.minZ + offset)) ||
                         check(axis, startLoc.getIntermediateWithZValue(dest, axis.maxZ - offset))) {
-                    highestDist = (int) second.distanceSq(first);
+                    highestDist = (int) second.distanceSquared(first);
                     highestMatch = second;
                 }
 
@@ -104,7 +107,7 @@ public class RoomProcessorCreeperSolver extends GeneralRoomProcessor {
             } else {
                 prismarines.remove(first);
                 prismarines.remove(highestMatch);
-                poses.add(new BlockPos[]{first, highestMatch});
+                poses.add(new Vector3i[]{first, highestMatch});
             }
         }
     }
@@ -123,17 +126,18 @@ public class RoomProcessorCreeperSolver extends GeneralRoomProcessor {
         if (!DgOneCongifConfig.creeperSolver) return;
         World w = getDungeonRoom().getContext().getWorld();
         for (int i = 0; i < poses.size(); i++) {
-            BlockPos[] poset = poses.get(i);
+            Vector3i[] poset = poses.get(i);
             Color color = colors[i % colors.length];
-            boolean oneIsConnected = w.getChunkFromBlockCoords(poset[0]).getBlock(poset[0]) != Blocks.sea_lantern &&
-                    w.getChunkFromBlockCoords(poset[1]).getBlock(poset[1]) != Blocks.sea_lantern;
-            RenderUtils.drawLine(new Vec3(poset[0].getX() + 0.5, poset[0].getY() + 0.5, poset[0].getZ() + 0.5),
-                    new Vec3(poset[1].getX() + 0.5, poset[1].getY() + 0.5, poset[1].getZ() + 0.5), oneIsConnected ? new Color(0, 0, 0, 50) : color, partialTicks, true);
+
+            boolean oneIsConnected = BlockCache.getBlockState(poset[0]).getBlock() != Blocks.sea_lantern &&
+                    BlockCache.getBlockState(poset[1]).getBlock() != Blocks.sea_lantern;
+            RenderUtils.drawLine(new Vec3(poset[0].x + 0.5, poset[0].y + 0.5, poset[0].z + 0.5),
+                    new Vec3(poset[1].x + 0.5, poset[1].y + 0.5, poset[1].z + 0.5), oneIsConnected ? new Color(0, 0, 0, 50) : color, partialTicks, true);
         }
-        final BlockPos low = getDungeonRoom().getMin();
+        final Vector3i low = getDungeonRoom().getMin();
         final AxisAlignedBB axis = AxisAlignedBB.fromBounds(
-                low.getX() + 17, low.getY() + 5, low.getZ() + 17,
-                low.getX() + 16, low.getY() + 8.5, low.getZ() + 16
+                low.x + 17, low.y + 5, low.z + 17,
+                low.x + 16, low.y + 8.5, low.z + 16
         );
         RenderUtils.highlightBox(axis, new Color(0x4400FF00, true), partialTicks, false);
     }

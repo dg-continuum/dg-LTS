@@ -18,7 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionChangeState;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionTree;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MPanel;

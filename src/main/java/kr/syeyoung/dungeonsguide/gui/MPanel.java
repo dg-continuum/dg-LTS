@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.gui;
 
 import kr.syeyoung.dungeonsguide.gui.elements.MTooltip;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -290,7 +289,4 @@ public class MPanel {
     }
     public void mouseMoved(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0) {}
 
-    public void setCursor(EnumCursor enumCursor) {
-        parent.setCursor(enumCursor);
-    }
 }

@@ -3,7 +3,7 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionComplete
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
@@ -11,9 +11,10 @@ import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import kr.syeyoung.dungeonsguide.oneconfig.secrets.AutoPathfindPage
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
-import kr.syeyoung.dungeonsguide.utils.SimpleTimer
+import kr.syeyoung.dungeonsguide.utils.VectorUtils
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleTimer
 import net.minecraft.client.Minecraft
-import net.minecraft.util.BlockPos
+import org.joml.Vector3i
 import java.awt.Color
 
 class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(parent) {
@@ -25,7 +26,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
     data class AutoGuideSecretCandidate(
         val mechanic: DungeonSecret,
         var cost: Double,
-        var pos: BlockPos,
+        var pos: Vector3i,
         var descipriton: String,
         var isDone: Boolean
     )
@@ -78,7 +79,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
     }
 
     override fun draw(partialTicks: Float) {
-        if (DgOneCongifConfig.DEBUG_MODE) {
+        if (DgOneCongifConfig.debugMode) {
             for ((id, value) in autoPathFindCandidates) {
                 RenderUtils.highlightBlock(
                     value.pos,
@@ -154,7 +155,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
                     val representingPoint = secretMechanic.getRepresentingPoint(parent.dungeonRoom)
                     if (representingPoint != null) {
                         val secretPos = representingPoint
-                            .getBlockPos(parent.dungeonRoom)
+                            .getVector3i(parent.dungeonRoom)
 
                         autoPathFindCandidates[mechId] =
                             AutoGuideSecretCandidate(
@@ -182,7 +183,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
 
 
-        val playerPos = Minecraft.getMinecraft().thePlayer.position
+        val playerPos = VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.position)
 
         // re calculate cost for each candidate
         for ((key, value) in autoPathFindCandidates) {
@@ -202,7 +203,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
             val representingPoint = value.mechanic.getRepresentingPoint(parent.dungeonRoom)
             if (representingPoint != null) {
                 val secretPos = representingPoint
-                    .getBlockPos(parent.dungeonRoom)
+                    .getVector3i(parent.dungeonRoom)
 
                 value.cost += if (DgOneCongifConfig.usePathfindCostCacls) {
                     DungeonsGuide.getDungeonsGuide().dungeonFacade.calculatePathLenght(
@@ -211,7 +212,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
                         parent.dungeonRoom
                     ).toDouble()
                 } else {
-                    secretPos.distanceSq(playerPos)
+                    secretPos.distance(playerPos)
                 }
 
                 autoPathFindCandidates[key] = value

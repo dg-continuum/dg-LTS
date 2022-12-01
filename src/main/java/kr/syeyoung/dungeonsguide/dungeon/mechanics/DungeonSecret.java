@@ -20,22 +20,25 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.actions.*;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -77,7 +80,7 @@ public class DungeonSecret implements DungeonMechanic {
     public void tick(DungeonRoom dungeonRoom) {
         if (secretType == SecretType.CHEST) {
             BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
-            IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
+            IBlockState blockState = BlockCache.getBlockState(pos);
             if (blockState.getBlock() == Blocks.chest || blockState.getBlock() == Blocks.trapped_chest) {
                 TileEntityChest chest = (TileEntityChest) dungeonRoom.getContext().getWorld().getTileEntity(pos);
                 if (chest != null) {
@@ -91,20 +94,19 @@ public class DungeonSecret implements DungeonMechanic {
                 }
             }
         } else if (secretType == SecretType.ESSENCE) {
-            BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
-            IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
-            if (blockState.getBlock() == Blocks.skull) {
+            Vector3i pos = secretPoint.getVector3i(dungeonRoom);
+            if (BlockCache.getBlockState(pos).getBlock() == Blocks.skull) {
                 dungeonRoom.getRoomContext().put("e-" + pos, true);
             }
         } else if (secretType == SecretType.ITEM_DROP) {
-            Vec3 pos = new Vec3(secretPoint.getBlockPos(dungeonRoom));
-            Vec3 player = Minecraft.getMinecraft().thePlayer.getPositionVector();
-            if (player.squareDistanceTo(pos) < 16) {
-                Vec3 vec3 = pos.subtract(player).normalize();
-                for (int i = 0; i < player.distanceTo(pos); i++) {
-                    Vec3 vec = player.addVector(vec3.xCoord * i, vec3.yCoord * i, vec3.zCoord * i);
-                    BlockPos bpos = new BlockPos(vec);
-                    IBlockState blockState = BlockCache.getBlockState(bpos);
+            Vector3d pos = new Vector3d(secretPoint.getVector3i(dungeonRoom));
+            Vector3d player = VectorUtils.getPlayerVector3d();
+            if (player.distanceSquared(pos) < 16) {
+                Vector3d vec3 = pos.sub(player).normalize();
+                for (int i = 0; i < player.distance(pos); i++) {
+                    Vector3d vec = player.add(vec3.x * i, vec3.y * i, vec3.z * i);
+
+                    IBlockState blockState = BlockCache.getBlockState(vec);
                     if (!DungeonRoom.isValidBlock(blockState))
                         return;
                 }
@@ -114,9 +116,10 @@ public class DungeonSecret implements DungeonMechanic {
     }
 
     public SecretStatus getSecretStatus(DungeonRoom dungeonRoom) {
+        Vector3i pos = secretPoint.getVector3i(dungeonRoom);
         if (secretType == SecretType.CHEST) {
-            BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
-            IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
+
+            IBlockState blockState = BlockCache.getBlockState(pos);
             if (dungeonRoom.getRoomContext().containsKey("c-" + pos))
                 return ((int) dungeonRoom.getRoomContext().get("c-" + pos) == 2 || blockState.getBlock() == Blocks.air) ? SecretStatus.FOUND : SecretStatus.CREATED;
 
@@ -125,7 +128,7 @@ public class DungeonSecret implements DungeonMechanic {
             } else if (blockState.getBlock() != Blocks.chest && blockState.getBlock() != Blocks.trapped_chest) {
                 return SecretStatus.ERROR;
             } else {
-                TileEntityChest chest = (TileEntityChest) dungeonRoom.getContext().getWorld().getTileEntity(pos);
+                TileEntityChest chest = (TileEntityChest) dungeonRoom.getContext().getWorld().getTileEntity(VectorUtils.Vec3iToBlockPos(pos));
                 if (chest.numPlayersUsing > 0) {
                     return SecretStatus.FOUND;
                 } else {
@@ -133,7 +136,6 @@ public class DungeonSecret implements DungeonMechanic {
                 }
             }
         } else if (secretType == SecretType.ESSENCE) {
-            BlockPos pos = secretPoint.getBlockPos(dungeonRoom);
             IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
             if (blockState.getBlock() == Blocks.skull) {
                 dungeonRoom.getRoomContext().put("e-" + pos, true);
@@ -144,29 +146,33 @@ public class DungeonSecret implements DungeonMechanic {
                 return SecretStatus.NOT_SURE;
             }
         } else if (secretType == SecretType.BAT) {
-            Vec3 spawn = new Vec3(secretPoint.getBlockPos(dungeonRoom));
-            for (int killed : DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getKilledBats()) {
-                if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().get(killed) == null) continue;
-                if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().get(killed).squareDistanceTo(spawn) < 100) {
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            for (int killed : context.getKilledBats()) {
+                if (context.getBatSpawnedLocations().get(killed) == null) continue;
+                if (context.getBatSpawnedLocations().get(killed).distanceSquared(pos) < 100) {
                     return SecretStatus.FOUND;
                 }
             }
             return SecretStatus.NOT_SURE;
         } else {
-            Vec3 pos = new Vec3(secretPoint.getBlockPos(dungeonRoom));
             if (dungeonRoom.getRoomContext().containsKey("i-" + pos))
                 return SecretStatus.FOUND;
-            Vec3 player = Minecraft.getMinecraft().thePlayer.getPositionVector();
-            if (player.squareDistanceTo(pos) < 16) {
-                Vec3 vec3 = pos.subtract(player).normalize();
-                for (int i = 0; i < player.distanceTo(pos); i++) {
-                    Vec3 vec = player.addVector(vec3.xCoord * i, vec3.yCoord * i, vec3.zCoord * i);
-                    BlockPos bpos = new BlockPos(vec);
-                    IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(bpos);
+
+            Vector3d secret = secretPoint.getVector3d(dungeonRoom);
+            Vector3d player = VectorUtils.getPlayerVector3d();
+
+
+            if (player.distance(secret) < 16) {
+                secret.sub(player).normalize();
+                for (int i = 0; i < player.distance(secret); i++) {
+
+                    player.add(secret.x * i, secret.y * i, secret.z * i);
+
+                    IBlockState blockState = BlockCache.getBlockState(player);
                     if (!DungeonRoom.isValidBlock(blockState))
                         return SecretStatus.NOT_SURE;
                 }
-                dungeonRoom.getRoomContext().put("i-" + pos, true);
+                dungeonRoom.getRoomContext().put("i-" + secret, true);
             }
             return SecretStatus.NOT_SURE;
         }
@@ -222,11 +228,11 @@ public class DungeonSecret implements DungeonMechanic {
 
     @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
-        BlockPos pos = getSecretPoint().getBlockPos(dungeonRoom);
+        Vector3i pos = getSecretPoint().getVector3i(dungeonRoom);
         RenderUtils.highlightBlock(pos, color, partialTicks);
-        RenderUtils.drawTextAtWorld(getSecretType().name(), pos.getX() + 0.5f, pos.getY() + 0.75f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(name, pos.getX() + 0.5f, pos.getY() + 0.375f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getSecretType().name(), pos.x + 0.5f, pos.x + 0.75f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(name, pos.x + 0.5f, pos.x + 0.375f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.x + 0.5f, pos.x + 0f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
     public DungeonSecret clone() throws CloneNotSupportedException {

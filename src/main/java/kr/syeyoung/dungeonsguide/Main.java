@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide;
 
 import cc.polyfrost.oneconfig.events.EventManager;
-import kr.syeyoung.dungeonsguide.auth.AuthManager;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -85,9 +84,6 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(this);
 
         ProgressManager.ProgressBar progressBar = ProgressManager.push("DungeonsGuide", 2);
-
-        AuthManager.getInstance().setBaseserverurl("https://dungeons.guide");
-//        AuthManager.getInstance().init();
 
 
         configDir = new File(preInitializationEvent.getModConfigurationDirectory(), "dungeonsguide");

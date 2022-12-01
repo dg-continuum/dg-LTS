@@ -19,7 +19,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions.tree;
 
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionRoot;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionRoot;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -20,7 +20,6 @@ package kr.syeyoung.dungeonsguide.config.guiconfig;
 
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
@@ -76,7 +75,6 @@ public class MCategoryElement extends MPanel {
     }
     @Override
     public void mouseMoved(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0) {
-        if (lastAbsClip.contains(absMouseX, absMouseY))
-            setCursor(EnumCursor.POINTING_HAND);
+
     }
 }

@@ -23,7 +23,6 @@ import kr.syeyoung.dungeonsguide.gui.elements.MTooltip;
 import kr.syeyoung.dungeonsguide.gui.elements.MTooltipText;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -228,8 +227,6 @@ public class PanelPartyListElement extends MPanel {
 
     @Override
     public void mouseMoved(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0) {
-        if (lastAbsClip.contains(absMouseX, absMouseY) && (getTooltipsOpen() == 0 || (mTooltip != null && mTooltip.isOpen()))) {
-            setCursor(EnumCursor.POINTING_HAND);
-        }
+
     }
 }

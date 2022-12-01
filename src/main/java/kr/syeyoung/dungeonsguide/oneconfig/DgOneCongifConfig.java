@@ -6,11 +6,15 @@ import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.*;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
-import kr.syeyoung.dungeonsguide.features.impl.dungeon.huds.FeatureDungeonMap;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.features.impl.debug.TestMap;
+import kr.syeyoung.dungeonsguide.features.impl.dungeon.huds.FeatureDungeonMap;
 import kr.syeyoung.dungeonsguide.oneconfig.dungeon.DungeonMapPage;
 import kr.syeyoung.dungeonsguide.oneconfig.dungeon.HideAnimalPage;
 import kr.syeyoung.dungeonsguide.oneconfig.dungeon.huds.*;
@@ -79,35 +83,35 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Blaze Solver"
     )
-    public static boolean BLAZE_SOLVER = true;
+    public static boolean blazeSolver = true;
 
     @Color(
             name = "Normal Blaze Color",
             category = "Solvers",
             subcategory = "Blaze Solver"
     )
-    public static OneColor BLAZE_SOLVER_COLOR_NORMAL = new OneColor(255,255,255, 255);
+    public static OneColor blazeSolverColorNormal = new OneColor(255,255,255, 255);
 
     @Color(
             name = "Next Blaze Color",
             category = "Solvers",
             subcategory = "Blaze Solver"
     )
-    public static OneColor BLAZE_SOLVER_COLOR_NEXT = new OneColor(0,255,0, 255);
+    public static OneColor blazeSolverColorNext = new OneColor(0,255,0, 255);
 
     @Color(
             name = "Next up Blaze Color",
             category = "Solvers",
             subcategory = "Blaze Solver"
     )
-    public static OneColor BLAZE_SOLVER_COLOR_NEXT_UP = new OneColor(255,255,0, 255);
+    public static OneColor blazeSolverColorNextUp = new OneColor(255,255,0, 255);
 
     @Color(
             name = "Blaze Border Color",
             category = "Solvers",
             subcategory = "Blaze Solver"
     )
-    public static OneColor BLAZE_SOLVER_BORDER = new OneColor(255,255,255, 0);
+    public static OneColor blazeSolverBorder = new OneColor(255,255,255, 0);
 
 
 
@@ -123,7 +127,7 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Bomb Defuse Solver"
     )
-    public static boolean BOMB_DEFUSE_SOLVER = false;
+    public static boolean bombDefuseSolver = false;
 
     @KeyBind(
             category = "Solvers",
@@ -131,7 +135,7 @@ public class DgOneCongifConfig extends Config {
             description = "Press to send solution in chat",
             subcategory = "Bomb Defuse Solver"
     )
-    public static OneKeyBind BOMB_DEFUSE_SOLVER_KEYBIND = new OneKeyBind(UKeyboard.KEY_NONE);
+    public static OneKeyBind bombDefuseSolverKeybind = new OneKeyBind(UKeyboard.KEY_NONE);
 
 
 
@@ -144,7 +148,7 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static boolean SOLVER_BOX = true;
+    public static boolean solverBox = true;
 
 
     @Switch(
@@ -153,7 +157,7 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static boolean SOLVER_BOX_DISABLE_TEXT = false;
+    public static boolean solverBoxDisableText = false;
     @Slider(
             name = "Line Thickness",
             min = 0,
@@ -162,35 +166,35 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static float SOLVER_BOX_LINEWIDTH = 1.0F;
+    public static float solverBoxLinewidth = 1.0F;
     @Color(
             name = "Line Color",
             description = "Color of the solution line",
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static OneColor SOLVER_BOX_LINE_COLOR = new OneColor(0xFF00FF00);
+    public static OneColor solverBoxLineColor = new OneColor(0xFF00FF00);
     @Color(
             name = "Target Color",
             description = "Color of the target button",
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static OneColor SOLVER_BOX_TARGET_COLOR = new OneColor(0x5500FFFF);
+    public static OneColor solverBoxTargetColor = new OneColor(0x5500FFFF);
     @Color(
             name = "Text Color Next Step",
             description = "Color of the text (next step)",
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static OneColor SOLVER_BOX_TEXT_COLOR_NEXT_STEP = new OneColor(0xFF00FF00);
+    public static OneColor solverBoxTextColorNextStep = new OneColor(0xFF00FF00);
     @Color(
             name = "Text Color Next Step",
             description = "Color of the text (others)",
             category = "Solvers",
             subcategory = "Box (Advanced)"
     )
-    public static OneColor SOLVER_BOX_TEXT_COLOR = new OneColor(0xFF000000);
+    public static OneColor solverBoxTextColor = new OneColor(0xFF000000);
 
 
 
@@ -203,7 +207,7 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Icepath (Advanced)"
     )
-    public static boolean ICE_FILL = true;
+    public static boolean iceFill = true;
 
     @Page(
             name = "options",
@@ -221,7 +225,7 @@ public class DgOneCongifConfig extends Config {
             category = "Solvers",
             subcategory = "Quiz"
     )
-    public static boolean KAHOOT_SOLVER = true;
+    public static boolean kahootSolver = true;
 
     @Page(
             name = "options",
@@ -302,7 +306,7 @@ public class DgOneCongifConfig extends Config {
             name = "enabled",
             size = 2,
             description = "See players through walls",
-            category = "dungeon",
+            category = "Dungeon",
             subcategory = "Player ESP"
     )
     public static boolean playerEps = true;
@@ -311,28 +315,28 @@ public class DgOneCongifConfig extends Config {
             name = "Hide Mob nametags",
             size = 2,
             description = "Hide mob nametags in dungeon",
-            category = "dungeon",
+            category = "Dungeon",
             subcategory = "Mobs"
     )
     public static boolean hideMobNametags = true;
 
     @Checkbox(
             name = "Highlight bats",
-            category = "dungeon",
+            category = "Dungeon",
             subcategory = "Mobs"
     )
     public static boolean highlightBats = true;
 
     @Checkbox(
             name = "Highlight Starred mobs",
-            category = "dungeon",
+            category = "Dungeon",
             subcategory = "Mobs"
     )
     public static boolean highlightStaredMobs = true;
 
     @Checkbox(
             name = "Highlight Skeleton Masters",
-            category = "dungeon",
+            category = "Dungeon",
             subcategory = "Mobs"
     )
     public static boolean highlightSkeletonMasters = true;
@@ -340,7 +344,7 @@ public class DgOneCongifConfig extends Config {
     @Page(
             name = "prefrences",
             location = PageLocation.BOTTOM,
-            category = "dungeon",
+            category = "Dungeon",
             subcategory = "Mobs"
     )
     static HighlightMobsPage hb = new HighlightMobsPage();
@@ -349,7 +353,7 @@ public class DgOneCongifConfig extends Config {
             name = "Hide Animals",
             description = "Hide Spirit Animals on F4. Click on Edit for precise setting",
             location = PageLocation.BOTTOM,
-            category = "dungeon"
+            category = "Dungeon"
     )
     static HideAnimalPage ha = new HideAnimalPage();
 
@@ -474,14 +478,6 @@ public class DgOneCongifConfig extends Config {
     public PartyReadyPage pr = new PartyReadyPage();
 
     @Switch(
-            name = "Enabled",
-            size = 2,
-            category = "Misc",
-            subcategory = "Press Any Mouse Button or Key to close Secret Chest"
-    )
-    public static boolean closeChestHelper = true;
-
-    @Switch(
             name = "Show Profit of Dungeon Reward Chests",
             description = "Show Profit of Dungeon Chests",
             size = 2,
@@ -489,15 +485,8 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean chestProfit = true;
 
-    @Slider(
-            name = "Price Threshold",
-            min = 1_000_000F,
-            max = 100_000_000F,
-            description = "The maximum price of item for chest to be closed. Default 1m",
-            category = "Misc",
-            subcategory = "Press Any Mouse Button or Key to close Secret Chest"
-    )
-    public static float closeChestHelperThreschkid = 1000000;
+
+
 
 
 
@@ -551,10 +540,23 @@ public class DgOneCongifConfig extends Config {
     )
     public static String apikey = "";
 
+    @Switch(
+            name = "Make everyone a penguin !!",
+            description = "Awwww",
+            category = "Misc"
+    )
+    public static boolean penguins = false;
 
 
 
 
+    @Switch(
+            name = "Enabled",
+            size = 2,
+            category = "Misc",
+            subcategory = "Press Any Mouse Button or Key to close Secret Chest"
+    )
+    public static boolean closeChestHelper = true;
     @Switch(
             name = "enabled",
             size = 2,
@@ -574,18 +576,10 @@ public class DgOneCongifConfig extends Config {
     public static float explosionDecreseMultiplyer = 10F;
 
 
-
-    @Switch(
-            name = "enabled",
-            size = 2,
-            description = "Do not let ability messages show up in chatbox\nclick on Edit for more precise settings",
-            category = "Misc",
-            subcategory = "Disable ability messages"
-    )
-    public static boolean disableMessages = true;
     @Page(
             name = "Settings",
             location = PageLocation.BOTTOM,
+            description = "Do not let ability messages show up in chatbox\nclick on Edit for more precise settings",
             category = "Misc",
             subcategory = "Disable ability messages"
     )
@@ -600,14 +594,6 @@ public class DgOneCongifConfig extends Config {
     )
     private static DungeonMapPage mp = new DungeonMapPage();
 
-    @Switch(
-            name = "enabled",
-            size = 2,
-            description = "Awwww",
-            category = "Misc",
-            subcategory = "Penguins"
-    )
-    public static boolean penguins = false;
 
 
     @Switch(
@@ -645,57 +631,6 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean tooltipPrice = false;
 
-
-
-    @Info(
-            text = "Disables usage of jna for discord rpc support. Breaks any discord related feature in the mod. Requires mod restart to get affected. This feature is only for those whose minecraft crashes due to discord gamesdk crash.",
-            type = InfoType.INFO,
-            category = "Discord",
-            subcategory = "Disable Native Library"
-    )
-    public static boolean useless;
-    @Switch(
-            name = "enable",
-            size = 2,
-            category = "Discord",
-            subcategory = "Disable Native Library"
-    )
-    public static boolean disableDiscd  = true;
-
-
-    @Switch(
-            name = "Use rich presence",
-            size = 2,
-            category = "Discord",
-            subcategory = "Rich Presence"
-    )
-    public static boolean useDiscordRP = false;
-
-
-    @Switch(
-            name = "Party Invite Viewer",
-            description = "Simply type /dg asktojoin or /dg atj to toggle whether ask-to-join would be presented as option on discord! Requires Discord RPC to be enabled",
-            size = 2,
-            category = "Discord",
-            subcategory = "Rich Presence"
-    )
-    public static boolean disocrdPartyInvite = false;
-
-    @Switch(
-            name = "Friend Online Notification",
-            description = "Notifies you in bottom when your discord friend has launched a Minecraft with DG! Requires the Friend's Discord RPC to be enabled",
-            size = 2,
-            category = "Discord",
-            subcategory = "Rich Presence"
-    )
-    public static boolean discordFriendOnlineAcidifications = false;
-
-    @Switch(
-            name = "Disable rich presence When not on Skyblock",
-            category = "Discord",
-            subcategory = "Rich Presence"
-    )
-    public static boolean disableDiscordRpNotOnSkyblock = false;
 
 
     @Page(
@@ -773,14 +708,14 @@ public class DgOneCongifConfig extends Config {
 
     @Checkbox(
             name = "Render beacons",
-            category = "secrets",
+            category = "Secrets",
             subcategory = "Preferences"
     )
     public static boolean renderSecretBeacons = true;
 
     @Checkbox(
             name = "Render Destination text",
-            category = "secrets",
+            category = "Secrets",
             subcategory = "Preferences"
     )
     public static boolean renderSecretDestText = true;
@@ -794,7 +729,7 @@ public class DgOneCongifConfig extends Config {
             description = "Select pathfinding algorithm used by paths",
             name = "Pathfinding Algorithm",
             options = {"THETA* (recommended)", "A* Diagonal", "A* Fine-Grid", "Jump Point Search"},
-            category = "secrets",
+            category = "Secrets",
             subcategory = "Preferences"
     )
     public static int secretPathfindStrategy = 0;
@@ -803,27 +738,27 @@ public class DgOneCongifConfig extends Config {
     @KeyBind(
             name = "Toggle Pathfind Lines",
             description = "A key for toggling pathfound line visibility.\nPress settings to edit the key",
-            category = "secrets",
+            category = "Secrets",
             subcategory = "Preferences"
     )
     public static OneKeyBind togglePathfindKeybind = new OneKeyBind(UKeyboard.KEY_NONE);
 
-    public static boolean togglePathfindStatus = false;
+    public transient static boolean togglePathfindStatus = false;
 
     @KeyBind(
             name = "Freeze Pathfind",
             description = "Freeze Pathfind, meaning the pathfind lines won't change when you move.\nPress settings to edit the key",
-            category = "secrets",
+            category = "Secrets",
             subcategory = "Preferences"
     )
     public static OneKeyBind freezePathfindingKeybinding = new OneKeyBind(UKeyboard.KEY_NONE);
-    public static boolean freezePathfindingStatus = false;
+    public transient static boolean freezePathfindingStatus = false;
 
 
     @Dropdown(
             name = "Mode",
             options = {"PathFind to All", "Blood Rush", "Auto pathfind"},
-            category = "secrets"
+            category = "Secrets"
     )
     public static int secretFindMode = 2;
 
@@ -832,7 +767,7 @@ public class DgOneCongifConfig extends Config {
     @Page(
             name = "PathFind to All Mode Settings",
             location = PageLocation.BOTTOM,
-            category = "secrets"
+            category = "Secrets"
     )
     public PathfindToALlPage pftap = new PathfindToALlPage();
 
@@ -845,7 +780,7 @@ public class DgOneCongifConfig extends Config {
     @Page(
             name = "Blood Rush Mode Settings",
             location = PageLocation.BOTTOM,
-            category = "secrets"
+            category = "Secrets"
     )
     public BloodRushPage brp = new BloodRushPage();
 
@@ -853,7 +788,7 @@ public class DgOneCongifConfig extends Config {
     @Page(
             name = "Auto pathfind Mode Settings",
             location = PageLocation.BOTTOM,
-            category = "secrets"
+            category = "Secrets"
     )
     public AutoPathfindPage app = new AutoPathfindPage();
 
@@ -912,6 +847,17 @@ public class DgOneCongifConfig extends Config {
             ChatTransmitter.addToQueue(ChatTransmitter.PREFIX + "§fToggled Pathfind Freeze to §e"+(DgOneCongifConfig.freezePathfindingStatus ? "on":"off"));
         });
 
+        addListener("secretFindMode", () -> {
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            if(context != null){
+                RoomProcessor roomProcessor = context.getCurrentRoomProcessor();
+                if(roomProcessor instanceof GeneralRoomProcessor){
+                    GeneralRoomProcessor smartCastMyAss = (GeneralRoomProcessor) roomProcessor;
+                    smartCastMyAss.updateStrategy();
+                }
+            }
+        });
+
     }
 
 
@@ -922,23 +868,23 @@ public class DgOneCongifConfig extends Config {
             name = "Debug mode",
             category = "Debug"
     )
-    public static boolean DEBUG_MODE = false;
+    public static boolean debugMode = false;
     @HUD(
             name = "Debug Map",
             category = "Debug"
     )
-    public static TestMap TEST_MAP = new TestMap();
+    public static TestMap testMap = new TestMap();
     @Switch(
             name = "Debuggable Map",
             category = "Debug"
     )
-    public static boolean DEBUGABLE_MAP = false;
+    public static boolean debugableMap = false;
     @Switch(
             name = "Block Caching",
             category = "Debug",
             description = "Cache all world.getBlockState calls"
     )
-    public static boolean DEBUG_BLOCKCACHING = true;
+    public static boolean debugBlockcaching = true;
 
     @Checkbox(
             name = "Experimental autopathfind",
@@ -954,14 +900,14 @@ public class DgOneCongifConfig extends Config {
             category = "Debug",
             subcategory = "Dungeon cords"
     )
-    public static boolean DEBUG_DUNGEON_CORDS = false;
+    public static boolean debugDungeonCords = false;
 
     @Color(
             name = "Color",
             category = "Debug",
             subcategory = "Dungeon cords"
     )
-    public static OneColor DUNGEON_CORDS_COLOR = new OneColor(255, 191, 0);
+    public static OneColor dungeonCordsColor = new OneColor(255, 191, 0);
 
 
     @Switch(
@@ -970,13 +916,13 @@ public class DgOneCongifConfig extends Config {
             category = "Debug",
             subcategory = "Dungeon Room Info"
     )
-    public static boolean DEBUG_ROOM_INFO = false;
+    public static boolean debugRoomInfo = false;
     @Color(
             name = "Color",
             category = "Debug",
             subcategory = "Dungeon Room Info"
     )
-    public static OneColor DUNGEON_ROOMINFO_COLOR = new OneColor(255, 255, 255);
+    public static OneColor dungeonRoominfoColor = new OneColor(255, 255, 255);
 
 
     @Switch(
@@ -984,7 +930,7 @@ public class DgOneCongifConfig extends Config {
             category = "Debug",
             subcategory = "Test People"
     )
-    public static boolean DEBUG_TEST_PEPOLE = false;
+    public static boolean debugTestPepole = false;
 
     @Slider(
             name = "Scale",
@@ -993,7 +939,7 @@ public class DgOneCongifConfig extends Config {
             category = "Debug",
             subcategory = "Test People"
     )
-    public static float DEBUG_TEST_PEPOLE_SCALE = 2F;
+    public static float debugTestPepoleScale = 2F;
 
 
     @Switch(
@@ -1002,12 +948,12 @@ public class DgOneCongifConfig extends Config {
             description = "Allow editing dungeon rooms\n\nWarning: using this feature can break or freeze your Minecraft\nThis is only for advanced users only",
             subcategory = "Room Edit"
     )
-    public static boolean DEBUG_ROOM_EDIT = false;
+    public static boolean debugRoomEdit = false;
 
     @KeyBind(
             category = "Debug",
             name = "Gui keybind",
             subcategory = "Room Edit"
     )
-    public static OneKeyBind DEBUG_ROOMEDIT_KEYBIND = new OneKeyBind(UKeyboard.KEY_R);
+    public static OneKeyBind debugRoomeditKeybind = new OneKeyBind(UKeyboard.KEY_R);
 }

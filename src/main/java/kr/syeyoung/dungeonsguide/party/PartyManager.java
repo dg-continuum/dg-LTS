@@ -21,16 +21,11 @@ package kr.syeyoung.dungeonsguide.party;
 import kr.syeyoung.dungeonsguide.chat.ChatProcessResult;
 import kr.syeyoung.dungeonsguide.chat.ChatProcessor;
 import kr.syeyoung.dungeonsguide.chat.ChatSubscriber;
-import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.events.impl.HypixelJoinedEvent;
-import kr.syeyoung.dungeonsguide.events.impl.StompConnectedEvent;
-import kr.syeyoung.dungeonsguide.features.impl.debug.FeatureTestPepole;
-import kr.syeyoung.dungeonsguide.stomp.*;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -405,8 +400,6 @@ public class PartyManager {
             secretBuilder.append(validChars.charAt(random.nextInt(validChars.length())));
         }
         askToJoinSecret = secretBuilder.toString();
-
-        StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("secret", askToJoinSecret).toString()).destination("/app/party.setjoinsecret"));
     }
 
     public static ChatSubscriber dashShredder() {
@@ -448,7 +441,6 @@ public class PartyManager {
             if (getPartyContext().getPartyID() != null) {
                 JSONObject object = new JSONObject();
                 object.put("partyid", getPartyContext().getPartyID());
-                StompManager.getInstance().send(new StompPayload().payload(object.toString()).destination( "/app/party.leave"));
             }
         }
 
@@ -469,7 +461,6 @@ public class PartyManager {
         }
         JSONObject object = new JSONObject();
         object.put("members", jsonArray);
-        StompManager.getInstance().send(new StompPayload().payload(object.toString()).destination("/app/party.join"));
 
         getPartyContext().setPartyID("!@#!@#!@#..........FETCHING..........$!@$!@$!@$"+UUID.randomUUID().toString());
     }
@@ -513,111 +504,12 @@ public class PartyManager {
 
     private Map<String, Long> playerInvAntiSpam = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-    @SubscribeEvent
-    public void stompConnect(StompConnectedEvent event) {
-
-        event.getStompInterface().subscribe("/user/queue/party.resp", (stompClient ,payload) -> {
-            JSONObject object = new JSONObject(payload);
-
-            String str = object.getString("status");
-            if ("success".equals(str) && partyContext != null) {
-                getPartyContext().setPartyID(object.getString("partyId"));
-                if (askToJoinSecret != null) {
-                    updateAskToJoin();
-                }
-            } else if (partyContext != null){
-                getPartyContext().setPartyID(null);
-            }
-        });
-
-        event.getStompInterface().subscribe("/user/queue/party.check", (stompClient ,payload) -> {
-            JSONObject object = new JSONObject(payload);
-            String playerName = object.getString("player");
-            String token = object.getString("token");
-            if (partyContext == null) {
-                requestPartyList((pc) -> {
-                    boolean contains = pc.getPartyRawMembers().contains(playerName);
-                    if (!contains) {
-                        StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("status", "failure").put("token", token).toString()).destination("/app/party.check.resp"));
-                    } else {
-                        StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("status", "success").put("token", token).toString()).destination("/app/party.check.resp"));
-                    }
-                });
-            } else {
-                if (getPartyContext().getPartyRawMembers().contains(playerName)) {
-                    StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("status", "success").put("token", token).toString()).destination("/app/party.check.resp"));
-                } else if (getPartyContext().isMemberComplete() && getPartyContext().isModeratorComplete() && getPartyContext().getPartyOwner() != null) {
-                    StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("status", "failure").put("token", token).toString()).destination("/app/party.check.resp"));
-                } else {
-                    requestPartyList((pc) -> {
-                        boolean contains = pc.getPartyRawMembers().contains(playerName);
-                        if (!contains) {
-                            StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("status", "failure").put("token", token).toString()).destination("/app/party.check.resp"));
-                        } else {
-                            StompManager.getInstance().send(new StompPayload().payload(new JSONObject().put("status", "success").put("token", token).toString()).destination("/app/party.check.resp"));
-                        }
-                    });
-                }
-            }
-        });
-        event.getStompInterface().subscribe("/user/queue/party.broadcast", (stompClient ,payload) -> {
-            String broadCastPlayload = new JSONObject(payload).getString("payload");
-            System.out.println("Received broadcast");
-            if(broadCastPlayload.startsWith("C:")) {
-                FeatureTestPepole.handlePartyBroadCast(broadCastPlayload);
-            }else {
-                try {
-                    ChatTransmitter.addToQueue(new ChatComponentText("§eDungeons Guide §7:: Message Broadcasted from player:: \n" + new JSONObject(payload).getString("payload")));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        event.getStompInterface().subscribe("/user/queue/party.join", (stompClient ,payload) -> {
-            JSONObject object = new JSONObject(payload);
-            String playerName = object.getString("player");
-            String secret = object.getString("secret");
-            if (secret.equals(askToJoinSecret) && partyContext != null && getPartyContext().getPartyRawMembers().size() < maxParty && playerInvAntiSpam.getOrDefault(playerName, 0L)  < System.currentTimeMillis() - 5000) {
-                playerInvAntiSpam.put(playerName, System.currentTimeMillis());
-                ChatProcessor.INSTANCE.addToChatQueue("/p invite "+playerName,() -> {}, true);
-            }
-        });
-        event.getStompInterface().subscribe("/user/queue/party.askedtojoin.resp", (stompClient ,payload) -> {
-            JSONObject object = new JSONObject(payload);
-            String invFrom = object.getString("username");
-            String token2 = object.getString("token");
-            if (!token2.equals(lastToken)) return;
-            lastToken = null;
-            ChatProcessor.INSTANCE.addToChatQueue("/p accept "+invFrom, () -> {}, true);
-            long end = System.currentTimeMillis() + 3000;
-            ChatProcessor.INSTANCE.subscribe((str, a) -> {
-                if (!str.contains("§r§ehas invited you to join their party!")) return System.currentTimeMillis() > end ? ChatProcessResult.REMOVE_LISTENER : ChatProcessResult.NONE;
-                String[] messageSplit = TextUtils.stripColor(str).split(" ");
-                String inviter = null;
-                for (String s : messageSplit) {
-                    if (s.startsWith("[")) continue;
-                    if (s.startsWith("-")) continue;;
-                    inviter = s;
-                    break;
-                }
-                if (invFrom.equalsIgnoreCase(inviter)) {
-                    ChatProcessor.INSTANCE.addToChatQueue("/p accept "+invFrom, () -> {}, true);
-                }
-                return ChatProcessResult.NONE;
-            });
-        });
-
-
-    }
 
     private String lastToken;
     public void joinWithToken(String secret) {
         lastToken = secret;
         if (partyContext != null && getPartyContext().isPartyExistHypixel())
             ChatProcessor.INSTANCE.addToChatQueue("/p leave", () -> {}, true);
-        StompManager.getInstance().send(new StompPayload().method(StompHeader.SEND)
-                .destination("/app/party.askedtojoin")
-                .payload(new JSONObject().put("token", secret).toString()));
     }
 
     private void potentialInvitenessChange() {

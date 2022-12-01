@@ -18,8 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle;
 
-import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import org.joml.Vector3i;
 
 public interface WaterNode {
     boolean canWaterGoThrough();
@@ -29,7 +29,7 @@ public interface WaterNode {
 
     boolean isWaterFilled(World w);
 
-    BlockPos getBlockPos();
+    Vector3i getBlockPos();
 
     int getX();
 

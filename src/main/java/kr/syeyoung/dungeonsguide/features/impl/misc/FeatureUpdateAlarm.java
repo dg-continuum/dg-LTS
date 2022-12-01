@@ -18,10 +18,9 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.misc;
 
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
-import kr.syeyoung.dungeonsguide.events.impl.StompConnectedEvent;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -29,19 +28,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class FeatureUpdateAlarm extends SimpleFeatureV2 {
     public FeatureUpdateAlarm() {
         super("etc.updatealarm");
-    }
-
-    @SubscribeEvent
-    public void onStomp(StompConnectedEvent stompConnectedEvent) {
-
-        stompConnectedEvent.getStompInterface().subscribe("/topic/updates", (stompClient, payload) -> {
-            this.stompPayload = payload;
-        });
-
-        stompConnectedEvent.getStompInterface().subscribe("/user/queue/messages", (stompClient, payload) -> {
-            this.stompPayload = payload;
-        });
-
     }
 
     private String stompPayload;

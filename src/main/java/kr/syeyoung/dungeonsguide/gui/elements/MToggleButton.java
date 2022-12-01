@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide.gui.elements;
 
 import kr.syeyoung.dungeonsguide.gui.MPanel;
-import kr.syeyoung.dungeonsguide.utils.cursor.EnumCursor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -90,7 +89,6 @@ public class MToggleButton extends MPanel {
 
     @Override
     public void mouseMoved(int absMouseX, int absMouseY, int relMouseX0, int relMouseY0) {
-        if (lastAbsClip.contains(absMouseX, absMouseY))
-            setCursor(EnumCursor.POINTING_HAND);
+
     }
 }

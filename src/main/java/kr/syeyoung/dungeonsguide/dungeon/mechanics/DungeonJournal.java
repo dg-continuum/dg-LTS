@@ -20,14 +20,14 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionChangeState;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionMove;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -65,10 +65,10 @@ public class DungeonJournal implements DungeonMechanic {
 
     @Override
     public void highlight(Color color, String name, DungeonRoom dungeonRoom, float partialTicks) {
-        BlockPos pos = getSecretPoint().getBlockPos(dungeonRoom);
+        Vector3i pos = getSecretPoint().getVector3i(dungeonRoom);
         RenderUtils.highlightBlock(pos, color, partialTicks);
-        RenderUtils.drawTextAtWorld("J-" + name, pos.getX() + 0.5f, pos.getY() + 0.375f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
-        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.getX() + 0.5f, pos.getY() + 0f, pos.getZ() + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld("J-" + name, pos.x + 0.5f, pos.y + 0.375f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
+        RenderUtils.drawTextAtWorld(getCurrentState(dungeonRoom), pos.x + 0.5f, pos.y + 0f, pos.z + 0.5f, 0xFFFFFFFF, 0.03f, false, true, partialTicks);
     }
 
 

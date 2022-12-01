@@ -21,13 +21,13 @@ package kr.syeyoung.dungeonsguide.dungeon.roomfinder;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoomInfoRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
-import kr.syeyoung.dungeonsguide.utils.ArrayUtils;
-import kr.syeyoung.dungeonsguide.utils.ShortUtils;
-import kr.syeyoung.dungeonsguide.utils.SimpleFuse;
+import kr.syeyoung.dungeonsguide.utils.*;
+import kr.syeyoung.dungeonsguide.utils.simple.SimpleFuse;
 import lombok.Getter;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import org.joml.Vector3i;
 
 import java.util.List;
 
@@ -47,11 +47,11 @@ public class RoomMatcher {
     public DungeonRoomInfo match() {
         if (matched.isBlown()) return match;
 
-        int zz = dungeonRoom.getMax().getZ() - dungeonRoom.getMin().getZ() + 1;
-        int xx = dungeonRoom.getMax().getX() - dungeonRoom.getMin().getX() + 1;
+        int zz = dungeonRoom.getMax().z - dungeonRoom.getMin().z + 1;
+        int xx = dungeonRoom.getMax().x - dungeonRoom.getMin().x + 1;
         for (int z = 0; z < zz; z++) {
             for (int x = 0; x < xx; x++) {
-                if (x % 8 == 0 && z % 8 == 0 && dungeonRoom.getContext().getWorld().getChunkFromBlockCoords(dungeonRoom.getRelativeBlockPosAt(x, 0, z)).isEmpty()) {
+                if (x % 8 == 0 && z % 8 == 0 && Minecraft.getMinecraft().theWorld.getChunkFromBlockCoords(VectorUtils.Vec3iToBlockPos(dungeonRoom.getRelativeBlockPosAt(x, 0, z))).isEmpty()) {
                     ChatTransmitter.addToQueue("Chunk Not loaded in Room Matcher");
                 }
             }
@@ -114,9 +114,9 @@ public class RoomMatcher {
     public DungeonRoomInfo createNew() {
         DungeonRoomInfo roomInfo = new DungeonRoomInfo(dungeonRoom.getShape(), dungeonRoom.getColor());
 
-        BlockPos max = dungeonRoom.getMax();
-        BlockPos min = dungeonRoom.getMin();
-        int[][] data = new int[max.getZ() - min.getZ() + 2][max.getX() - min.getX() + 2];
+        Vector3i max = dungeonRoom.getMax();
+        Vector3i min = dungeonRoom.getMin();
+        int[][] data = new int[max.z - min.z + 2][max.x - min.x + 2];
 
         for (int z = 0; z < data.length; z++) {
             for (int x = 0; x < data[0].length; x++) {

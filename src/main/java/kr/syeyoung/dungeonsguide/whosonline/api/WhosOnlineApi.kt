@@ -1,6 +1,6 @@
 package kr.syeyoung.dungeonsguide.whosonline.api
 
-import kr.syeyoung.dungeonsguide.stomp.StompClient
+import kr.syeyoung.dungeonsguide.whosonline.WebSocketClientStatus
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager
 import kr.syeyoung.dungeonsguide.whosonline.api.messages.client.C01IsOnline
 import kr.syeyoung.dungeonsguide.whosonline.api.messages.client.C02OnlineCheckBulk
@@ -25,7 +25,7 @@ class WhosOnlineApi(
      * @return -s if websocket is ok
      */
     fun stateCheck(): Boolean {
-        return client.status != StompClient.StompClientStatus.CONNECTED
+        return client.status != WebSocketClientStatus.CONNECTED
     }
 
     /**

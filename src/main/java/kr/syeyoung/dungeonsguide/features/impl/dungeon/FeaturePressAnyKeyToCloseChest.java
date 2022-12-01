@@ -18,14 +18,13 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon;
 
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.ContainerChest;
-import net.minecraft.inventory.IInventory;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -50,16 +49,8 @@ public class FeaturePressAnyKeyToCloseChest extends SimpleFeatureV2 {
             ContainerChest ch = (ContainerChest) ((GuiChest) screen).inventorySlots;
             if (!("Large Chest".equals(ch.getLowerChestInventory().getName())
                     || "Chest".equals(ch.getLowerChestInventory().getName()))) return;
-            IInventory actualChest = ch.getLowerChestInventory();
 
-            int priceSum = 0;
-            for (int i = 0; i < actualChest.getSizeInventory(); i++) {
-                priceSum += FeatureChestPrice.getPrice(actualChest.getStackInSlot(i));
-            }
-
-            if (priceSum < (int) DgOneCongifConfig.closeChestHelperThreschkid) {
-                Minecraft.getMinecraft().thePlayer.closeScreen();
-            }
+            Minecraft.getMinecraft().thePlayer.closeScreen();
         }
     }
 

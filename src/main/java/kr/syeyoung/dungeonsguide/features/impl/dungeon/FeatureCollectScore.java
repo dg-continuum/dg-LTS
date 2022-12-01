@@ -18,31 +18,19 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon;
 
-import cc.polyfrost.oneconfig.config.annotations.Exclude;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
-import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
-import kr.syeyoung.dungeonsguide.stomp.StaticResourceCache;
-import kr.syeyoung.dungeonsguide.stomp.StompManager;
-import kr.syeyoung.dungeonsguide.stomp.StompPayload;
 import kr.syeyoung.dungeonsguide.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
 import net.minecraft.util.ChatComponentText;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 public class FeatureCollectScore extends SimpleFeatureV2 {
     public FeatureCollectScore() {
         super("misc.gatherscoredata");
     }
-
-    @Exclude
-    static final Logger logger = LogManager.getLogger("FeatureCollectScore");
 
     public static void collectDungeonRunData(byte[] mapData, DungeonContext context) {
         int skill = MapUtils.readNumber(mapData, 51, 35, 9);
@@ -58,23 +46,6 @@ public class FeatureCollectScore extends SimpleFeatureV2 {
                 .put("percentage", DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() / 100.0)
                 .put("floor", DungeonContext.getDungeonName());
         ChatTransmitter.sendDebugChat(new ChatComponentText(payload.toString()));
-
-        if(!StompManager.getInstance().isStompConnected()){
-            logger.warn("Error stomp is not connected while trying to send dungeons scored");
-            return;
-        }
-
-        String target = null;
-        try {
-            target = StaticResourceCache.INSTANCE.getResource(StaticResourceCache.DATA_COLLECTION).get().getValue();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        if (DgOneCongifConfig.collectSpeedScore && !target.contains("falsefalsefalsefalse")) {
-            StompManager.getInstance().send(new StompPayload().payload(payload.toString()).destination(target.replace("false", "").trim()));
-        }
     }
 
 

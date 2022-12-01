@@ -27,8 +27,8 @@ import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MValue;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.Getter;
-import net.minecraft.client.Minecraft;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -133,7 +133,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
             add.setOnActionPerformed(new Runnable() {
                 @Override
                 public void run() {
-                    OffsetPoint offsetPoint = new OffsetPoint(EditingContext.getEditingContext().getRoom(), Minecraft.getMinecraft().thePlayer.getPosition());
+                    OffsetPoint offsetPoint = new OffsetPoint(EditingContext.getEditingContext().getRoom(), VectorUtils.getPlayerVector3i());
                     MValue mValue;
                     MParameters.add(mValue = new MValue(offsetPoint, buildAddonsFor(offsetPoint)));
                     ((OffsetPointSet) parameter.getNewData()).getOffsetPointList().add(offsetPoint);
@@ -207,7 +207,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
     @Override
     public void renderWorld(float partialTicks) {
         for (OffsetPoint offsetPoint : ((OffsetPointSet) parameter.getNewData()).getOffsetPointList()) {
-            RenderUtils.highlightBlock(offsetPoint.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 255, 50), partialTicks);
+            RenderUtils.highlightBlock(offsetPoint.getVector3i(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 255, 50), partialTicks);
         }
     }
 

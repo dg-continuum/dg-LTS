@@ -18,21 +18,20 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.debug;
 
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import org.apache.commons.lang3.StringUtils;
+import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
-
-import java.awt.*;
 
 public class FeatureRoomDebugInfo extends GuiFeature {
     public FeatureRoomDebugInfo() {
@@ -44,18 +43,17 @@ public class FeatureRoomDebugInfo extends GuiFeature {
 
     @Override
     public boolean isEnabled() {
-        return DgOneCongifConfig.DEBUG_ROOM_INFO;
+        return DgOneCongifConfig.debugRoomInfo;
     }
 
     SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
     @Override
     public void drawHUD(float partialTicks) {
         if (!skyblockStatus.isOnDungeon()) return;
-        if (!DgOneCongifConfig.DEBUG_MODE) return;
+        if (!DgOneCongifConfig.debugMode) return;
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
         if (context == null) return;
-        EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
-        Point roomPt = context.getMapProcessor().worldPointToRoomPoint(thePlayer.getPosition());
+        Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
         DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 
@@ -66,17 +64,17 @@ public class FeatureRoomDebugInfo extends GuiFeature {
             if (context.getBossfightProcessor() == null) {
                 fontRenderer.drawString("Where are you?!", 0, 0, 0xFFFFFF);
             } else {
-                fontRenderer.drawString("You're prob in bossfight", 0, 0, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("processor: "+context.getBossfightProcessor(), 0, 10, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("phase: "+context.getBossfightProcessor().getCurrentPhase(), 0, 20, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("nextPhase: "+ StringUtils.join(context.getBossfightProcessor().getNextPhases(), ","), 0, 30, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("phases: "+ StringUtils.join(context.getBossfightProcessor().getPhases(), ","), 0, 40, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
+                fontRenderer.drawString("You're prob in bossfight", 0, 0, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("processor: "+context.getBossfightProcessor(), 0, 10, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("phase: "+context.getBossfightProcessor().getCurrentPhase(), 0, 20, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("nextPhase: "+ StringUtils.join(context.getBossfightProcessor().getNextPhases(), ","), 0, 30, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("phases: "+ StringUtils.join(context.getBossfightProcessor().getPhases(), ","), 0, 40, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
             }
         } else {
-                fontRenderer.drawString("you're in the room... color/shape/rot " + dungeonRoom.getColor() + " / " + dungeonRoom.getShape() + " / "+dungeonRoom.getRoomMatcher().getRotation(), 0, 0, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("room uuid: " + dungeonRoom.getDungeonRoomInfo().getUuid() + (dungeonRoom.getDungeonRoomInfo().isRegistered() ? "" : " (not registered)"), 0, 10, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("room name: " + dungeonRoom.getDungeonRoomInfo().getName(), 0, 20, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-                fontRenderer.drawString("room state / max secret: " + dungeonRoom.getCurrentState() + " / "+dungeonRoom.getTotalSecrets(), 0, 30, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
+                fontRenderer.drawString("you're in the room... color/shape/rot " + dungeonRoom.getColor() + " / " + dungeonRoom.getShape() + " / "+dungeonRoom.getRoomMatcher().getRotation(), 0, 0, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("room uuid: " + dungeonRoom.getDungeonRoomInfo().getUuid() + (dungeonRoom.getDungeonRoomInfo().isRegistered() ? "" : " (not registered)"), 0, 10, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("room name: " + dungeonRoom.getDungeonRoomInfo().getName(), 0, 20, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("room state / max secret: " + dungeonRoom.getCurrentState() + " / "+dungeonRoom.getTotalSecrets(), 0, 30, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
 
         }
     }
@@ -88,11 +86,11 @@ public class FeatureRoomDebugInfo extends GuiFeature {
         GlStateManager.enableBlend();
         GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        fr.drawString("Line 1", 0,0, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-        fr.drawString("Line 2", 0,10, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-        fr.drawString("Line 3", 0,20, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-        fr.drawString("Line 4", 0,30, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
-        fr.drawString("Line 5", 0,40, DgOneCongifConfig.DUNGEON_ROOMINFO_COLOR.getRGB());
+        fr.drawString("Line 1", 0,0, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+        fr.drawString("Line 2", 0,10, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+        fr.drawString("Line 3", 0,20, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+        fr.drawString("Line 4", 0,30, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+        fr.drawString("Line 5", 0,40, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
     }
 
 }

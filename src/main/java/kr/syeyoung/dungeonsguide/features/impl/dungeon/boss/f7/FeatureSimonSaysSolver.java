@@ -25,6 +25,7 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.Bossfig
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -32,6 +33,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.joml.Vector3i;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -39,8 +41,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
-    private final List<BlockPos> orderbuild = new ArrayList<BlockPos>();
-    private final LinkedList<BlockPos> orderclick = new LinkedList<BlockPos>();
+    private final List<Vector3i> orderbuild = new ArrayList<>();
+    private final LinkedList<Vector3i> orderclick = new LinkedList<>();
     private boolean wasButton = false;
 
     public FeatureSimonSaysSolver() {
@@ -93,7 +95,7 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
         if (!wasButton) {
             for (BlockPos allInBox : BlockPos.getAllInBox(new BlockPos(310, 123, 291), new BlockPos(310, 120, 294))) {
                 if (DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(allInBox).getBlock() == Blocks.sea_lantern && !orderbuild.contains(allInBox)) {
-                    orderbuild.add(allInBox);
+                    orderbuild.add(VectorUtils.BlockPosToVec3i(allInBox));
                 }
             }
         }

@@ -10,7 +10,7 @@ import net.minecraft.util.MathHelper
 import org.joml.Vector3d
 import java.util.*
 
-class AStarFineGrid(private val dungeonRoom: DungeonRoomAccessor) : PathfinderStrategy(dungeonRoom) {
+class AStarFineGrid(private val room: DungeonRoomAccessor) : PathfinderStrategy(room) {
     var dx: Int = 0
     var dy: Int = 0
     var dz: Int = 0
@@ -125,7 +125,7 @@ class AStarFineGrid(private val dungeonRoom: DungeonRoomAccessor) : PathfinderSt
 
                 // check blocked.
                 if (!(destinationBB.minX <= neighbor.coordinate.x && neighbor.coordinate.x <= destinationBB.maxX && destinationBB.minY <= neighbor.coordinate.y && neighbor.coordinate.y <= destinationBB.maxY && destinationBB.minZ <= neighbor.coordinate.z && neighbor.coordinate.z <= destinationBB.maxZ // near destination
-                            || !dungeonRoom.isBlocked(
+                            || !roomAccessor.isBlocked(
                         neighbor.coordinate.x,
                         neighbor.coordinate.y,
                         neighbor.coordinate.z

@@ -25,6 +25,7 @@ import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MValue;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
@@ -56,8 +57,8 @@ public class GuiDungeonAddSet extends MGui {
         this.valueEditOffsetPointSet = processorParameterEditPane;
         getMainPanel().setBackgroundColor(new Color(17, 17, 17, 179));
         {
-            start = new OffsetPoint(EditingContext.getEditingContext().getRoom(), Minecraft.getMinecraft().thePlayer.getPosition());
-            end = new OffsetPoint(EditingContext.getEditingContext().getRoom(), Minecraft.getMinecraft().thePlayer.getPosition());
+            start = new OffsetPoint(EditingContext.getEditingContext().getRoom(), VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
+            end = new OffsetPoint(EditingContext.getEditingContext().getRoom(), VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
         }
         {
             MValue mValue = new MValue(start, Collections.emptyList());
@@ -105,10 +106,10 @@ public class GuiDungeonAddSet extends MGui {
 
     public void onWorldRender(float partialTicks) {
         for (OffsetPoint pos : getBlockPoses()) {
-            RenderUtils.highlightBlock(pos.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 255, 50), partialTicks);
+            RenderUtils.highlightBlock(pos.getVector3i(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 255, 50), partialTicks);
         }
-        RenderUtils.highlightBlock(start.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(255, 0, 0, 100), partialTicks);
-        RenderUtils.highlightBlock(end.getBlockPos(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 0, 100), partialTicks);
+        RenderUtils.highlightBlock(start.getVector3i(EditingContext.getEditingContext().getRoom()), new Color(255, 0, 0, 100), partialTicks);
+        RenderUtils.highlightBlock(end.getVector3i(EditingContext.getEditingContext().getRoom()), new Color(0, 255, 0, 100), partialTicks);
     }
 
     public List<OffsetPoint> getBlockPoses() {
