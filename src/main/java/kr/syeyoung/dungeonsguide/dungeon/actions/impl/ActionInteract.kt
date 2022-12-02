@@ -15,75 +15,75 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.DungeonsGuide
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
+import kr.syeyoung.dungeonsguide.utils.RenderUtils
+import net.minecraft.entity.Entity
+import java.awt.Color
+import java.util.function.Predicate
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
-import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent;
-import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import net.minecraft.entity.Entity;
-import org.joml.Vector3i;
+class ActionInteract(private val target: OffsetPoint) : AbstractAction() {
+    var predicate = Predicate { _: Entity? -> false }
+    var radius = 0
+    private var interacted = false
 
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionInteract extends AbstractAction {
-    private Set<AbstractAction> preRequisite = new HashSet<>();
-    private OffsetPoint target;
-    private Predicate<Entity> predicate = entity -> false;
-    private int radius;
-    private boolean interacted = false;
-
-    public ActionInteract(OffsetPoint target) {
-        this.target = target;
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        return interacted
     }
 
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return preRequisite;
-    }
-
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        return interacted;
-    }
-
-    @Override
-    public void onLivingInteract(DungeonRoom dungeonRoom, PlayerInteractEntityEvent event, ActionRouteProperties actionRouteProperties) {
-        if (interacted) return;
-
-        Vector3i spawnLoc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBatSpawnedLocations().get(event.getEntity().getEntityId());
-        if (spawnLoc == null) {
-            return;
+    override fun onLivingInteract(
+        dungeonRoom: DungeonRoom?,
+        event: PlayerInteractEntityEvent?,
+        actionRouteProperties: ActionRouteProperties?
+    ) {
+        if (interacted) return
+        val entity = event!!.entity
+        val spawnLoc =
+            DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[entity!!.entityId] ?: return
+        if (target.getVector3i(dungeonRoom)
+                .distanceSquared(spawnLoc.x, spawnLoc.y, spawnLoc.z) > radius.toLong() * radius
+        ) {
+            return
         }
-        if (target.getVector3i(dungeonRoom).distanceSquared((int) spawnLoc.x, (int) spawnLoc.y, (int) spawnLoc.z) > (long) radius * radius) {
-            return;
+        if (!predicate.test(entity)) {
+            return
         }
-        if (!predicate.test(event.getEntity())) {
-            return;
-        }
-        interacted = true;
+        interacted = true
     }
 
-    @Override
-    public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
-        Vector3i pos = target.getVector3i(dungeonRoom);
-        RenderUtils.highlightBlock(pos, new Color(0, 255, 255, 50), partialTicks, true);
-        RenderUtils.drawTextAtWorld("Interact", pos.x + 0.5f, pos.y + 0.3f, pos.z + 0.5f, 0xFFFFFF00, 0.02f, false, false, partialTicks);
+    override fun onRenderWorld(
+        dungeonRoom: DungeonRoom?,
+        partialTicks: Float,
+        actionRouteProperties: ActionRouteProperties?,
+        flag: Boolean
+    ) {
+        val pos = target.getVector3i(dungeonRoom)
+        RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
+        RenderUtils.drawTextAtWorld(
+            "Interact",
+            pos.x + 0.5f,
+            pos.y + 0.3f,
+            pos.z + 0.5f,
+            -0x100,
+            0.02f,
+            false,
+            false,
+            partialTicks
+        )
     }
 
-    @Override
-    public String toString() {
-        return "InteractEntity\n- target: " + target.toString() + "\n- radius: " + radius + "\n- predicate: " + (predicate.test(null) ? "null" : predicate.getClass().getSimpleName());
+    override fun toString(): String {
+        return """
+            InteractEntity
+            - target: $target
+            - radius: $radius
+            - predicate: ${if (predicate.test(null)) "null" else predicate.javaClass.simpleName}
+            """.trimIndent()
     }
 }

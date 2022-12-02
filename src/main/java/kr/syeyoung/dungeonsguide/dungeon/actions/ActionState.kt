@@ -1,12 +1,5 @@
-package kr.syeyoung.dungeonsguide.dungeon.actions;
+package kr.syeyoung.dungeonsguide.dungeon.actions
 
-public enum ActionState {
-    navigate("navigate"),
-    found("found");
-
-    private final String state;
-
-    ActionState(String state) {
-        this.state = state;
-    }
+enum class ActionState(private val state: String) {
+    navigate("navigate"), found("found");
 }

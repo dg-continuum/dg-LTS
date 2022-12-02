@@ -19,12 +19,12 @@ fun buildSecretStrategy(e: Int, parent: GeneralRoomProcessor): SecretGuideStrate
 
 abstract class SecretGuideStrategy(val parent: GeneralRoomProcessor) {
     open val actionPath: MutableMap<String, ActionRoute> = HashMap()
-    fun addAction(mechanic: String?, state: String?, actionRouteProperties: ActionRouteProperties?): String {
+    fun addAction(mechanic: String, state: String, actionRouteProperties: ActionRouteProperties): String {
         val str = UUID.randomUUID().toString()
         addAction(str, mechanic, state, actionRouteProperties)
         return str
     }
-    fun addAction(id: String, mechanic: String?, state: String?, actionRouteProperties: ActionRouteProperties?) {
+    fun addAction(id: String, mechanic: String, state: String, actionRouteProperties: ActionRouteProperties) {
         actionPath[id] = ActionRoute(parent.dungeonRoom, mechanic, state, actionRouteProperties)
     }
     fun cancel(id: String) {

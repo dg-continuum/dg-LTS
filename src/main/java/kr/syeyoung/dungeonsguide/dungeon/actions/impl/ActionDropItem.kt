@@ -15,70 +15,68 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.utils.RenderUtils
+import net.minecraft.entity.item.EntityItem
+import net.minecraft.util.AxisAlignedBB
+import java.awt.Color
+import java.util.function.Predicate
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
-import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.util.AxisAlignedBB;
-import org.joml.Vector3i;
+class ActionDropItem(private val target: OffsetPoint) : AbstractAction() {
+    private val predicate = Predicate { _: EntityItem? -> true }
 
-import java.awt.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionDropItem extends AbstractAction {
-    private Set<AbstractAction> preRequisite = new HashSet<>();
-    private OffsetPoint target;
-    private Predicate<EntityItem> predicate = Predicates.alwaysTrue();
-
-    public ActionDropItem(OffsetPoint target) {
-        this.target = target;
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        val secretLocation = target.getVector3i(dungeonRoom)
+        val item = dungeonRoom!!.context.world.getEntitiesWithinAABB(
+            EntityItem::class.java,
+            AxisAlignedBB.fromBounds(
+                secretLocation.x.toDouble(),
+                secretLocation.y.toDouble(),
+                secretLocation.z.toDouble(),
+                (
+                        secretLocation.x + 1).toDouble(),
+                (
+                        secretLocation.y + 1).toDouble(),
+                (
+                        secretLocation.z + 1).toDouble()
+            )
+        )
+        return if (item.isEmpty()) {
+            false
+        } else true
     }
 
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return preRequisite;
+    override fun onRenderWorld(
+        dungeonRoom: DungeonRoom?,
+        partialTicks: Float,
+        actionRouteProperties: ActionRouteProperties?,
+        flag: Boolean
+    ) {
+        val pos = target.getVector3i(dungeonRoom)
+        RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
+        RenderUtils.drawTextAtWorld(
+            "Drop Item",
+            pos.x + 0.5f,
+            pos.y + 0.3f,
+            pos.z + 0.5f,
+            -0x100,
+            0.02f,
+            false,
+            false,
+            partialTicks
+        )
     }
 
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        Vector3i secretLocation = target.getVector3i(dungeonRoom);
-        List<EntityItem> item = dungeonRoom.getContext().getWorld().getEntitiesWithinAABB(EntityItem.class,
-                AxisAlignedBB.fromBounds(
-                        secretLocation.x,
-                        secretLocation.y,
-                        secretLocation.z,
-                        secretLocation.x + 1,
-                        secretLocation.y + 1,
-                        secretLocation.z + 1));
-        if (item.isEmpty()) {
-            return false;
-        }
-        return (predicate == null || predicate.apply(item.get(0)));
-    }
-
-    @Override
-    public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
-        Vector3i pos = target.getVector3i(dungeonRoom);
-        RenderUtils.highlightBlock(pos, new Color(0, 255, 255, 50), partialTicks, true);
-        RenderUtils.drawTextAtWorld("Drop Item", pos.x + 0.5f, pos.y + 0.3f, pos.z + 0.5f, 0xFFFFFF00, 0.02f, false, false, partialTicks);
-    }
-
-
-    @Override
-    public String toString() {
-        return "DropItem\n- target: " + target.toString() + "\n- predicate: " + predicate.getClass().getSimpleName();
+    override fun toString(): String {
+        return """
+            DropItem
+            - target: $target
+            - predicate: ${predicate.javaClass.simpleName}
+            """.trimIndent()
     }
 }

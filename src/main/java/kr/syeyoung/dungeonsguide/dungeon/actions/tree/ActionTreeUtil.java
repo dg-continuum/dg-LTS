@@ -26,13 +26,13 @@ public class ActionTreeUtil {
     public static List<AbstractAction> linearifyActionTree(ActionTree input) {
         ActionTree tree = copyActionTree(input);
 
-        List<AbstractAction> actions = new ArrayList<AbstractAction>();
+        List<AbstractAction> actions = new ArrayList<>();
 
         int plsHalt = 0;
         while (tree.getChildren().size() != 0) {
             plsHalt++;
             if (plsHalt > 1000000) throw new IllegalStateException("Linearifying process ran for 1 million cycle");
-            Set<ActionTree> visited = new HashSet<ActionTree>();
+            Set<ActionTree> visited = new HashSet<>();
             ActionTree curr = tree;
 
             int plsHalt2 = 0;
@@ -61,7 +61,7 @@ public class ActionTreeUtil {
     }
 
     public static ActionTree copyActionTree(ActionTree tree) {
-        Map<ActionTree, ActionTree> built = new HashMap<ActionTree, ActionTree>();
+        Map<ActionTree, ActionTree> built = new HashMap<>();
         if (tree.getParent().size() != 0) throw new IllegalArgumentException("that is not head of tree");
         return copyActionTree(tree, built);
     }

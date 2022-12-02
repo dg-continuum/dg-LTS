@@ -50,7 +50,7 @@ public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
             Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
                 ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);

@@ -52,8 +52,18 @@ public class DungeonContext {
     @Getter
     @Setter
     private static String dungeonName;
-    @Getter
+
+    public World getWorld() {
+        return world;
+    }
+
     private final World world;
+
+    public Set<Vector3i> getExpositions() {
+        return expositions;
+    }
+
+    private Set<Vector3i> expositions = new HashSet<>();
 
     public MapProcessor getMapProcessor() {
         return mapProcessor;

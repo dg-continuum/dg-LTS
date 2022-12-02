@@ -52,7 +52,7 @@ public class DungeonPressurePlate implements DungeonMechanic {
             Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
                 ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
@@ -72,11 +72,11 @@ public class DungeonPressurePlate implements DungeonMechanic {
         if ("triggered".equalsIgnoreCase(state)) {
             ActionDropItem actionClick = new ActionDropItem(platePoint);
             preRequisites.add(actionClick);
-            preRequisites = actionClick.getPreRequisite();
+            preRequisites = actionClick.getPreRequisites(dungeonRoom);
         }
         ActionMove actionMove = new ActionMove(platePoint);
         preRequisites.add(actionMove);
-        preRequisites = actionMove.getPreRequisite();
+        preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
             ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);

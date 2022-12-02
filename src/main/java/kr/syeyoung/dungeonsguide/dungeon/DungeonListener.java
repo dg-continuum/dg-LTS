@@ -51,6 +51,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -68,6 +69,14 @@ import java.util.Map;
 
 public class DungeonListener {
 
+    @SubscribeEvent
+    public void onExplosion(ExplosionEvent event) {
+        DungeonContext ctx = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if(ctx != null){
+            Vec3 pos = event.explosion.getPosition();
+            ctx.getExpositions().add(new Vector3i((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord));
+        }
+    }
 
     @Getter
     private final Map<Integer, Vec3> entityIdToPosMap = new HashMap<>();
@@ -548,7 +557,7 @@ public class DungeonListener {
         DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
 
         if (DungeonsGuide.getDungeonsGuide().getDungeonFacade() != null) {
-            EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
+
             Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
 
             if (context.getBossfightProcessor() != null) {

@@ -129,14 +129,14 @@ public class DungeonSecret implements DungeonMechanic {
                 return SecretStatus.ERROR;
             } else {
                 TileEntityChest chest = (TileEntityChest) dungeonRoom.getContext().getWorld().getTileEntity(VectorUtils.Vec3iToBlockPos(pos));
-                if (chest.numPlayersUsing > 0) {
+                if (chest != null && chest.numPlayersUsing > 0 ) {
                     return SecretStatus.FOUND;
                 } else {
                     return SecretStatus.CREATED;
                 }
             }
         } else if (secretType == SecretType.ESSENCE) {
-            IBlockState blockState = DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(pos);
+            IBlockState blockState = BlockCache.getBlockState(pos);
             if (blockState.getBlock() == Blocks.skull) {
                 dungeonRoom.getRoomContext().put("e-" + pos, true);
                 return SecretStatus.DEFINITELY_NOT;
@@ -185,7 +185,7 @@ public class DungeonSecret implements DungeonMechanic {
             Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(null);
             for (String str : preRequisite) {
                 if (!str.isEmpty()) {
                     String[] split = str.split(":");
@@ -204,18 +204,18 @@ public class DungeonSecret implements DungeonMechanic {
         if (secretType == SecretType.CHEST || secretType == SecretType.ESSENCE) {
             ActionClick actionClick = new ActionClick(secretPoint);
             preRequisites.add(actionClick);
-            preRequisites = actionClick.getPreRequisite();
+            preRequisites = actionClick.getPreRequisites(dungeonRoom);
         } else if (secretType == SecretType.BAT) {
             ActionKill actionKill = new ActionKill(secretPoint);
             preRequisites.add(actionKill);
             actionKill.setPredicate(EntityBat.class::isInstance);
             actionKill.setRadius(10);
-            preRequisites = actionKill.getPreRequisite();
+            preRequisites = actionKill.getPreRequisites(null);
         }
 
         ActionMove actionMove = new ActionMove(secretPoint);
         preRequisites.add(actionMove);
-        preRequisites = actionMove.getPreRequisite();
+        preRequisites = actionMove.getPreRequisites(null);
 
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;

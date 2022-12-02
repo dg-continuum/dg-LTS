@@ -49,7 +49,7 @@ public class PacketListener extends ChannelDuplexHandler {
     public static long lastPacketReceived;
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Packet packet = (Packet) msg;
+        Packet<?> packet = (Packet<?>) msg;
         lastPacketReceived = System.currentTimeMillis();
         if (SkyblockStatus.isOnSkyblock()
                 && msg instanceof S04PacketEntityEquipment
@@ -103,7 +103,7 @@ public class PacketListener extends ChannelDuplexHandler {
     }
 
     private static class SingleBlockChange extends S23PacketBlockChange {
-        private S23PacketBlockChange old;
+        private final S23PacketBlockChange old;
         public SingleBlockChange(S23PacketBlockChange blockChange) {
             this.old = blockChange;
         }
@@ -139,7 +139,7 @@ public class PacketListener extends ChannelDuplexHandler {
 
 
     private static class MultiBlockChange extends S22PacketMultiBlockChange {
-        private S22PacketMultiBlockChange old;
+        private final S22PacketMultiBlockChange old;
         public MultiBlockChange(S22PacketMultiBlockChange blockChange) {
             this.old = blockChange;
         }
@@ -170,7 +170,7 @@ public class PacketListener extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        Packet packet = (Packet) msg;
+        Packet<?> packet = (Packet<?>) msg;
         if (packet instanceof C02PacketUseEntity) {
             C02PacketUseEntity packet2 = (C02PacketUseEntity) packet;
             PlayerInteractEntityEvent piee;

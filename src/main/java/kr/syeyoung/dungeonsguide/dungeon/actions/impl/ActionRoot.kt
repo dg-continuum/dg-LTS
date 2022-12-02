@@ -15,34 +15,23 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.util.HashSet;
-import java.util.Set;
+class ActionRoot : AbstractAction() {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionRoot extends AbstractAction {
-    private Set<AbstractAction> preRequisite = new HashSet<>();
-
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return preRequisite;
+    override fun getPreRequisites(dungeonRoom: DungeonRoom?): Set<AbstractAction?> {
+        return preRequisite
     }
 
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        return true;
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        return true
     }
 
-    @Override
-    public String toString() {
-        return "Action Root";
+    override fun toString(): String {
+        return "Action Root"
     }
 }

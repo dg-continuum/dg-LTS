@@ -51,7 +51,7 @@ public class DungeonJournal implements DungeonMechanic {
         {
             ActionMove actionMove = new ActionMove(secretPoint);
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(dungeonRoom);
         }
         {
             for (String str : preRequisite) {

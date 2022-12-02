@@ -21,7 +21,6 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
-import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
@@ -198,7 +197,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         if (FeatureRegistry.SECRET_CREATE_REFRESH_LINE.keybind == keyInputEvent.key) {
             if (!FeatureRegistry.SECRET_CREATE_REFRESH_LINE.isEnabled) return
             val actionRoute = getBestFit(0f)
-            if (actionRoute == null || actionRoute.currentAction == null) {
+            if (actionRoute == null) {
                 logger.error("actionRoute was null after SECRET_CREATE_REFRESH_LINE keypress")
                 return
             }
@@ -209,17 +208,14 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                 currentAction.forceRefresh(dungeonRoom)
                 return
             }
-            if (currentAction is ActionMoveNearestAir) {
-                currentAction.forceRefresh(dungeonRoom)
-            }
             if (actionRoute.current >= 1) {
-                val abstractAction = actionRoute.actions[actionRoute.current - 1]
-                if (abstractAction is ActionMove) {
-                    abstractAction.forceRefresh(dungeonRoom)
+
+                actionRoute.actions[actionRoute.current - 1].let {
+                    if (it is ActionMove){
+                        it.forceRefresh(dungeonRoom)
+                    }
                 }
-                if (abstractAction is ActionMoveNearestAir) {
-                    abstractAction.forceRefresh(dungeonRoom)
-                }
+
             }
             if (FeatureRegistry.SECRET_CREATE_REFRESH_LINE.isPathfind && !actionRoute.actionRouteProperties.isPathfind) {
                 actionRoute.actionRouteProperties.isPathfind = true
@@ -275,16 +271,12 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                 continue
             }
             val currentAction = value.currentAction
-            var target: Vector3i? = if (currentAction is ActionMove) {
-                currentAction.target?.getVector3i(dungeonRoom)
-            } else if (currentAction is ActionMoveNearestAir) {
-                currentAction.target?.getVector3i(dungeonRoom)
+            val target: Vector3i? = if (currentAction is ActionMove) {
+                currentAction.target.getVector3i(dungeonRoom)
             } else {
                 if (value.current >= 1) {
                     val abstractAction = value.actions[value.current - 1]
                     if (abstractAction is ActionMove) {
-                        abstractAction.target.getVector3i(dungeonRoom)
-                    } else if (abstractAction is ActionMoveNearestAir) {
                         abstractAction.target.getVector3i(dungeonRoom)
                     } else {
                         continue

@@ -52,7 +52,7 @@ public class DungeonOnewayLever implements DungeonMechanic {
             Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
                 ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
@@ -67,10 +67,10 @@ public class DungeonOnewayLever implements DungeonMechanic {
         Set<AbstractAction> preRequisites = base = new HashSet<>();
         ActionClick actionClick;
         preRequisites.add(actionClick = new ActionClick(leverPoint));
-        preRequisites = actionClick.getPreRequisite();
+        preRequisites = actionClick.getPreRequisites(dungeonRoom);
         ActionMove actionMove = new ActionMove(leverPoint);
         preRequisites.add(actionMove);
-        preRequisites = actionMove.getPreRequisite();
+        preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
             ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);

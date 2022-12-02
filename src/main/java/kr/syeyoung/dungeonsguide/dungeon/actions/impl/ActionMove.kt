@@ -15,113 +15,120 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
+import kr.syeyoung.dungeonsguide.utils.RenderUtils
+import kr.syeyoung.dungeonsguide.utils.VectorUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.util.MathHelper
+import org.joml.Vector3d
+import java.util.concurrent.Future
 
-import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
-import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
-import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.MathHelper;
-import org.joml.Vector3d;
-import org.joml.Vector3i;
+open class ActionMove(val target: OffsetPoint) : AbstractAction() {
+    private var tick = -1
+    private var poses: List<Vector3d?>? = null
+    private var latestFuture: Future<List<Vector3d?>>? = null
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionMove extends AbstractAction {
-    private Set<AbstractAction> preRequisite = new HashSet<>();
-    private OffsetPoint target;
-    private int tick = -1;
-    private List<Vector3d> poses;
-    private Future<List<Vector3d>> latestFuture;
-    public ActionMove(OffsetPoint target) {
-        this.target = target;
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        return target.getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) < 3
     }
 
-    static void draw(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag, OffsetPoint target, List<Vector3d> poses) {
-        Vector3i pos = target.getVector3i(dungeonRoom);
-
-        float distance = (float) pos.distance(VectorUtils.getPlayerVector3i());
-        float multiplier = distance / 120f; //mobs only render ~120 blocks away
-        if (flag) multiplier *= 2.0f;
-        float scale = 0.45f * multiplier;
-        scale *= 25.0 / 6.0;
-        if (actionRouteProperties.isBeacon()) {
+    override fun onRenderWorld(
+        dungeonRoom: DungeonRoom?,
+        partialTicks: Float,
+        actionRouteProperties: ActionRouteProperties?,
+        flag: Boolean
+    ) {
+        val pos = target.getVector3i(dungeonRoom)
+        val distance = pos.distanceSquared(VectorUtils.getPlayerVector3i()).toFloat()
+        var multiplier = distance / 120f //mobs only render ~120 blocks away
+        if (flag) multiplier *= 2.0f
+        var scale = 0.45f * multiplier
+        scale *= (25.0 / 6.0).toFloat()
+        if (actionRouteProperties!!.beacon) {
             if (DgOneCongifConfig.renderSecretBeacons) {
-                RenderUtils.renderBeaconBeam(pos.x, pos.y, pos.z, actionRouteProperties.getBeaconBeamColor(), partialTicks);
+                RenderUtils.renderBeaconBeam(
+                    pos.x.toDouble(),
+                    pos.y.toDouble(),
+                    pos.z.toDouble(),
+                    actionRouteProperties.beaconBeamColor,
+                    partialTicks
+                )
             }
-            RenderUtils.highlightBlock(pos, actionRouteProperties.getBeaconColor(), partialTicks);
+            RenderUtils.highlightBlock(pos, actionRouteProperties.beaconColor, partialTicks)
         }
         if (DgOneCongifConfig.renderSecretDestText) {
-            RenderUtils.drawTextAtWorld("Destination", pos.x + 0.5f, pos.y + 0.5f + scale, pos.z + 0.5f, 0xFF00FF00, flag ? 2f : 1f, true, false, partialTicks);
+            RenderUtils.drawTextAtWorld(
+                "Destination",
+                pos.x + 0.5f,
+                pos.y + 0.5f + scale,
+                pos.z + 0.5f,
+                -0xff0100,
+                if (flag) 2f else 1f,
+                true,
+                false,
+                partialTicks
+            )
         }
-        RenderUtils.drawTextAtWorld(String.format("%.2f", MathHelper.sqrt_double(pos.distance(VectorUtils.getPlayerVector3i()))) + "m", pos.x + 0.5f, pos.y + 0.5f - scale, pos.z + 0.5f, 0xFFFFFF00, flag ? 2f : 1f, true, false, partialTicks);
-
-        if ((!DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().isEmpty() && DgOneCongifConfig.togglePathfindKeybind.getKeyBinds().get(0) != UKeyboard.KEY_NONE) || !DgOneCongifConfig.togglePathfindStatus) {
-            RenderUtils.drawLinesVec3(poses, actionRouteProperties.getLineColor(), actionRouteProperties.getLineWidth(), partialTicks, true);
+        RenderUtils.drawTextAtWorld(
+            String.format(
+                "%.2f",
+                MathHelper.sqrt_double(pos.distance(VectorUtils.getPlayerVector3i()))
+            ) + "m",
+            pos.x + 0.5f,
+            pos.y + 0.5f - scale,
+            pos.z + 0.5f,
+            -0x100,
+            if (flag) 2f else 1f,
+            true,
+            false,
+            partialTicks
+        )
+        if (!DgOneCongifConfig.togglePathfindStatus) {
+            RenderUtils.drawLinesVec3(
+                poses,
+                actionRouteProperties.lineColor,
+                actionRouteProperties.lineWidth,
+                partialTicks,
+                true
+            )
         }
-
     }
 
-    public OffsetPoint getTarget() {
-        return target;
-    }
+    override fun onTick(dungeonRoom: DungeonRoom?, actionRouteProperties: ActionRouteProperties?) {
+        tick = (tick + 1) % 1.coerceAtLeast(actionRouteProperties!!.lineRefreshRate)
 
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return preRequisite;
-    }
-
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        return target.getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) < 25;
-    }
-
-    @Override
-    public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
-        draw(dungeonRoom, partialTicks, actionRouteProperties, flag, target, poses);
-    }
-
-    @Override
-    public void onTick(DungeonRoom dungeonRoom, ActionRouteProperties actionRouteProperties) {
-        tick = (tick + 1) % Math.max(1, actionRouteProperties.getLineRefreshRate());
-        if (latestFuture != null && latestFuture.isDone()) {
-            try {
-                poses = latestFuture.get();
-                latestFuture = null;
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+        latestFuture?.let {
+            if(it.isDone){
+                poses = it.get()
+                latestFuture = null
             }
         }
 
-        if (tick == 0 && actionRouteProperties.isPathfind() && latestFuture == null) {
+        if (tick == 0 && actionRouteProperties.isPathfind && latestFuture == null) {
             if (!DgOneCongifConfig.freezePathfindingStatus || poses == null) {
-                latestFuture = dungeonRoom.createEntityPathTo(Minecraft.getMinecraft().thePlayer, target.getVector3i(dungeonRoom));
+                latestFuture = dungeonRoom!!.createEntityPathTo(
+                    Minecraft.getMinecraft().thePlayer,
+                    target.getVector3i(dungeonRoom)
+                )
             }
         }
     }
 
-    public void forceRefresh(DungeonRoom dungeonRoom) {
+    fun forceRefresh(dungeonRoom: DungeonRoom) {
         if (latestFuture == null) {
-            latestFuture = dungeonRoom.createEntityPathTo(Minecraft.getMinecraft().thePlayer, target.getVector3i(dungeonRoom));
+            latestFuture =
+                dungeonRoom.createEntityPathTo(Minecraft.getMinecraft().thePlayer, target.getVector3i(dungeonRoom))
         }
     }
 
-    @Override
-    public String toString() {
-        return "Move\n- target: " + target.toString();
+    override fun toString(): String {
+        return "Move\n- target: $target"
     }
+
 }

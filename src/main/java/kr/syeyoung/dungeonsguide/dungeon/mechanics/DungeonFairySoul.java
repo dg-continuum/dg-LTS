@@ -55,10 +55,10 @@ public class DungeonFairySoul implements DungeonMechanic {
         actionClick.setRadius(3);
         base.add(actionClick);
 
-        base = actionClick.getPreRequisite();
+        base = actionClick.getPreRequisites(null);
         ActionMove actionMove = new ActionMove(secretPoint);
         base.add(actionMove);
-        base = actionMove.getPreRequisite();
+        base = actionMove.getPreRequisites(null);
 
         for (String str : preRequisite) {
             if (!str.isEmpty()) {

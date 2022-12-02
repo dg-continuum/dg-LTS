@@ -15,50 +15,53 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions
 
-package kr.syeyoung.dungeonsguide.dungeon.actions;
-
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-
-import java.util.Set;
+import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.entity.player.PlayerInteractEvent
 
 /**
  * THIS IS A ABSTRACT CLASS CUZ I DONT WANT SO MANY EMPTY OVERRIDES
  */
-public abstract class AbstractAction {
-    public void onPlayerInteract(DungeonRoom dungeonRoom, PlayerInteractEvent event, ActionRouteProperties actionRouteProperties) {
-
+abstract class AbstractAction {
+    var preRequisite: Set<AbstractAction?> = HashSet()
+    open fun getPreRequisites(dungeonRoom: DungeonRoom?): Set<AbstractAction?> {
+        return preRequisite
     }
 
-    public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
-
+    open fun onPlayerInteract(
+        dungeonRoom: DungeonRoom?,
+        event: PlayerInteractEvent?,
+        actionRouteProperties: ActionRouteProperties?
+    ) {
     }
 
-    public void onLivingDeath(DungeonRoom dungeonRoom, LivingDeathEvent event, ActionRouteProperties actionRouteProperties) {
-
+    open fun onRenderWorld(
+        dungeonRoom: DungeonRoom?,
+        partialTicks: Float,
+        actionRouteProperties: ActionRouteProperties?,
+        flag: Boolean
+    ) {
     }
 
-    public void onRenderScreen(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties) {
-
+    open fun onLivingDeath(
+        dungeonRoom: DungeonRoom?,
+        event: LivingDeathEvent?,
+        actionRouteProperties: ActionRouteProperties?
+    ) {
     }
 
-    public void onLivingInteract(DungeonRoom dungeonRoom, PlayerInteractEntityEvent event, ActionRouteProperties actionRouteProperties) {
-
+    fun onRenderScreen(dungeonRoom: DungeonRoom?, partialTicks: Float, actionRouteProperties: ActionRouteProperties?) {}
+    open fun onLivingInteract(
+        dungeonRoom: DungeonRoom?,
+        event: PlayerInteractEntityEvent?,
+        actionRouteProperties: ActionRouteProperties?
+    ) {
     }
 
-    public void onTick(DungeonRoom dungeonRoom, ActionRouteProperties actionRouteProperties) {
-
-    }
-
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return null;
-    }
-
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        return false;
-    }
+    open fun onTick(dungeonRoom: DungeonRoom?, actionRouteProperties: ActionRouteProperties?) {}
+    abstract fun isComplete(dungeonRoom: DungeonRoom?): Boolean
 }

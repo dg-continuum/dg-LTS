@@ -15,144 +15,109 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.tree
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.tree;
+import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
+import kr.syeyoung.dungeonsguide.utils.VectorUtils
+import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.entity.player.PlayerInteractEvent
 
-import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
-import kr.syeyoung.dungeonsguide.dungeon.actions.*;
-import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
-import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete;
-import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
-import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
-import lombok.Getter;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+class ActionRoute(
+    dungeonRoom: DungeonRoom,
+    val mechanic: String,
+    val state: String,
+    val actionRouteProperties: ActionRouteProperties
+) {
 
-import java.util.List;
 
-public class ActionRoute {
-    public String getMechanic() {
-        return mechanic;
-    }
+    val actions: MutableList<AbstractAction>
+    private val dungeonRoom: DungeonRoom
+    var current: Int
 
-    private final String mechanic;
-    @Getter
-    private final String state;
-
-    public List<AbstractAction> getActions() {
-        return actions;
-    }
-
-    private final List<AbstractAction> actions;
-    private final DungeonRoom dungeonRoom;
-
-    public ActionRouteProperties getActionRouteProperties() {
-        return actionRouteProperties;
-    }
-
-    public void setCurrent(int current) {
-        this.current = current;
-    }
-
-    private final ActionRouteProperties actionRouteProperties;
-
-    public int getCurrent() {
-        return current;
-    }
-
-    private int current;
-
-    public ActionRoute(DungeonRoom dungeonRoom, String mechanic, String state, ActionRouteProperties actionRouteProperties) {
-        this.mechanic = mechanic;
-        this.state = state;
-        this.actionRouteProperties = actionRouteProperties;
-
-        System.out.println("Creating Action Route with mechanic:" + mechanic + " State:" + state);
-        ActionChangeState actionChangeState = new ActionChangeState(mechanic, state);
-        ActionTree tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom);
-        actions = ActionTreeUtil.linearifyActionTree(tree);
-        actions.add(new ActionComplete());
-        ChatTransmitter.sendDebugChat("Created ActionRoute with " + actions.size() + " steps");
-        ChatTransmitter.sendDebugChat("========== STEPS ==========");
-        for (AbstractAction action : actions) {
-            ChatTransmitter.sendDebugChat(action.toString());
+    init {
+        println("Creating Action Route with mechanic:$mechanic State:$state")
+        val actionChangeState = ActionChangeState(mechanic, state)
+        val tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom)
+        actions = ActionTreeUtil.linearifyActionTree(tree)
+        actions.add(ActionComplete())
+        ChatTransmitter.sendDebugChat("Created ActionRoute with " + actions.size + " steps")
+        ChatTransmitter.sendDebugChat("========== STEPS ==========")
+        for (action in actions) {
+            ChatTransmitter.sendDebugChat(action.toString())
         }
-        ChatTransmitter.sendDebugChat("=========== END ===========");
-
-
-        current = 0;
-        this.dungeonRoom = dungeonRoom;
+        ChatTransmitter.sendDebugChat("=========== END ===========")
+        current = 0
+        this.dungeonRoom = dungeonRoom
     }
 
-    public AbstractAction next() {
-        current++;
-        if (current >= actions.size()) {
-            current = actions.size() - 1;
+    operator fun next(): AbstractAction {
+        current++
+        if (current >= actions.size) {
+            current = actions.size - 1
         }
-        return getCurrentAction();
+        return currentAction
     }
 
-    public AbstractAction prev() {
-        current--;
+    fun prev(): AbstractAction {
+        current--
         if (current < 0) {
-            current = 0;
+            current = 0
         }
-        return getCurrentAction();
+        return currentAction
     }
 
-    public AbstractAction getCurrentAction() {
-        return actions.get(current);
+    val currentAction: AbstractAction
+        get() = actions[current]
+
+    fun onPlayerInteract(event: PlayerInteractEvent?) {
+        currentAction.onPlayerInteract(dungeonRoom, event, actionRouteProperties)
     }
 
-
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        getCurrentAction().onPlayerInteract(dungeonRoom, event, actionRouteProperties);
+    fun onLivingDeath(event: LivingDeathEvent?) {
+        currentAction.onLivingDeath(dungeonRoom, event, actionRouteProperties)
     }
 
-    public void onLivingDeath(LivingDeathEvent event) {
-        getCurrentAction().onLivingDeath(dungeonRoom, event, actionRouteProperties);
-    }
-
-    public void onRenderWorld(float partialTicks, boolean flag) {
-
+    fun onRenderWorld(partialTicks: Float, flag: Boolean) {
         if (current - 1 >= 0) {
-            AbstractAction abstractAction = actions.get(current - 1);
-            if (((abstractAction instanceof ActionMove && ((ActionMove) abstractAction).getTarget().getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) >= 5)
-                    || (abstractAction instanceof ActionMoveNearestAir && ((ActionMoveNearestAir) abstractAction).getTarget().getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) >= 5))) {
-                abstractAction.onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
+            val abstractAction = actions[current - 1]
+            if (abstractAction is ActionMove && abstractAction.target.getVector3i(dungeonRoom)
+                    .distance(VectorUtils.getPlayerVector3i()) >= 5 || abstractAction is ActionMoveNearestAir && abstractAction.target.getVector3i(
+                    dungeonRoom
+                ).distance(VectorUtils.getPlayerVector3i()) >= 5
+            ) {
+                abstractAction.onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag)
             }
         }
-
-        getCurrentAction().onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag);
-
-
+        currentAction.onRenderWorld(dungeonRoom, partialTicks, actionRouteProperties, flag)
     }
 
-    public void onRenderScreen(float partialTicks) {
-        getCurrentAction().onRenderScreen(dungeonRoom, partialTicks, actionRouteProperties);
+    fun onRenderScreen(partialTicks: Float) {
+        currentAction.onRenderScreen(dungeonRoom, partialTicks, actionRouteProperties)
     }
 
-    public void onTick() {
-        AbstractAction currentAction = getCurrentAction();
-
-        currentAction.onTick(dungeonRoom, actionRouteProperties);
-        if (this.current - 1 >= 0 && (actions.get(this.current - 1) instanceof ActionMove || actions.get(this.current - 1) instanceof ActionMoveNearestAir))
-            actions.get(this.current - 1).onTick(dungeonRoom, actionRouteProperties);
-
-        if (dungeonRoom.getMechanics().get(mechanic).getCurrentState(dungeonRoom).equals(state)) {
-            this.current = actions.size() - 1;
+    fun onTick() {
+        val currentAction = currentAction
+        currentAction.onTick(dungeonRoom, actionRouteProperties)
+        if (current - 1 >= 0 && (actions[current - 1] is ActionMove || actions[current - 1] is ActionMoveNearestAir)) actions[current - 1].onTick(
+            dungeonRoom,
+            actionRouteProperties
+        )
+        if (dungeonRoom.mechanics[mechanic]!!.getCurrentState(dungeonRoom) == state) {
+            current = actions.size - 1
         }
-
         if (currentAction.isComplete(dungeonRoom)) {
-            next();
+            next()
         }
     }
 
-    public void onLivingInteract(PlayerInteractEntityEvent event) {
-        getCurrentAction().onLivingInteract(dungeonRoom, event, actionRouteProperties);
+    fun onLivingInteract(event: PlayerInteractEntityEvent?) {
+        currentAction.onLivingInteract(dungeonRoom, event, actionRouteProperties)
     }
-
 }

@@ -15,91 +15,82 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.DungeonsGuide
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.utils.RenderUtils
+import kr.syeyoung.dungeonsguide.utils.VectorUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.texture.TextureMap
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.init.Blocks
+import java.awt.Color
 
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
-import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import kr.syeyoung.dungeonsguide.utils.RenderUtils;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import org.joml.Vector3i;
 
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
+class ActionBreakWithSuperBoom(private val target: OffsetPoint) : AbstractAction() {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionBreakWithSuperBoom extends AbstractAction {
-    private Set<AbstractAction> preRequisite = new HashSet<>();
-    private OffsetPoint target;
-
-    public ActionBreakWithSuperBoom(OffsetPoint target) {
-        this.target = target;
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        val thing = target.getVector3i(dungeonRoom)
+        for (el in DungeonsGuide.getDungeonsGuide().dungeonFacade.context.expositions) {
+            if (thing.distance(el) < 5) {
+                return true
+            }
+        }
+        return false
     }
 
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return preRequisite;
+    override fun onRenderWorld(
+        dungeonRoom: DungeonRoom?,
+        partialTicks: Float,
+        actionRouteProperties: ActionRouteProperties?,
+        flag: Boolean
+    ) {
+        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture)
+        val blockpos = target.getVector3i(dungeonRoom)
+        val viewingFrom = Minecraft.getMinecraft().renderViewEntity
+        val x = viewingFrom.lastTickPosX + (viewingFrom.posX - viewingFrom.lastTickPosX) * partialTicks
+        val y = viewingFrom.lastTickPosY + (viewingFrom.posY - viewingFrom.lastTickPosY) * partialTicks
+        val z = viewingFrom.lastTickPosZ + (viewingFrom.posZ - viewingFrom.lastTickPosZ) * partialTicks
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(-x, -y, -z)
+        GlStateManager.disableLighting()
+        GlStateManager.enableAlpha()
+        GlStateManager.disableDepth()
+        GlStateManager.depthMask(false)
+        GlStateManager.enableBlend()
+        val tessellator = Tessellator.getInstance()
+        val vertexbuffer = tessellator.worldRenderer
+        vertexbuffer.begin(7, DefaultVertexFormats.BLOCK)
+        val blockrendererdispatcher = Minecraft.getMinecraft().blockRendererDispatcher
+        blockrendererdispatcher.blockModelRenderer.renderModel(
+            Minecraft.getMinecraft().theWorld,
+            blockrendererdispatcher.blockModelShapes.getModelForState(Blocks.tnt.defaultState),
+            Blocks.tnt.defaultState, VectorUtils.Vec3iToBlockPos(blockpos), vertexbuffer, false
+        )
+        tessellator.draw()
+        GlStateManager.enableLighting()
+        GlStateManager.popMatrix()
+        RenderUtils.highlightBlock(blockpos, Color(0, 255, 255, 50), partialTicks, true)
+        RenderUtils.drawTextAtWorld(
+            "Superboom",
+            blockpos.x + 0.5f,
+            blockpos.y + 0.5f,
+            blockpos.z + 0.5f,
+            -0x100,
+            0.03f,
+            false,
+            false,
+            partialTicks
+        )
     }
 
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        return false;
-    }
-
-    @Override
-    public void onRenderWorld(DungeonRoom dungeonRoom, float partialTicks, ActionRouteProperties actionRouteProperties, boolean flag) {
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-
-        Vector3i blockpos = target.getVector3i(dungeonRoom);
-
-        Entity viewing_from = Minecraft.getMinecraft().getRenderViewEntity();
-
-        double x_fix = viewing_from.lastTickPosX + ((viewing_from.posX - viewing_from.lastTickPosX) * partialTicks);
-        double y_fix = viewing_from.lastTickPosY + ((viewing_from.posY - viewing_from.lastTickPosY) * partialTicks);
-        double z_fix = viewing_from.lastTickPosZ + ((viewing_from.posZ - viewing_from.lastTickPosZ) * partialTicks);
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-x_fix, -y_fix, -z_fix);
-        GlStateManager.disableLighting();
-        GlStateManager.enableAlpha();
-        GlStateManager.disableDepth();
-        GlStateManager.depthMask(false);
-        GlStateManager.enableBlend();
-
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer vertexbuffer = tessellator.getWorldRenderer();
-        vertexbuffer.begin(7, DefaultVertexFormats.BLOCK);
-
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        blockrendererdispatcher.getBlockModelRenderer().renderModel(Minecraft.getMinecraft().theWorld,
-                blockrendererdispatcher.getBlockModelShapes().getModelForState(Blocks.tnt.getDefaultState()),
-                Blocks.tnt.getDefaultState(), VectorUtils.Vec3iToBlockPos(blockpos), vertexbuffer, false);
-        tessellator.draw();
-
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
-
-        RenderUtils.highlightBlock(blockpos, new Color(0, 255, 255, 50), partialTicks, true);
-        RenderUtils.drawTextAtWorld("Superboom", blockpos.x + 0.5f, blockpos.y + 0.5f, blockpos.z + 0.5f, 0xFFFFFF00, 0.03f, false, false, partialTicks);
-    }
-
-    @Override
-    public String toString() {
-        return "BreakWithSuperboom\n- target: " + target.toString();
+    override fun toString(): String {
+        return "BreakWithSuperboom\n- target: $target"
     }
 }

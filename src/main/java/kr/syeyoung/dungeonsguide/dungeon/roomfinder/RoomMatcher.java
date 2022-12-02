@@ -56,8 +56,8 @@ public class RoomMatcher {
                 }
             }
         }
-
         matched.blow();
+
         int lowestcost = 10;
         int lowestRot = 0;
         DungeonRoomInfo bestMatch = null;

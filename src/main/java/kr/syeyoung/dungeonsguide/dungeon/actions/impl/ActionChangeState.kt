@@ -15,63 +15,41 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonDummy
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonDummy;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.util.HashSet;
-import java.util.Set;
+class ActionChangeState(private val mechanicName: String, private val state: String) : AbstractAction() {
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class ActionChangeState extends AbstractAction {
-    @EqualsAndHashCode.Exclude
-    private Set<AbstractAction> preRequisite2 = new HashSet<AbstractAction>();
-
-    private String mechanicName;
-    private String state;
-
-    public ActionChangeState(String mechanicName, String state) {
-        this.mechanicName = mechanicName;
-        this.state = state;
+    private val preRequisite2: Set<AbstractAction?> = HashSet()
+    override fun getPreRequisites(dungeonRoom: DungeonRoom?): Set<AbstractAction?> {
+        val set: MutableSet<AbstractAction?> = HashSet(preRequisite2)
+        val mechanic = dungeonRoom!!.mechanics[mechanicName]
+        if (mechanic != null) set.addAll(mechanic.getAction(state, dungeonRoom))
+        return set
     }
 
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        Set<AbstractAction> set = new HashSet<>(preRequisite2);
-        DungeonMechanic mechanic = dungeonRoom.getMechanics().get(mechanicName);
-        if (mechanic != null)
-            set.addAll(mechanic.getAction(state, dungeonRoom));
-        return set;
+    override fun toString(): String {
+        return "ChangeState\n- target: $mechanicName\n- state: $state"
     }
 
-    @Override
-    public String toString() {
-        return "ChangeState\n- target: " + mechanicName + "\n- state: " + state;
-    }
-
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        DungeonMechanic mechanic = dungeonRoom.getMechanics().get(mechanicName);
-        if (state.equalsIgnoreCase("navigate")) {
-            return true;
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        val mechanic = dungeonRoom!!.mechanics[mechanicName]
+        if (state.equals("navigate", ignoreCase = true)) {
+            return true
         }
         if (mechanic == null) {
-            return false;
+            return false
         }
-        if (mechanic instanceof DungeonSecret && ((DungeonSecret) mechanic).getSecretType() != DungeonSecret.SecretType.CHEST) {
-            return true;
+        if (mechanic is DungeonSecret && mechanic.secretType != DungeonSecret.SecretType.CHEST) {
+            return true
         }
-        if (mechanic instanceof DungeonDummy) {
-            return true;
-        }
-        return mechanic.getCurrentState(dungeonRoom).equalsIgnoreCase(state);
+        return if (mechanic is DungeonDummy) {
+            true
+        } else mechanic.getCurrentState(dungeonRoom).equals(state, ignoreCase = true)
     }
 }

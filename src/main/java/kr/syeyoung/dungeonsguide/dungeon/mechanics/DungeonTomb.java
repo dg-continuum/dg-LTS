@@ -52,7 +52,7 @@ public class DungeonTomb implements DungeonMechanic, RouteBlocker {
             Set<AbstractAction> preRequisites = base = new HashSet<>();
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(getRepresentingPoint(dungeonRoom));
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
                 ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
@@ -71,11 +71,11 @@ public class DungeonTomb implements DungeonMechanic, RouteBlocker {
 
         ActionBreakWithSuperBoom actionClick = new ActionBreakWithSuperBoom(secretPoint.getOffsetPointList().get(0));
         preRequisites.add(actionClick);
-        preRequisites = actionClick.getPreRequisite();
+        preRequisites = actionClick.getPreRequisites(dungeonRoom);
 
         ActionMoveNearestAir actionMove = new ActionMoveNearestAir(secretPoint.getOffsetPointList().get(0));
         preRequisites.add(actionMove);
-        preRequisites = actionMove.getPreRequisite();
+        preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
             ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);

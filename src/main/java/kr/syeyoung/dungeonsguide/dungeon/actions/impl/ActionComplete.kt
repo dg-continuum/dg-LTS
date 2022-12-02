@@ -15,28 +15,17 @@
  *     You should have received a copy of the GNU Affero General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-package kr.syeyoung.dungeonsguide.dungeon.actions.impl;
+import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 
-import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
-
-import java.util.Collections;
-import java.util.Set;
-
-public class ActionComplete extends AbstractAction {
-    @Override
-    public Set<AbstractAction> getPreRequisites(DungeonRoom dungeonRoom) {
-        return Collections.emptySet();
+class ActionComplete : AbstractAction() {
+    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        return false
     }
 
-    @Override
-    public boolean isComplete(DungeonRoom dungeonRoom) {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Completed";
+    override fun toString(): String {
+        return "Completed"
     }
 }

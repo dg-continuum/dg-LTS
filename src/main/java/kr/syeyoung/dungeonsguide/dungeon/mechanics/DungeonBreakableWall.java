@@ -61,7 +61,7 @@ public class DungeonBreakableWall implements DungeonMechanic, RouteBlocker {
             }
             ActionMoveNearestAir actionMove = new ActionMoveNearestAir(thatPt);
             preRequisites.add(actionMove);
-            preRequisites = actionMove.getPreRequisite();
+            preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
                 ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
@@ -79,7 +79,7 @@ public class DungeonBreakableWall implements DungeonMechanic, RouteBlocker {
         Set<AbstractAction> preRequisites = base = new HashSet<>();
         ActionBreakWithSuperBoom actionClick = new ActionBreakWithSuperBoom(getRepresentingPoint(dungeonRoom));
         preRequisites.add(actionClick);
-        preRequisites = actionClick.getPreRequisite();
+        preRequisites = actionClick.getPreRequisites(dungeonRoom);
 
         int leastY = Integer.MAX_VALUE;
         OffsetPoint thatPt = null;
@@ -91,7 +91,7 @@ public class DungeonBreakableWall implements DungeonMechanic, RouteBlocker {
         }
         ActionMoveNearestAir actionMove = new ActionMoveNearestAir(thatPt);
         preRequisites.add(actionMove);
-        preRequisites = actionMove.getPreRequisite();
+        preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
             ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
