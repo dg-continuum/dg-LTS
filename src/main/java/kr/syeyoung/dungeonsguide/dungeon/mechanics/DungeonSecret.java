@@ -25,7 +25,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.*;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
@@ -48,7 +48,6 @@ import java.util.Set;
 
 @Data
 public class DungeonSecret implements DungeonMechanic {
-    private static final long serialVersionUID = 8784808599222706537L;
 
 
     public OffsetPoint getSecretPoint() {
@@ -189,7 +188,7 @@ public class DungeonSecret implements DungeonMechanic {
             for (String str : preRequisite) {
                 if (!str.isEmpty()) {
                     String[] split = str.split(":");
-                    ActionChangeState actionChangeState = new ActionChangeState(split[0], split[1]);
+                    ActionChangeState actionChangeState = new ActionChangeState(split[0], ActionState.valueOf(split[1]));
                     preRequisites.add(actionChangeState);
                 }
             }
@@ -219,7 +218,7 @@ public class DungeonSecret implements DungeonMechanic {
 
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
-            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
             preRequisites.add(actionChangeState);
         }
 

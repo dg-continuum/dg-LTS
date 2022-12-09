@@ -1,25 +1,9 @@
-/*
- *     Dungeons Guide - The most intelligent Hypixel Skyblock Dungeons Mod
- *     Copyright (C) 2021  cyoung06
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as published
- *     by the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- *
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor
 
 import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
@@ -27,7 +11,6 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonAddSet
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies.AutoFinderStrategy
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies.SecretGuideStrategy
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies.buildSecretStrategy
@@ -93,16 +76,10 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
             if (context.batSpawnedLocations.containsKey(en.entityId)) {
                 GlStateManager.enableBlend()
                 GL14.glBlendFuncSeparate(
-                    GL11.GL_SRC_ALPHA,
-                    GL11.GL_ONE_MINUS_SRC_ALPHA,
-                    GL11.GL_ONE,
-                    GL11.GL_ONE_MINUS_SRC_ALPHA
+                    GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA
                 )
                 GlStateManager.tryBlendFuncSeparate(
-                    GL11.GL_SRC_ALPHA,
-                    GL11.GL_ONE_MINUS_SRC_ALPHA,
-                    GL11.GL_ONE,
-                    GL11.GL_ONE_MINUS_SRC_ALPHA
+                    GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA
                 )
                 val fr = Minecraft.getMinecraft().fontRendererObj
                 fr.drawString(
@@ -179,9 +156,9 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
 
     override fun onPostGuiRender(event: DrawScreenEvent.Post) {}
     override fun onEntityUpdate(updateEvent: LivingUpdateEvent) {
-        if (updateEvent.entityLiving is EntityArmorStand && updateEvent.entityLiving.name != null &&
-            updateEvent.entityLiving.name.contains("Mimic") &&
-            !dungeonRoom.context.isGotMimic
+        if (updateEvent.entityLiving is EntityArmorStand && updateEvent.entityLiving.name != null && updateEvent.entityLiving.name.contains(
+                "Mimic"
+            ) && !dungeonRoom.context.isGotMimic
         ) {
             dungeonRoom.context.isGotMimic = true
         }
@@ -211,7 +188,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
             if (actionRoute.current >= 1) {
 
                 actionRoute.actions[actionRoute.current - 1].let {
-                    if (it is ActionMove){
+                    if (it is ActionMove) {
                         it.forceRefresh(dungeonRoom)
                     }
                 }
@@ -239,21 +216,15 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
             val iBlockState = event.world.getBlockState(event.pos)
             if (iBlockState.block === Blocks.chest || iBlockState.block === Blocks.trapped_chest) lastChest = event.pos
         }
-        if (event.entityPlayer.heldItem != null &&
-            event.entityPlayer.heldItem.item === Items.stick &&
-            DgOneCongifConfig.debugRoomEdit &&
-            DgOneCongifConfig.debugMode
-        ) {
+        if (event.entityPlayer.heldItem != null && event.entityPlayer.heldItem.item === Items.stick && DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
             val ec = EditingContext.getEditingContext() ?: return
             if (ec.current !is GuiDungeonAddSet) return
             val gdas = ec.current as GuiDungeonAddSet
             if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
                 if (last) gdas.end.setPosInWorld(
-                    dungeonRoom,
-                    VectorUtils.BlockPosToVec3i(event.pos)
+                    dungeonRoom, VectorUtils.BlockPosToVec3i(event.pos)
                 ) else gdas.start.setPosInWorld(
-                    dungeonRoom,
-                    VectorUtils.BlockPosToVec3i(event.pos)
+                    dungeonRoom, VectorUtils.BlockPosToVec3i(event.pos)
                 )
                 last = !last
             }
@@ -266,16 +237,16 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         }
         var smallest: ActionRoute? = null
         var smallestTan = 0.002
-        for ((_, value) in strategy.actionPath) {
-            if (value.actionRouteProperties.lineRefreshRate != -1 && value.actionRouteProperties.isPathfind) {
+        for ((_, actionRoute) in strategy.actionPath) {
+            if (    actionRoute.actionRouteProperties.lineRefreshRate != -1 && actionRoute.actionRouteProperties.isPathfind) {
                 continue
             }
-            val currentAction = value.currentAction
+            val currentAction = actionRoute.currentAction
             val target: Vector3i? = if (currentAction is ActionMove) {
                 currentAction.target.getVector3i(dungeonRoom)
             } else {
-                if (value.current >= 1) {
-                    val abstractAction = value.actions[value.current - 1]
+                if (actionRoute.current >= 1) {
+                    val abstractAction = actionRoute.actions[actionRoute.current - 1]
                     if (abstractAction is ActionMove) {
                         abstractAction.target.getVector3i(dungeonRoom)
                     } else {
@@ -285,13 +256,14 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                     continue
                 }
             }
+            val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
             val vectorV = VectorUtils.distSquared(
-                VectorUtils.vec3ToVec3d(Minecraft.getMinecraft().renderViewEntity.getLook(partialTicks)),
-                VectorUtils.vec3ToVec3d(Minecraft.getMinecraft().renderViewEntity.getPositionEyes(partialTicks)),
+                VectorUtils.vec3ToVec3d(renderViewEntity.getLook(partialTicks)),
+                VectorUtils.vec3ToVec3d(renderViewEntity.getPositionEyes(partialTicks)),
                 Vector3d(target).add(0.5, 0.5, 0.5)
             )
             if (vectorV < smallestTan) {
-                smallest = value
+                smallest = actionRoute
                 smallestTan = vectorV
             }
         }
@@ -309,12 +281,10 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                         val secret = DungeonSecret()
                         secret.secretType = DungeonSecret.SecretType.BAT
                         secret.secretPoint = OffsetPoint(
-                            dungeonRoom,
-                            context.batSpawnedLocations[deathEvent.entity.entityId]
+                            dungeonRoom, context.batSpawnedLocations[deathEvent.entity.entityId]
                         )
                         screen.sep.createNewMechanic(
-                            "BAT-" + UUID.randomUUID(),
-                            secret
+                            "BAT-" + UUID.randomUUID(), secret
                         )
                         return
                     }
@@ -323,12 +293,10 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                     val secret = DungeonSecret()
                     secret.secretType = DungeonSecret.SecretType.BAT
                     secret.secretPoint = OffsetPoint(
-                        dungeonRoom,
-                        context.batSpawnedLocations[deathEvent.entity.entityId]
+                        dungeonRoom, context.batSpawnedLocations[deathEvent.entity.entityId]
                     )
                     (EditingContext.getEditingContext().current as GuiDungeonRoomEdit).sep.createNewMechanic(
-                        "BAT-" + UUID.randomUUID(),
-                        secret
+                        "BAT-" + UUID.randomUUID(), secret
                     )
                 }
             }

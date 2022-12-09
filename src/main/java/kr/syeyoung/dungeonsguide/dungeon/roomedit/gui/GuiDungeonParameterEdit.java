@@ -24,7 +24,7 @@ import kr.syeyoung.dungeonsguide.dungeon.roomedit.panes.DynamicEditor;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.*;

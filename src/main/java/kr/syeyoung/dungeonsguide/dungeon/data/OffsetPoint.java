@@ -18,9 +18,8 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.data;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
@@ -32,7 +31,6 @@ import javax.vecmath.Vector2d;
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 public class OffsetPoint implements Cloneable, Serializable {
     private static final long serialVersionUID = 3102336358774967540L;
 
@@ -40,13 +38,31 @@ public class OffsetPoint implements Cloneable, Serializable {
     private int y;
     private int z;
 
+    public OffsetPoint(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     public OffsetPoint(DungeonRoom dungeonRoom, Vector3i pos) {
         setPosInWorld(dungeonRoom, pos);
     }
+
     public OffsetPoint(DungeonRoom dungeonRoom, Vec3 pos) {
         setPosInWorld(dungeonRoom, new Vector3i((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord));
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getZ() {
+        return z;
+    }
 
     public void setPosInWorld(DungeonRoom dungeonRoom, Vector3i pos) {
         Vector2d vector2d = new Vector2d(pos.x - dungeonRoom.getMin().x, pos.z - dungeonRoom.getMin().z);

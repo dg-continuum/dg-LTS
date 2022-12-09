@@ -22,7 +22,7 @@ import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonEndedEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;

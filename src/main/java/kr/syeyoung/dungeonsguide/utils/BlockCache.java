@@ -50,8 +50,12 @@ public class BlockCache {
         return getBlockState(new BlockPos(pos.x, pos.y, pos.z)).getBlock();
     }
 
+    public static Block getBlock(@NotNull BlockPos pos) {
+        return getBlockState(pos).getBlock();
+    }
+
     public static IBlockState getBlockState(@NotNull BlockPos pos) {
-        if (DgOneCongifConfig.debugMode) {
+        if (DgOneCongifConfig.visualiseBlockGetCalls) {
             long now = System.currentTimeMillis();
             // iF THE DIFFERENCE BETWEEN LAST ASKED AND NOW IS BIGGER THEN ONE SECOND RESET THE COUNTER
             if (lastAsked - now >= 1000) {
@@ -78,7 +82,7 @@ public class BlockCache {
 
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
-        if (!DgOneCongifConfig.debugMode) return;
+        if (!DgOneCongifConfig.visualiseBlockGetCalls) return;
 
         val iterator = visualise.entrySet().iterator();
         while (iterator.hasNext()) {

@@ -26,7 +26,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import org.joml.Vector3i;
@@ -52,7 +52,7 @@ public class DungeonLever implements DungeonMechanic {
             preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
-                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
                 preRequisites.add(actionChangeState);
             }
             return base;
@@ -72,7 +72,7 @@ public class DungeonLever implements DungeonMechanic {
         preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
-            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
             preRequisites.add(actionChangeState);
         }
         return base;

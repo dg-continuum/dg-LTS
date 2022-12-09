@@ -1,5 +1,6 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
@@ -13,7 +14,7 @@ class BloodRushStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(pare
                 if (value.doorfinder.type.isHeadToBlood) {
                     addAction(
                         key,
-                        "navigate",
+                        ActionState.navigate,
                         FeatureRegistry.SECRET_BLOOD_RUSH_LINE_PROPERTIES.routeProperties
                     )
                 }

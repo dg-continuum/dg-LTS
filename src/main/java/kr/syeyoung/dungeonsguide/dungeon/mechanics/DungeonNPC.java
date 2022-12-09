@@ -22,7 +22,7 @@ import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import org.joml.Vector3i;
@@ -36,7 +36,6 @@ import static kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonFairySoul.getAb
 
 @Data
 public class DungeonNPC implements DungeonMechanic {
-    private static final long serialVersionUID = -89487601113028763L;
     private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
     private List<String> preRequisite = new ArrayList<>();
 

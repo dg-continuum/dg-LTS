@@ -3,9 +3,10 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
@@ -137,7 +138,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
                 addAction(
                     "AUTO-BROWSE",
                     it.id,
-                    "found",
+                    ActionState.found,
                     FeatureRegistry.SECRET_LINE_PROPERTIES_AUTOPATHFIND.routeProperties
                 )
             }
@@ -273,7 +274,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         addAction(
             "AUTO-BROWSE",
             lowestWeightMechanic.id,
-            "found",
+            ActionState.found,
             FeatureRegistry.SECRET_LINE_PROPERTIES_AUTOPATHFIND.routeProperties
         )
     }

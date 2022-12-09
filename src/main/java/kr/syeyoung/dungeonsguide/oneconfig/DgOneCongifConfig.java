@@ -950,6 +950,12 @@ public class DgOneCongifConfig extends Config {
     )
     public static boolean debugRoomEdit = false;
 
+    @Switch(
+            name = "Visualise block get calls",
+            category = "Debug"
+    )
+    public static boolean visualiseBlockGetCalls = false;
+
     @KeyBind(
             category = "Debug",
             name = "Gui keybind",

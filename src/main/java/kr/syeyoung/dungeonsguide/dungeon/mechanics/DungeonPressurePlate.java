@@ -26,7 +26,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import org.joml.Vector3i;
@@ -37,7 +37,6 @@ import java.util.*;
 
 @Data
 public class DungeonPressurePlate implements DungeonMechanic {
-    private static final long serialVersionUID = 7450034718355390645L;
     private OffsetPoint platePoint = new OffsetPoint(0, 0, 0);
     private List<String> preRequisite = new ArrayList<>();
     private String triggering = "";
@@ -55,7 +54,7 @@ public class DungeonPressurePlate implements DungeonMechanic {
             preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
-                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
                 preRequisites.add(actionChangeState);
             }
             return base;
@@ -79,7 +78,7 @@ public class DungeonPressurePlate implements DungeonMechanic {
         preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
-            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
             preRequisites.add(actionChangeState);
         }
 

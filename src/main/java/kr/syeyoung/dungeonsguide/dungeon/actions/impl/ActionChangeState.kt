@@ -17,19 +17,20 @@
  */
 package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonDummy
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 
 
-class ActionChangeState(private val mechanicName: String, private val state: String) : AbstractAction() {
+class ActionChangeState(private val mechanicName: String, private val state: ActionState) : AbstractAction() {
 
-    private val preRequisite2: Set<AbstractAction?> = HashSet()
-    override fun getPreRequisites(dungeonRoom: DungeonRoom?): Set<AbstractAction?> {
-        val set: MutableSet<AbstractAction?> = HashSet(preRequisite2)
+    private val preRequisite2: Set<AbstractAction> = HashSet()
+    override fun getPreRequisites(dungeonRoom: DungeonRoom?): MutableSet<AbstractAction> {
+        val set: MutableSet<AbstractAction> = HashSet(preRequisite2)
         val mechanic = dungeonRoom!!.mechanics[mechanicName]
-        if (mechanic != null) set.addAll(mechanic.getAction(state, dungeonRoom))
+        if (mechanic != null) set.addAll(mechanic.getAction(state.name, dungeonRoom))
         return set
     }
 
@@ -39,7 +40,7 @@ class ActionChangeState(private val mechanicName: String, private val state: Str
 
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
         val mechanic = dungeonRoom!!.mechanics[mechanicName]
-        if (state.equals("navigate", ignoreCase = true)) {
+        if (state == ActionState.navigate) {
             return true
         }
         if (mechanic == null) {
@@ -50,6 +51,6 @@ class ActionChangeState(private val mechanicName: String, private val state: Str
         }
         return if (mechanic is DungeonDummy) {
             true
-        } else mechanic.getCurrentState(dungeonRoom).equals(state, ignoreCase = true)
+        } else mechanic.getCurrentState(dungeonRoom).equals(state.state, ignoreCase = true)
     }
 }

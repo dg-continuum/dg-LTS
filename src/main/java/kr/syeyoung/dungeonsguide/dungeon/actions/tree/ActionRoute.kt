@@ -1,29 +1,13 @@
-/*
- *     Dungeons Guide - The most intelligent Hypixel Skyblock Dungeons Mod
- *     Copyright (C) 2021  cyoung06
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as published
- *     by the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- *
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package kr.syeyoung.dungeonsguide.dungeon.actions.tree
 
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
 import net.minecraftforge.event.entity.living.LivingDeathEvent
@@ -32,7 +16,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
 class ActionRoute(
     dungeonRoom: DungeonRoom,
     val mechanic: String,
-    val state: String,
+    val state: ActionState,
     val actionRouteProperties: ActionRouteProperties
 ) {
 
@@ -45,7 +29,7 @@ class ActionRoute(
         println("Creating Action Route with mechanic:$mechanic State:$state")
         val actionChangeState = ActionChangeState(mechanic, state)
         val tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom)
-        actions = ActionTreeUtil.linearifyActionTree(tree)
+        actions = tree?.let { ActionTreeUtil.linearityActionTree(it) } as MutableList<AbstractAction>
         actions.add(ActionComplete())
         ChatTransmitter.sendDebugChat("Created ActionRoute with " + actions.size + " steps")
         ChatTransmitter.sendDebugChat("========== STEPS ==========")
@@ -109,7 +93,7 @@ class ActionRoute(
             dungeonRoom,
             actionRouteProperties
         )
-        if (dungeonRoom.mechanics[mechanic]!!.getCurrentState(dungeonRoom) == state) {
+        if (dungeonRoom.mechanics[mechanic]!!.getCurrentState(dungeonRoom) == state.state) {
             current = actions.size - 1
         }
         if (currentAction.isComplete(dungeonRoom)) {

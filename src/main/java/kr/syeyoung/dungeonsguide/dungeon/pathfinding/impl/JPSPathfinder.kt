@@ -7,10 +7,11 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.MathHelper
 import org.joml.Vector3d
+import org.joml.Vector3i
 import java.util.*
 import kotlin.math.abs
 
-class JPSPathfinder(private val room: DungeonRoomAccessor): PathfinderStrategy(room) {
+class JPSPathfinder(room: DungeonRoomAccessor): PathfinderStrategy(room) {
     private val nodeMap: HashMap<Int, Node> = HashMap()
 
 
@@ -66,94 +67,97 @@ class JPSPathfinder(private val room: DungeonRoomAccessor): PathfinderStrategy(r
     }
 
     fun getNeighbors(prevN: Node, n: Node): Set<Node> {
-//        if (true) throw new RuntimeException("ah");
-        val dx = MathHelper.clamp_int(n.x - prevN.x, -1, 1)
-        val dy = MathHelper.clamp_int(n.y - prevN.y, -1, 1)
-        val dz = MathHelper.clamp_int(n.z - prevN.z, -1, 1)
-        val x = n.x
-        val y = n.y
-        val z = n.z
-        val nx = n.x + dx
-        val ny = n.y + dy
-        val nz = n.z + dz
+
+        val d = Vector3i(
+            MathHelper.clamp_int(n.x - prevN.x, -1, 1),
+            MathHelper.clamp_int(n.y - prevN.y, -1, 1),
+            MathHelper.clamp_int(n.z - prevN.z, -1, 1)
+        )
+        val c = Vector3i(n.x, n.y, n.z)
+        val next = Vector3i(n.x + d.x, n.y + d.y, n.z + d.z)
+
         val nexts: MutableSet<Node> = HashSet()
-        val determinant = abs(dx) + abs(dy) + abs(dz)
-        if (determinant == 0) {
-            for (i in -1..1) for (j in -1..1) for (k in -1..1) {
-                if (i == 0 && j == 0 && k == 0) continue
-                nexts.add(openNode(x + i, y + j, z + k))
-            }
-        } else if (determinant == 1) {
-            nexts.add(openNode(nx, ny, nz))
-            for (i in -1..1) {
-                for (j in -1..1) {
-                    if (i == 0 && j == 0) continue
-                    if (dx != 0 && roomAccessor.isBlocked(x, y + i, z + j)) nexts.add(openNode(nx, y + i, z + j))
-                    if (dy != 0 && roomAccessor.isBlocked(x + i, y, z + j)) nexts.add(openNode(x + i, ny, z + j))
-                    if (dz != 0 && roomAccessor.isBlocked(x + i, y + j, z)) nexts.add(openNode(x + i, y + j, nz))
+        when (abs(d.x) + abs(d.y) + abs(d.z)) {
+            0 -> {
+                for (i in -1..1) for (j in -1..1) for (k in -1..1) {
+                    if (i == 0 && j == 0 && k == 0) continue
+                    nexts.add(openNode(c.x + i, c.y + j, c.z + k))
                 }
             }
-        } else if (determinant == 2) {
-            if (dz != 0) nexts.add(openNode(x, y, nz))
-            if (dy != 0) nexts.add(openNode(x, ny, z))
-            if (dx != 0) nexts.add(openNode(nx, y, z))
-            nexts.add(openNode(nx, ny, nz))
-            if (dx == 0) {
-                if (roomAccessor.isBlocked(x, y, z - dz)) {
-                    nexts.add(openNode(x, ny, z - dz))
-                    if (roomAccessor.isBlocked(x + 1, y, z - dz)) nexts.add(openNode(x + 1, ny, z - dz))
-                    if (roomAccessor.isBlocked(x - 1, y, z - dz)) nexts.add(openNode(x - 1, ny, z - dz))
-                }
-                if (roomAccessor.isBlocked(x, y - dy, z)) {
-                    nexts.add(openNode(x, y - dy, nz))
-                    if (roomAccessor.isBlocked(x + 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz))
-                    if (roomAccessor.isBlocked(x - 1, y - dy, z)) nexts.add(openNode(x + 1, y - dy, nz))
-                }
-            } else if (dy == 0) {
-                if (roomAccessor.isBlocked(x, y, z - dz)) {
-                    nexts.add(openNode(nx, y, z - dz))
-                    if (roomAccessor.isBlocked(x, y + 1, z - dz)) nexts.add(openNode(nx, y + 1, z - dz))
-                    if (roomAccessor.isBlocked(x, y - 1, z - dz)) nexts.add(openNode(nx, y - 1, z - dz))
-                }
-                if (roomAccessor.isBlocked(x - dx, y, z)) {
-                    nexts.add(openNode(x - dx, y, nz))
-                    if (roomAccessor.isBlocked(x - dx, y + 1, z)) nexts.add(openNode(x - dx, y + 1, nz))
-                    if (roomAccessor.isBlocked(x - dx, y - 1, z)) nexts.add(openNode(x - dx, y - 1, nz))
-                }
-            } else if (dz == 0) {
-                if (roomAccessor.isBlocked(x, y - dy, z)) {
-                    nexts.add(openNode(nx, y - dy, z))
-                    if (roomAccessor.isBlocked(x, y - dy, z + 1)) nexts.add(openNode(nx, y - dy, z + 1))
-                    if (roomAccessor.isBlocked(x, y - dy, z - 1)) nexts.add(openNode(nx, y - dy, z - 1))
-                }
-                if (roomAccessor.isBlocked(x - dx, y, z)) {
-                    nexts.add(openNode(x - dx, ny, z))
-                    if (roomAccessor.isBlocked(x - dx, y, z + 1)) nexts.add(openNode(x - dx, ny, z + 1))
-                    if (roomAccessor.isBlocked(x - dx, y, z - 1)) nexts.add(openNode(x - dx, ny, z - 1))
+            1 -> {
+                nexts.add(openNode(next.x, next.y, next.z))
+                for (i in -1..1) {
+                    for (j in -1..1) {
+                        if (i == 0 && j == 0) continue
+                        if (d.x != 0 && roomAccessor.isBlocked(c.x, c.y + i, c.z + j)) nexts.add(openNode(next.x, c.y + i, c.z + j))
+                        if (d.y != 0 && roomAccessor.isBlocked(c.x + i, c.y, c.z + j)) nexts.add(openNode(c.x + i, next.y, c.z + j))
+                        if (d.z != 0 && roomAccessor.isBlocked(c.x + i, c.y + j, c.z)) nexts.add(openNode(c.x + i, c.y + j, next.z))
+                    }
                 }
             }
-        } else if (determinant == 3) {
-            nexts.add(openNode(x, y, nz))
-            nexts.add(openNode(x, ny, z))
-            nexts.add(openNode(nx, y, z))
-            nexts.add(openNode(nx, y, nz))
-            nexts.add(openNode(x, ny, nz))
-            nexts.add(openNode(nx, ny, z))
-            nexts.add(openNode(nx, ny, nz))
-            if (roomAccessor.isBlocked(x, y, z - dz)) {
-                nexts.add(openNode(x, ny, z - dz))
-                nexts.add(openNode(nx, ny, z - dz))
-                nexts.add(openNode(nx, y, z - dz))
+            2 -> {
+                if (d.z != 0) nexts.add(openNode(c.x, c.y, next.z))
+                if (d.y != 0) nexts.add(openNode(c.x, next.y, c.z))
+                if (d.x != 0) nexts.add(openNode(next.x, c.y, c.z))
+                nexts.add(openNode(next.x, next.y, next.z))
+                if (d.x == 0) {
+                    if (roomAccessor.isBlocked(c.x, c.y, c.z - d.z)) {
+                        nexts.add(openNode(c.x, next.y, c.z - d.z))
+                        if (roomAccessor.isBlocked(c.x + 1, c.y, c.z - d.z)) nexts.add(openNode(c.x + 1, next.y, c.z - d.z))
+                        if (roomAccessor.isBlocked(c.x - 1, c.y, c.z - d.z)) nexts.add(openNode(c.x - 1, next.y, c.z - d.z))
+                    }
+                    if (roomAccessor.isBlocked(c.x, c.y - d.y, c.z)) {
+                        nexts.add(openNode(c.x, c.y - d.y, next.z))
+                        if (roomAccessor.isBlocked(c.x + 1, c.y - d.y, c.z)) nexts.add(openNode(c.x + 1, c.y - d.y, next.z))
+                        if (roomAccessor.isBlocked(c.x - 1, c.y - d.y, c.z)) nexts.add(openNode(c.x + 1, c.y - d.y, next.z))
+                    }
+                } else if (d.y == 0) {
+                    if (roomAccessor.isBlocked(c.x, c.y, c.z - d.z)) {
+                        nexts.add(openNode(next.x, c.y, c.z - d.z))
+                        if (roomAccessor.isBlocked(c.x, c.y + 1, c.z - d.z)) nexts.add(openNode(next.x, c.y + 1, c.z - d.z))
+                        if (roomAccessor.isBlocked(c.x, c.y - 1, c.z - d.z)) nexts.add(openNode(next.x, c.y - 1, c.z - d.z))
+                    }
+                    if (roomAccessor.isBlocked(c.x - d.x, c.y, c.z)) {
+                        nexts.add(openNode(c.x - d.x, c.y, next.z))
+                        if (roomAccessor.isBlocked(c.x - d.x, c.y + 1, c.z)) nexts.add(openNode(c.x - d.x, c.y + 1, next.z))
+                        if (roomAccessor.isBlocked(c.x - d.x, c.y - 1, c.z)) nexts.add(openNode(c.x - d.x, c.y - 1, next.z))
+                    }
+                } else if (d.z == 0) {
+                    if (roomAccessor.isBlocked(c.x, c.y - d.y, c.z)) {
+                        nexts.add(openNode(next.x, c.y - d.y, c.z))
+                        if (roomAccessor.isBlocked(c.x, c.y - d.y, c.z + 1)) nexts.add(openNode(next.x, c.y - d.y, c.z + 1))
+                        if (roomAccessor.isBlocked(c.x, c.y - d.y, c.z - 1)) nexts.add(openNode(next.x, c.y - d.y, c.z - 1))
+                    }
+                    if (roomAccessor.isBlocked(c.x - d.x, c.y, c.z)) {
+                        nexts.add(openNode(c.x - d.x, next.y, c.z))
+                        if (roomAccessor.isBlocked(c.x - d.x, c.y, c.z + 1)) nexts.add(openNode(c.x - d.x, next.y, c.z + 1))
+                        if (roomAccessor.isBlocked(c.x - d.x, c.y, c.z - 1)) nexts.add(openNode(c.x - d.x, next.y, c.z - 1))
+                    }
+                }
             }
-            if (roomAccessor.isBlocked(x - dx, y, z)) {
-                nexts.add(openNode(x - dx, ny, nz))
-                nexts.add(openNode(x - dx, ny, z))
-                nexts.add(openNode(x - dx, y, nz))
-            }
-            if (roomAccessor.isBlocked(x, y - dy, z)) {
-                nexts.add(openNode(x, y - dy, nz))
-                nexts.add(openNode(nx, y - dy, z))
-                nexts.add(openNode(nx, y - dy, nz))
+            3 -> {
+                nexts.add(openNode(c.x, c.y, next.z))
+                nexts.add(openNode(c.x, next.y, c.z))
+                nexts.add(openNode(next.x, c.y, c.z))
+                nexts.add(openNode(next.x, c.y, next.z))
+                nexts.add(openNode(c.x, next.y, next.z))
+                nexts.add(openNode(next.x, next.y, c.z))
+                nexts.add(openNode(next.x, next.y, next.z))
+                if (roomAccessor.isBlocked(c.x, c.y, c.z - d.z)) {
+                    nexts.add(openNode(c.x, next.y, c.z - d.z))
+                    nexts.add(openNode(next.x, next.y, c.z - d.z))
+                    nexts.add(openNode(next.x, c.y, c.z - d.z))
+                }
+                if (roomAccessor.isBlocked(c.x - d.x, c.y, c.z)) {
+                    nexts.add(openNode(c.x - d.x, next.y, next.z))
+                    nexts.add(openNode(c.x - d.x, next.y, c.z))
+                    nexts.add(openNode(c.x - d.x, c.y, next.z))
+                }
+                if (roomAccessor.isBlocked(c.x, c.y - d.y, c.z)) {
+                    nexts.add(openNode(c.x, c.y - d.y, next.z))
+                    nexts.add(openNode(next.x, c.y - d.y, c.z))
+                    nexts.add(openNode(next.x, c.y - d.y, next.z))
+                }
             }
         }
         return nexts
@@ -173,7 +177,7 @@ class JPSPathfinder(private val room: DungeonRoomAccessor): PathfinderStrategy(r
                 ny,
                 nz
             )
-            val determinant = Math.abs(dx) + Math.abs(dy) + Math.abs(dz)
+            val determinant = abs(dx) + abs(dy) + abs(dz)
             if (determinant == 1) {
                 for (i in -1..1) {
                     for (j in -1..1) {
@@ -312,7 +316,9 @@ class JPSPathfinder(private val room: DungeonRoomAccessor): PathfinderStrategy(r
                 addNode(n, jumpPT, true)
             }
         }
-        if (end == null) return false
+        if (end == null) {
+            return false
+        }
         var p = end
         while (p != null) {
             route.addLast(Vector3d((p.x / 2.0f).toDouble(), p.y / 2.0f + 0.1, (p.z / 2.0f).toDouble()))

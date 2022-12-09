@@ -17,8 +17,8 @@
  */
 package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 
 class ActionComplete : AbstractAction() {
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {

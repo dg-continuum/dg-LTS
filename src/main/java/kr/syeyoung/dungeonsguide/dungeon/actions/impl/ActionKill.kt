@@ -21,7 +21,7 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import net.minecraft.entity.Entity
 import net.minecraftforge.event.entity.living.LivingDeathEvent

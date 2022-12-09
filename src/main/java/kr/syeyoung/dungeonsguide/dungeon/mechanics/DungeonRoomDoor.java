@@ -24,8 +24,9 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import lombok.Getter;
 import org.joml.Vector3i;
 
 import java.awt.*;
@@ -38,7 +39,8 @@ public class DungeonRoomDoor implements DungeonMechanic {
     }
 
     private final DungeonDoor doorfinder;
-    private OffsetPoint offsetPoint;
+    @Getter
+    public OffsetPoint offsetPoint;
 
     public DungeonRoomDoor(DungeonRoom dungeonRoom, DungeonDoor doorfinder) {
         this.doorfinder = doorfinder;

@@ -1,5 +1,5 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions
 
-enum class ActionState(private val state: String) {
+enum class ActionState(val state: String) {
     navigate("navigate"), found("found");
 }

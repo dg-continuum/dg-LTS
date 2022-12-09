@@ -20,6 +20,7 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionBreakWithSuperBoom;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir;
@@ -27,7 +28,7 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.RouteBlocker;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import net.minecraft.block.Block;
@@ -40,7 +41,6 @@ import java.util.*;
 
 @Data
 public class DungeonBreakableWall implements DungeonMechanic, RouteBlocker {
-    private static final long serialVersionUID = 1161593374765852217L;
     private OffsetPointSet secretPoint = new OffsetPointSet();
     private List<String> preRequisite = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class DungeonBreakableWall implements DungeonMechanic, RouteBlocker {
             preRequisites = actionMove.getPreRequisites(dungeonRoom);
             for (String str : preRequisite) {
                 if (str.isEmpty()) continue;
-                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+                ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
                 preRequisites.add(actionChangeState);
             }
             return base;
@@ -94,7 +94,7 @@ public class DungeonBreakableWall implements DungeonMechanic, RouteBlocker {
         preRequisites = actionMove.getPreRequisites(dungeonRoom);
         for (String str : preRequisite) {
             if (str.isEmpty()) continue;
-            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], str.split(":")[1]);
+            ActionChangeState actionChangeState = new ActionChangeState(str.split(":")[0], ActionState.valueOf(str.split(":")[1]));
             preRequisites.add(actionChangeState);
         }
         return base;

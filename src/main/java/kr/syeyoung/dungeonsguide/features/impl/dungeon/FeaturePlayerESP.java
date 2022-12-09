@@ -90,7 +90,7 @@ public class FeaturePlayerESP extends SimpleFeatureV2 {
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         GlStateManager.popMatrix();
 
-        GL11.glDisable(GL11.GL_STENCIL_TEST); // Turn this shit off!
+        GL11.glDisable(GL11.GL_STENCIL_TEST);
 
         inv.armorInventory = armor;
         inv.mainInventory = hand;

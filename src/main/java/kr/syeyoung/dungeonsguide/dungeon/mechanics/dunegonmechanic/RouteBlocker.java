@@ -18,7 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 
 public interface RouteBlocker {
     boolean isBlocking(DungeonRoom dungeonRoom);

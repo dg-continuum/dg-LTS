@@ -18,9 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionTree;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MTextField;
@@ -54,7 +55,7 @@ public class ActionDisplayPane extends MPanel {
                         String text = textField.getText();
                         String target = text.split(":")[0];
                         String state = text.split(":")[1];
-                        ActionChangeState actionChangeState = new ActionChangeState(target, state);
+                        ActionChangeState actionChangeState = new ActionChangeState(target, ActionState.valueOf(state));
                         ActionTree tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom);
 
                         displayPane = new ActionTreeDisplayPane(dungeonRoom, tree);

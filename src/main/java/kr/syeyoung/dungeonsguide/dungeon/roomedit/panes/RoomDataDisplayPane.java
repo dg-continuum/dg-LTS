@@ -18,7 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;

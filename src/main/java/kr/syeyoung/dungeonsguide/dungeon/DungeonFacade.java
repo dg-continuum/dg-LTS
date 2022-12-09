@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.CachedPathFinder;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import lombok.Setter;
 import lombok.val;
 import net.minecraftforge.common.MinecraftForge;
@@ -52,6 +51,7 @@ public class DungeonFacade {
         MinecraftForge.EVENT_BUS.register(dgEventListener);
         try {
             DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
+            KotlinDungeonRoomInfoRegistry.INSTANCE.loadAll(Main.getConfigDir());
         } catch (IOException e) {
             e.printStackTrace();
         }

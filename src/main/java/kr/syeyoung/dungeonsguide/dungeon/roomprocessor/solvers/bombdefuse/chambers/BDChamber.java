@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.chamb
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.block.state.IBlockState;

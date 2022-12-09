@@ -26,7 +26,6 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.dungeon.map.DungeonMapData;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.features.impl.dungeon.FeatureCollectScore;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
 import kr.syeyoung.dungeonsguide.utils.simple.SimpleLock;
@@ -82,8 +81,6 @@ public class MapProcessor {
     @Getter
     @Setter
     private Point topLeftMapPoint;
-    @Setter
-    private boolean bugged = false;
     @Getter
     private boolean initialized = false;
     @Getter
@@ -116,17 +113,17 @@ public class MapProcessor {
 
             if (mapData != null) {
                 processMapThrottle.tick();
+
                 if (processMapThrottle.shouldRun() && processMapLock.isUnlocked()) {
                     processMapData(mapData);
                 }
 
                 latestMapData = mapData;
+                if (mapIconToPlayerMap.size() < context.getPlayers().size() && initialized) {
+                    getPlayersFromMap(latestMapData);
+                }
             }
 
-
-            if (latestMapData != null && mapIconToPlayerMap.size() < context.getPlayers().size() && initialized) {
-                getPlayersFromMap(latestMapData);
-            }
         }
 
     }
@@ -160,8 +157,6 @@ public class MapProcessor {
 
 
         data.eat(mapData);
-
-        bugged = data.bugged;
 
         unitRoomDimension = data.unitRoomDimension;
 

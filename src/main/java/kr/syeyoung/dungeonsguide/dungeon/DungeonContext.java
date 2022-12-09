@@ -22,7 +22,6 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
@@ -163,6 +162,13 @@ public class DungeonContext {
 
     public void setGotMimic(boolean gotMimic) {
         this.gotMimic = gotMimic;
+    }
+
+    @Nullable
+    public DungeonRoom getCurrentRoom(){
+        Vector2i roomPt = mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
+
+        return getRoomMapper().get(roomPt);
     }
 
 

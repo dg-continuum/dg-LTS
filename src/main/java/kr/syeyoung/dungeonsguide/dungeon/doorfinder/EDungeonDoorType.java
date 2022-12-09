@@ -31,6 +31,18 @@ public enum EDungeonDoorType {
     UNOPEN(true, false, false, "gate");
 
 
+    public boolean isExist() {
+        return exist;
+    }
+
+    public boolean isKeyRequired() {
+        return keyRequired;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     private final boolean exist;
     private final boolean keyRequired;
 

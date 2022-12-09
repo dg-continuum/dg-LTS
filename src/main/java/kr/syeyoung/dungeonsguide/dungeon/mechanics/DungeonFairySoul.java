@@ -20,13 +20,14 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionInteract;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.predicates.PredicateArmorStand;
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import lombok.Data;
 import net.minecraft.entity.Entity;
@@ -41,11 +42,10 @@ import java.util.function.Predicate;
 
 @Data
 public class DungeonFairySoul implements DungeonMechanic {
-    private static final long serialVersionUID = 156412742320519783L;
     private OffsetPoint secretPoint = new OffsetPoint(0, 0, 0);
     private List<String> preRequisite = new ArrayList<String>();
 
-    static Set<AbstractAction> getAbstractActions(String state, OffsetPoint secretPoint, List<String> preRequisite) {
+    static public Set<AbstractAction> getAbstractActions(String state, OffsetPoint secretPoint, List<String> preRequisite) {
         if (!"navigate".equalsIgnoreCase(state))
             throw new IllegalArgumentException(state + " is not valid state for secret");
 
@@ -63,7 +63,7 @@ public class DungeonFairySoul implements DungeonMechanic {
         for (String str : preRequisite) {
             if (!str.isEmpty()) {
                 String[] split = str.split(":");
-                base.add(new ActionChangeState(split[0], split[1]));
+                base.add(new ActionChangeState(split[0], ActionState.valueOf(split[1])));
             }
         }
         return base;

@@ -237,13 +237,7 @@ public class ValueEditOffsetPointSet extends MPanel implements ValueEdit<OffsetP
 
         @Override
         public Object cloneObj(Object object) {
-            try {
-                return ((OffsetPointSet) object).clone();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
-            assert false;
-            return null;
+            return ((OffsetPointSet) object).clone();
         }
     }
 }

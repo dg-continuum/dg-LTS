@@ -18,14 +18,10 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 
 
 class ActionRoot : AbstractAction() {
-
-    override fun getPreRequisites(dungeonRoom: DungeonRoom?): Set<AbstractAction?> {
-        return preRequisite
-    }
 
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
         return true

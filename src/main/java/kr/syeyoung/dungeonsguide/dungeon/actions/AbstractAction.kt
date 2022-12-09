@@ -17,8 +17,8 @@
  */
 package kr.syeyoung.dungeonsguide.dungeon.actions
 
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
-import kr.syeyoung.dungeonsguide.dungeon.roomfinder.DungeonRoom
 import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -27,9 +27,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
  * THIS IS A ABSTRACT CLASS CUZ I DONT WANT SO MANY EMPTY OVERRIDES
  */
 abstract class AbstractAction {
-    var preRequisite: Set<AbstractAction?> = HashSet()
-    open fun getPreRequisites(dungeonRoom: DungeonRoom?): Set<AbstractAction?> {
-        return preRequisite
+    var preRequisite: Set<AbstractAction> = HashSet()
+    open fun getPreRequisites(dungeonRoom: DungeonRoom?): MutableSet<AbstractAction> {
+        return preRequisite.toMutableSet()
     }
 
     open fun onPlayerInteract(
