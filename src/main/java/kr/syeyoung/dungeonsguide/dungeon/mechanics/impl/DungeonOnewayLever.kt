@@ -36,18 +36,19 @@ class DungeonOnewayLever : DungeonMechanic(), Cloneable {
             val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
             preRequisites.add(actionMove)
             preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-            for (str in preRequisite) {
-                if (str.isEmpty()) continue
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
 
-                preRequisites.add(actionChangeState)
+            preRequisite.forEach { str ->
+                if (str.isNotEmpty()) {
+                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+
+                    preRequisites.add(actionChangeState)
+                }
             }
             return base
         }
         require("triggered".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
+        val base: MutableSet<AbstractAction> = HashSet()
         var preRequisites = base
         var actionClick: ActionClick
         preRequisites.add(ActionClick(leverPoint).also { actionClick = it })
@@ -55,12 +56,14 @@ class DungeonOnewayLever : DungeonMechanic(), Cloneable {
         val actionMove = ActionMove(leverPoint)
         preRequisites.add(actionMove)
         preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-        for (str in preRequisite) {
-            if (str.isEmpty()) continue
-            val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
 
-            preRequisites.add(actionChangeState)
+        preRequisite.forEach { str ->
+            if (str.isNotEmpty()) {
+                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+
+                preRequisites.add(actionChangeState)
+            }
         }
         return base
     }

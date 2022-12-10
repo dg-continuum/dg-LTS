@@ -24,27 +24,29 @@ class DungeonDummy : DungeonMechanic(), Cloneable {
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-//        if (!"navigate".equalsIgnoreCase(state)) throw new IllegalArgumentException(state+" is not valid state for secret");
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
-        var preRequisites = base
-        if (state.equals("navigate", ignoreCase = true)) {
-            val actionMove = ActionMove(secretPoint)
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom)
-        } else if (state.equals("click", ignoreCase = true)) {
-            val actionClick = ActionClick(secretPoint)
-            preRequisites.add(actionClick)
-            preRequisites = actionClick.getPreRequisites(dungeonRoom)
-            val actionMove = ActionMove(secretPoint)
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom)
+        var base: MutableSet<AbstractAction> = HashSet()
+
+        when(state.lowercase()){
+            "navigate" -> {
+                val actionMove = ActionMove(secretPoint)
+                base.add(actionMove)
+                base = actionMove.getPreRequisites(dungeonRoom)
+            }
+            "click" -> {
+                val actionClick = ActionClick(secretPoint)
+                base.add(actionClick)
+                base = actionClick.getPreRequisites(dungeonRoom)
+                val actionMove = ActionMove(secretPoint)
+                base.add(actionMove)
+                base = actionMove.getPreRequisites(dungeonRoom)
+            }
         }
-        for (str in preRequisite) {
-            if (str.isEmpty()) continue
-            val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
-            preRequisites.add(actionChangeState)
+
+        preRequisite.forEach { str ->
+            if (str.isNotEmpty()) {
+                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                base.add(ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1])))
+            }
         }
 
         return base

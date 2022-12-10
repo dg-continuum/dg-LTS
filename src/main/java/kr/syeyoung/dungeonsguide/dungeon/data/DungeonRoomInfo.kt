@@ -3,7 +3,6 @@ package kr.syeyoung.dungeonsguide.dungeon.data
 import java.io.Serializable
 import java.util.*
 
-
 class DungeonRoomInfo() : Serializable {
 
     constructor(shape: Short, color: Byte) : this() {
@@ -11,7 +10,8 @@ class DungeonRoomInfo() : Serializable {
         this.color = color
     }
 
-    @Transient @JvmField
+    @Transient
+    @JvmField
     var registered = false
 
     var isUserMade = false

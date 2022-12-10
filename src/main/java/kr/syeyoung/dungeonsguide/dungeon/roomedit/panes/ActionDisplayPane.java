@@ -55,7 +55,7 @@ public class ActionDisplayPane extends MPanel {
                         String text = textField.getText();
                         String target = text.split(":")[0];
                         String state = text.split(":")[1];
-                        ActionChangeState actionChangeState = new ActionChangeState(target, ActionState.valueOf(state));
+                        ActionChangeState actionChangeState = new ActionChangeState(target, ActionState.turnIntoForm(state));
                         ActionTree tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom);
 
                         displayPane = new ActionTreeDisplayPane(dungeonRoom, tree);

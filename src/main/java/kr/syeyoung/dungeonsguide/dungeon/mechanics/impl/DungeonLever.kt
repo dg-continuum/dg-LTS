@@ -33,14 +33,16 @@ class DungeonLever : DungeonMechanic(), Cloneable {
             val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
             preRequisites.add(actionMove)
             preRequisites = actionMove.getPreRequisites(dungeonRoom)
-            for (str in preRequisite) {
-                if (str.isEmpty()) continue
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
 
-                preRequisites.add(actionChangeState)
+            preRequisite.forEach { str ->
+                if (str.isNotEmpty()) {
+                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+
+                    preRequisites.add(actionChangeState)
+                }
             }
+
             return base
         }
         require(
@@ -64,7 +66,7 @@ class DungeonLever : DungeonMechanic(), Cloneable {
             if (str.isNotEmpty()) {
                 val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
 
                 preRequisites.add(actionChangeState)
 

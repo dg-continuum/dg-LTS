@@ -86,17 +86,17 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
             actionClick.radius = 3
             base.add(actionClick)
             base = actionClick.getPreRequisites(null).toMutableSet()
-            val actionMove = ActionMove(secretPoint)
-            base.add(actionMove)
-            base = actionMove.getPreRequisites(null).toMutableSet()
-            for (str in preRequisite) {
+            base.add(ActionMove(secretPoint))
+            base = ActionMove(secretPoint).getPreRequisites(null).toMutableSet()
+
+            preRequisite.forEach { str ->
                 if (str.isNotEmpty()) {
                     val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
-                    base.add(actionChangeState)
+                    base.add(ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1])))
                 }
             }
+
             return base
         }
     }

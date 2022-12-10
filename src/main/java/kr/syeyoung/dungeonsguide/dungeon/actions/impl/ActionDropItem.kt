@@ -46,9 +46,7 @@ class ActionDropItem(private val target: OffsetPoint) : AbstractAction() {
                         secretLocation.z + 1).toDouble()
             )
         )
-        return if (item.isEmpty()) {
-            false
-        } else true
+        return item.isNotEmpty()
     }
 
     override fun onRenderWorld(

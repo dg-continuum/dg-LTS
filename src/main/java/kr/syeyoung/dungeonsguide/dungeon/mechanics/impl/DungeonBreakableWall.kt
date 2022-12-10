@@ -15,23 +15,20 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.RouteBlocker
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import net.minecraft.init.Blocks
 import java.awt.Color
-import java.util.*
 
 
 class DungeonBreakableWall : DungeonMechanic(), RouteBlocker, Cloneable {
     var secretPoint = OffsetPointSet()
     var preRequisite: List<String> = ArrayList()
 
-    override public fun clone(): Any {
+    public override fun clone(): Any {
         return super.clone()
     }
 
     override val mechType: MechanicType = MechanicType.BreakableWall
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
-        var preRequisites = base
+        var base: MutableSet<AbstractAction> = HashSet()
 
         var leastY = Int.MAX_VALUE
         var thatPt: OffsetPoint? = null
@@ -42,11 +39,11 @@ class DungeonBreakableWall : DungeonMechanic(), RouteBlocker, Cloneable {
             }
         }
 
-        when(state.lowercase(Locale.getDefault())){
+        when(state.lowercase()){
             "navigate" -> {
                 val actionMove = ActionMoveNearestAir(thatPt!!)
-                preRequisites.add(actionMove)
-                preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
+                base.add(actionMove)
+                base = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
             }
 
             "open" -> {
@@ -54,12 +51,12 @@ class DungeonBreakableWall : DungeonMechanic(), RouteBlocker, Cloneable {
                     return emptySet()
                 }
                 val actionClick = ActionBreakWithSuperBoom(getRepresentingPoint(dungeonRoom)!!)
-                preRequisites.add(actionClick)
-                preRequisites = actionClick.getPreRequisites(dungeonRoom).toMutableSet()
+                base.add(actionClick)
+                base = actionClick.getPreRequisites(dungeonRoom).toMutableSet()
 
                 val actionMove = ActionMoveNearestAir(thatPt!!)
-                preRequisites.add(actionMove)
-                preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
+                base.add(actionMove)
+                base = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
 
             }
 
@@ -71,12 +68,12 @@ class DungeonBreakableWall : DungeonMechanic(), RouteBlocker, Cloneable {
                 val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()
 
-                val element = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
-                preRequisites.add(element)
+                val element = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+                base.add(element)
             }
         }
-        return base
 
+        return base
     }
 
 
@@ -120,9 +117,7 @@ class DungeonBreakableWall : DungeonMechanic(), RouteBlocker, Cloneable {
 
     override fun getCurrentState(dungeonRoom: DungeonRoom): String {
         var b = Blocks.air
-        if (secretPoint.offsetPointList != null) {
-            if (!secretPoint.offsetPointList.isEmpty()) b = secretPoint.offsetPointList[0].getBlock(dungeonRoom)
-        }
+        if (secretPoint.offsetPointList.isNotEmpty()) b = secretPoint.offsetPointList[0].getBlock(dungeonRoom)
         return if (b === Blocks.air) "open" else "closed"
     }
 

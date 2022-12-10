@@ -37,17 +37,16 @@ class DungeonPressurePlate : DungeonMechanic(), Cloneable {
             val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
             preRequisites.add(actionMove)
             preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-            for (str in preRequisite) {
-                if (str.isNotEmpty()) {
 
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+            preRequisite.forEach { str ->
+                if (str.isNotEmpty()) {
+                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
 
                     preRequisites.add(actionChangeState)
-
                 }
             }
+
             return base
         }
 
@@ -70,14 +69,15 @@ class DungeonPressurePlate : DungeonMechanic(), Cloneable {
         val actionMove = ActionMove(platePoint)
         preRequisites.add(actionMove)
         preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-        for (str in preRequisite) {
-            if (str.isEmpty()) continue
-            val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+        preRequisite.forEach { str ->
+            if (str.isNotEmpty()) {
+                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
 
-            preRequisites.add(actionChangeState)
+                preRequisites.add(actionChangeState)
+            }
         }
+
         return base
     }
 

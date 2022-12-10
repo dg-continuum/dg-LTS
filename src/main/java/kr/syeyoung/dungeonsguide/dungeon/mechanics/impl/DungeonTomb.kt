@@ -28,20 +28,20 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
     }
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         if (state.equals("navigate", ignoreCase = true)) {
-            val base: MutableSet<AbstractAction>
-            base = HashSet()
-            var preRequisites = base
-            val tt = getRepresentingPoint(dungeonRoom)
-            if (tt != null) {
-                val actionMove = ActionMoveNearestAir(tt)
-                preRequisites.add(actionMove)
-                preRequisites = actionMove.getPreRequisites(dungeonRoom) as MutableSet<AbstractAction>
-                for (str in preRequisite) {
-                    if (str.isEmpty()) continue
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+            getRepresentingPoint(dungeonRoom)?.let {
+                var base: MutableSet<AbstractAction> = HashSet()
 
-                    preRequisites.add(actionChangeState)
+                val actionMove = ActionMoveNearestAir(it)
+                base.add(actionMove)
+                base = actionMove.getPreRequisites(dungeonRoom)
+
+                preRequisite.forEach { str ->
+                    if(str.isNotEmpty()){
+                        val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                            .toTypedArray()
+
+                        base.add(ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1])))
+                    }
                 }
                 return base
             }
@@ -62,7 +62,7 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
         for (str in preRequisite) {
             if (str.isEmpty()) continue
             val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
 
             preRequisites.add(actionChangeState)
         }
@@ -87,8 +87,8 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
                 true,
                 partialTicks
             )
-            for (offsetPoint in secretPoint.offsetPointList) {
-                RenderUtils.highlightBlock(offsetPoint.getVector3i(dungeonRoom), color, partialTicks)
+            secretPoint.offsetPointList.forEach {
+                RenderUtils.highlightBlock(it.getVector3i(dungeonRoom), color, partialTicks)
             }
         }
     }

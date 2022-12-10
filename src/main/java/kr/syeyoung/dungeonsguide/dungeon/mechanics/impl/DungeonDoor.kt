@@ -23,39 +23,28 @@ class DungeonDoor : DungeonMechanic(), RouteBlocker, Cloneable {
     public override fun clone(): Any {
         return super.clone()
     }
+
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         require(
             "open".equals(state, ignoreCase = true) || "closed".equals(
-                state,
-                ignoreCase = true
+                state, ignoreCase = true
             )
         ) { "$state is not valid state for door" }
         if (state.equals(getCurrentState(dungeonRoom), ignoreCase = true)) return emptySet()
         val base: MutableSet<AbstractAction> = HashSet()
-        if (state.equals("open", ignoreCase = true)) {
-            for (str in openPreRequisite) {
-                if (str.isEmpty()) continue
 
+        for (str in (if (state == "open") openPreRequisite else closePreRequisite)) {
+            if (str.isNotEmpty()) {
+                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-
-                val element = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+                val element = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
 
                 base.add(element)
             }
-        } else {
-            for (str in closePreRequisite) {
-                if (str.isEmpty()) continue
 
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
-
-                base.add(actionChangeState)
-            }
 
         }
+
         return base
     }
 
@@ -64,15 +53,7 @@ class DungeonDoor : DungeonMechanic(), RouteBlocker, Cloneable {
         val firstpt = secretPoint.offsetPointList[0]
         val pos = firstpt.getVector3i(dungeonRoom)
         RenderUtils.drawTextAtWorld(
-            name,
-            pos.x + 0.5f,
-            pos.y + 0.75f,
-            pos.z + 0.5f,
-            -0x1,
-            0.03f,
-            false,
-            true,
-            partialTicks
+            name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, -0x1, 0.03f, false, true, partialTicks
         )
         RenderUtils.drawTextAtWorld(
             getCurrentState(dungeonRoom),
@@ -105,8 +86,7 @@ class DungeonDoor : DungeonMechanic(), RouteBlocker, Cloneable {
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
         val currentStatus = getCurrentState(dungeonRoom)
         if (currentStatus.equals(
-                "closed",
-                ignoreCase = true
+                "closed", ignoreCase = true
             )
         ) return setOf("open") else if (currentStatus.equals("open", ignoreCase = true)) return setOf("closed")
         return emptySet()

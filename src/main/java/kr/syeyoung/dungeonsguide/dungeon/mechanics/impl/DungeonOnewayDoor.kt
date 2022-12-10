@@ -34,27 +34,30 @@ class DungeonOnewayDoor : DungeonMechanic(), RouteBlocker, Cloneable {
             val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
             preRequisites.add(actionMove)
             preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-            for (str in preRequisite) {
-                if (str.isEmpty()) continue
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+            preRequisite.forEach { str ->
+                if (str.isNotEmpty()) {
+                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
 
-                preRequisites.add(actionChangeState)
+                    preRequisites.add(actionChangeState)
+                }
             }
+
             return base
         }
         require("open".equals(state, ignoreCase = true)) { "$state is not valid state for door" }
         if (!isBlocking(dungeonRoom)) {
             return emptySet()
         }
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
-        for (str in preRequisite) {
-            if (str.isEmpty()) continue
-            val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+        val base: MutableSet<AbstractAction> = HashSet()
 
-            base.add(actionChangeState)
+        preRequisite.forEach { str ->
+            if (str.isNotEmpty()) {
+                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+
+                base.add(actionChangeState)
+            }
         }
         return base
     }

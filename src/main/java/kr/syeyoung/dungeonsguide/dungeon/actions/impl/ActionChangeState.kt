@@ -12,8 +12,8 @@ class ActionChangeState(private val mechanicName: String, private val state: Act
     private val preRequisite2: Set<AbstractAction> = HashSet()
     override fun getPreRequisites(dungeonRoom: DungeonRoom?): MutableSet<AbstractAction> {
         val set: MutableSet<AbstractAction> = HashSet(preRequisite2)
-        val mechanic = dungeonRoom!!.mechanics[mechanicName]
-        if (mechanic != null) mechanic.getAction(state.name, dungeonRoom)?.let { set.addAll(it) }
+        val mechanic = dungeonRoom!!.mechanics[mechanicName] ?: return set
+        mechanic.getAction(state.name, dungeonRoom)?.let { set.addAll(it) }
         return set
     }
 

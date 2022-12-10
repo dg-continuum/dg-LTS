@@ -146,7 +146,7 @@ public class CommandDgDebug extends CommandBase {
 
                 DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
                 GeneralRoomProcessor grp = (GeneralRoomProcessor) dungeonRoom.getRoomProcessor();
-                grp.getStrategy().addAction("COMMAND", args[1], ActionState.valueOf(args[2]), FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
+                grp.getStrategy().addAction("COMMAND", args[1], ActionState.turnIntoForm(args[2]), FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
             } catch (Throwable t) {
                 t.printStackTrace();
             }

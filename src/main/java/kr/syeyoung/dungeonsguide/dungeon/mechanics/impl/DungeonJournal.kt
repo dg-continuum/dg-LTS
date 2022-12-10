@@ -24,22 +24,21 @@ class DungeonJournal : DungeonMechanic(), Cloneable {
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         require("navigate".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
-        var preRequisites = base
-        run {
-            val actionMove = ActionMove(secretPoint)
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom)
-        }
-        for (str in preRequisite) {
-            if (str.isEmpty()) continue
+        var base: MutableSet<AbstractAction> = HashSet()
 
-            val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.valueOf(toTypedArray[1]))
+        val actionMove = ActionMove(secretPoint)
+        base.add(actionMove)
+        base = actionMove.getPreRequisites(dungeonRoom)
 
-            preRequisites.add(actionChangeState)
+        preRequisite.forEach { str ->
+            if (str.isNotEmpty()) {
+                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+
+                base.add(actionChangeState)
+            }
         }
+
         return base
     }
 
