@@ -58,13 +58,13 @@ public class RoomProcessorButtonSolver extends GeneralRoomProcessor {
     }
 
     @Override
-    public void onInteractBlock(PlayerInteractEvent event) {
-        super.onInteractBlock(event);
+    public void onInteractBlock(PlayerInteractEvent playerInteractEvent) {
+        super.onInteractBlock(playerInteractEvent);
         if (bugged) return;
 
-        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
+        if (playerInteractEvent.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
         for (int i = 0; i < buttons.length; i++) {
-            if (event.pos.equals(buttons[i])) {
+            if (playerInteractEvent.pos.equals(buttons[i])) {
                 clicked = System.currentTimeMillis();
                 clickedButton = i;
                 return;

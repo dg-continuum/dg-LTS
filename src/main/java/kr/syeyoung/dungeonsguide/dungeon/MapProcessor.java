@@ -81,7 +81,11 @@ public class MapProcessor {
     @Getter
     @Setter
     private Point topLeftMapPoint;
-    @Getter
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     private boolean initialized = false;
     @Getter
     private int undiscoveredRoom = 0;

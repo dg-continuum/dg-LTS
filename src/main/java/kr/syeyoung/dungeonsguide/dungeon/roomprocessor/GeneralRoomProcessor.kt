@@ -37,18 +37,18 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.joml.Vector3d
-import org.joml.Vector3i
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.util.*
 
 open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
-    private var stack = 0
-    private var secrets2: Long = 0
-    private var last = false
-    private var lastChest: BlockPos? = null
+    private var stackSize = 0
+    private var numSecrets = 0
+    private var isLast = false
+    private var previousChest: BlockPos? = null
 
     val context: DungeonContext = DungeonsGuide.getDungeonsGuide().dungeonFacade.context
 
@@ -65,11 +65,14 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     }
 
     override fun drawScreen(partialTicks: Float) {
-        for (a in strategy.actionPath.values) {
-            a.onRenderScreen(partialTicks)
+
+        strategy.actionPath.values.forEach {
+            it.onRenderScreen(partialTicks)
         }
+
         if (DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
-            if (Minecraft.getMinecraft().objectMouseOver == null) return
+            Minecraft.getMinecraft().objectMouseOver ?: return
+
             val en = Minecraft.getMinecraft().objectMouseOver.entityHit ?: return
             val sr = ScaledResolution(Minecraft.getMinecraft())
 
@@ -81,8 +84,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                 GlStateManager.tryBlendFuncSeparate(
                     GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA
                 )
-                val fr = Minecraft.getMinecraft().fontRendererObj
-                fr.drawString(
+                Minecraft.getMinecraft().fontRendererObj.drawString(
                     "Spawned at " + context.batSpawnedLocations[en.entityId],
                     sr.scaledWidth / 2,
                     sr.scaledHeight / 2,
@@ -94,21 +96,23 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
 
     override fun drawWorld(partialTicks: Float) {
         strategy.draw(partialTicks)
-        val finalSmallest = getBestFit(partialTicks)
-        for ((_, value) in strategy.actionPath) {
-            value.onRenderWorld(partialTicks, finalSmallest === value)
+        val finalSmallest = findClosestActionRoute(partialTicks)
+        strategy.actionPath.forEach { (_, actionRoute) ->
+            actionRoute.onRenderWorld(partialTicks, finalSmallest === actionRoute)
         }
         if (DgOneCongifConfig.debugMode && EditingContext.getEditingContext() != null && EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
-            for ((key, value1) in dungeonRoom.mechanics) {
-                value1?.highlight(Color(0, 255, 255, 50), key, dungeonRoom, partialTicks)
+            dungeonRoom.mechanics.forEach { (key, dungeonMechanic) ->
+                dungeonMechanic?.highlight(Color(0, 255, 255, 50), key, dungeonRoom, partialTicks)
             }
         }
     }
 
     override fun chatReceived(chat: IChatComponent) {
-        if (lastChest != null && chat.formattedText == "§r§cThis chest has already been searched!§r") {
-            dungeonRoom.roomContext["c-" + lastChest.toString()] = 2
-            lastChest = null
+        if (previousChest != null) {
+            if (chat.formattedText == "§r§cThis chest has already been searched!§r") {
+                dungeonRoom.roomContext["c-" + previousChest.toString()] = 2
+                previousChest = null
+            }
         }
     }
 
@@ -122,11 +126,10 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         val pt1 = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(pos.add(2, 0, 2)))
         val pt2 = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(pos.add(-2, 0, -2)))
         if (pt1 != pt2) {
-            stack = 0
-            secrets2 = -1
+            stackSize = 0
+            numSecrets = -1
             return
         }
-        val pos2 = dungeonRoom.min.add(5, 0, 5)
         val text = chat.formattedText
         val secretsIndex = text.indexOf("Secrets")
         var secrets = 0
@@ -140,13 +143,14 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
             val it = text.substring(theindex + 2, secretsIndex - 1)
             secrets = it.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1].toInt()
         }
-        if (secrets2 == secrets.toLong()) stack++ else {
-            stack = 0
-            secrets2 = secrets.toLong()
+        if (numSecrets == secrets) {
+            stackSize++
+        } else {
+            stackSize = 0
+            numSecrets = secrets
         }
-        if (stack == 4 && dungeonRoom.totalSecrets != secrets) {
+        if (stackSize == 4 && dungeonRoom.totalSecrets != secrets) {
             dungeonRoom.totalSecrets = secrets
-            if (FeatureRegistry.DUNGEON_INTERMODCOMM.isEnabled) Minecraft.getMinecraft().thePlayer.sendChatMessage("/pchat \$DG-Comm " + pos2.x + "/" + pos2.z + " " + secrets)
         }
     }
 
@@ -173,7 +177,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         }
         if (FeatureRegistry.SECRET_CREATE_REFRESH_LINE.keybind == keyInputEvent.key) {
             if (!FeatureRegistry.SECRET_CREATE_REFRESH_LINE.isEnabled) return
-            val actionRoute = getBestFit(0f)
+            val actionRoute = findClosestActionRoute(0f)
             if (actionRoute == null) {
                 logger.error("actionRoute was null after SECRET_CREATE_REFRESH_LINE keypress")
                 return
@@ -203,80 +207,70 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     }
 
     override fun onInteract(event: PlayerInteractEntityEvent) {
-        for (a in strategy.actionPath.values) {
-            a.onLivingInteract(event)
+        strategy.actionPath.values.forEach {
+            it.onLivingInteract(event)
         }
     }
 
-    override fun onInteractBlock(event: PlayerInteractEvent) {
-        for (a in strategy.actionPath.values) {
-            a.onPlayerInteract(event)
+    override fun onInteractBlock(playerInteractEvent: PlayerInteractEvent) {
+        strategy.actionPath.values.forEach {
+            it.onPlayerInteract(playerInteractEvent)
         }
-        if (event.pos != null) {
-            val iBlockState = event.world.getBlockState(event.pos)
-            if (iBlockState.block === Blocks.chest || iBlockState.block === Blocks.trapped_chest) lastChest = event.pos
+
+        playerInteractEvent.pos?.let {
+            val block = playerInteractEvent.world.getBlockState(it).block
+            if (block == Blocks.chest || block == Blocks.trapped_chest) {
+                previousChest = it
+            }
         }
-        if (event.entityPlayer.heldItem != null && event.entityPlayer.heldItem.item === Items.stick && DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
+
+        if (playerInteractEvent.entityPlayer.heldItem != null && playerInteractEvent.entityPlayer.heldItem.item == Items.stick && DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
             val ec = EditingContext.getEditingContext() ?: return
             if (ec.current !is GuiDungeonAddSet) return
             val gdas = ec.current as GuiDungeonAddSet
-            if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-                if (last) gdas.end.setPosInWorld(
-                    dungeonRoom, VectorUtils.BlockPosToVec3i(event.pos)
+            if (playerInteractEvent.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+                if (isLast) gdas.end.setPosInWorld(
+                    dungeonRoom, VectorUtils.BlockPosToVec3i(playerInteractEvent.pos)
                 ) else gdas.start.setPosInWorld(
-                    dungeonRoom, VectorUtils.BlockPosToVec3i(event.pos)
+                    dungeonRoom, VectorUtils.BlockPosToVec3i(playerInteractEvent.pos)
                 )
-                last = !last
+                isLast = !isLast
             }
         }
     }
 
-    private fun getBestFit(partialTicks: Float): ActionRoute? {
-        if (!DgOneCongifConfig.freezePathfindingStatus) {
-            return null
-        }
-        var smallest: ActionRoute? = null
-        var smallestTan = 0.002
-        for ((_, actionRoute) in strategy.actionPath) {
-            if (    actionRoute.actionRouteProperties.lineRefreshRate != -1 && actionRoute.actionRouteProperties.isPathfind) {
-                continue
-            }
+    private fun findClosestActionRoute(partialTicks: Float): ActionRoute? {
+        var closest: ActionRoute? = null
+        var closestDistance = 0.002
+        strategy.actionPath.forEach { (_, actionRoute) ->
             val currentAction = actionRoute.currentAction
-            val target: Vector3i? = if (currentAction is ActionMove) {
-                currentAction.target.getVector3i(dungeonRoom)
-            } else {
-                if (actionRoute.current >= 1) {
-                    val abstractAction = actionRoute.actions[actionRoute.current - 1]
-                    if (abstractAction is ActionMove) {
-                        abstractAction.target.getVector3i(dungeonRoom)
-                    } else {
-                        continue
-                    }
-                } else {
-                    continue
+
+            if (currentAction is ActionMove) {
+                val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
+                val distance = VectorUtils.distSquared(
+                    VectorUtils.vec3ToVec3d(renderViewEntity.getLook(partialTicks)),
+                    VectorUtils.vec3ToVec3d(renderViewEntity.getPositionEyes(partialTicks)),
+                    Vector3d(currentAction.target.getVector3i(dungeonRoom)).add(0.5, 0.5, 0.5)
+                )
+                if (distance < closestDistance) {
+                    closest = actionRoute
+                    closestDistance = distance
                 }
             }
-            val renderViewEntity = Minecraft.getMinecraft().renderViewEntity
-            val vectorV = VectorUtils.distSquared(
-                VectorUtils.vec3ToVec3d(renderViewEntity.getLook(partialTicks)),
-                VectorUtils.vec3ToVec3d(renderViewEntity.getPositionEyes(partialTicks)),
-                Vector3d(target).add(0.5, 0.5, 0.5)
-            )
-            if (vectorV < smallestTan) {
-                smallest = actionRoute
-                smallestTan = vectorV
-            }
         }
-        return smallest
+        return closest
     }
 
     override fun onEntityDeath(deathEvent: LivingDeathEvent) {
-        for (a in strategy.actionPath.values) {
-            a.onLivingDeath(deathEvent)
+
+        strategy.actionPath.values.forEach {
+            it.onLivingDeath(deathEvent)
         }
-        if (EditingContext.getEditingContext() != null && EditingContext.getEditingContext().room === dungeonRoom) {
-            if (deathEvent.entity is EntityBat) {
-                for (screen in EditingContext.getEditingContext().guiStack) {
+
+
+        EditingContext.getEditingContext()?.let { editingContext ->
+            if (editingContext.room === dungeonRoom && deathEvent.entity is EntityBat) {
+                for (screen in editingContext.guiStack) {
                     if (screen is GuiDungeonRoomEdit) {
                         context.batSpawnedLocations[deathEvent.entity.entityId]?.let {
                             val secret = DungeonSecret()
@@ -291,26 +285,28 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
                         return
                     }
                 }
-                if (EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
+                if (editingContext.current is GuiDungeonRoomEdit) {
                     context.batSpawnedLocations[deathEvent.entity.entityId]?.let {
                         val secret = DungeonSecret()
                         secret.secretType = DungeonSecret.SecretType.BAT
                         secret.secretPoint = OffsetPoint(
                             dungeonRoom, it
                         )
-                        (EditingContext.getEditingContext().current as GuiDungeonRoomEdit).sep.createNewMechanic(
+                        (editingContext.current as GuiDungeonRoomEdit).sep.createNewMechanic(
                             "BAT-" + UUID.randomUUID(), secret
                         )
                     }
                 }
+
             }
         }
     }
 
     override fun onBlockUpdate(blockUpdateEvent: BlockUpdateEvent) {
-        for (updatedBlock in blockUpdateEvent.updatedBlocks) {
-            if (updatedBlock.second == DungeonRoom.preBuilt) continue
-            dungeonRoom.resetBlock(updatedBlock.first)
+        blockUpdateEvent.updatedBlocks.forEach { updatedBlock ->
+            if (updatedBlock.second != DungeonRoom.preBuilt) {
+                dungeonRoom.resetBlock(updatedBlock.first)
+            }
         }
     }
 
@@ -319,6 +315,6 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     }
 
     companion object {
-        val logger = LogManager.getLogger("GeneralRoomProcessor")
+        val logger: Logger = LogManager.getLogger("GeneralRoomProcessor")
     }
 }

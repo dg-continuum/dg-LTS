@@ -18,17 +18,16 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.gui;
 
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.panes.DynamicEditor;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MGui;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.*;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
@@ -41,7 +40,11 @@ public class GuiDungeonParameterEdit extends MGui {
     private final MButton save;
     private final MButton delete;
     private String classSelection;
-    @Getter
+
+    public ValueEdit getValueEdit() {
+        return valueEdit;
+    }
+
     private ValueEdit valueEdit;
 
     public GuiDungeonParameterEdit(final MParameter parameter2, final DynamicEditor processorParameterEditPane) {

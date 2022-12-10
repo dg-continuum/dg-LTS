@@ -22,18 +22,20 @@ class ActionChangeState(private val mechanicName: String, private val state: Act
     }
 
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
-        val mechanic = dungeonRoom!!.mechanics[mechanicName]
         if (state == ActionState.navigate) {
             return true
         }
-        if (mechanic == null) {
-            return false
-        }
+        dungeonRoom ?: return false
+
+        val mechanic = dungeonRoom.mechanics[mechanicName] ?: return false
         if (mechanic is DungeonSecret && mechanic.secretType != DungeonSecret.SecretType.CHEST) {
             return true
         }
-        return if (mechanic is DungeonDummy) {
-            true
-        } else mechanic.getCurrentState(dungeonRoom).equals(state.state, ignoreCase = true)
+        if (mechanic is DungeonDummy) {
+            return true
+        }
+
+
+        return mechanic.getCurrentState(dungeonRoom).equals(state.state, ignoreCase = true)
     }
 }

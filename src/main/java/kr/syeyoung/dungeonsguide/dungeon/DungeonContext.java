@@ -25,8 +25,6 @@ import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderR
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -42,14 +40,89 @@ public class DungeonContext {
     private final Map<Integer, Vector3i> batSpawnedLocations = new HashMap<>();
 
     private final List<Integer> killedBats = new ArrayList<>();
+
+    public static String getDungeonName() {
+        return dungeonName;
+    }
+
+    public Map<Vector2i, DungeonRoom> getRoomMapper() {
+        return roomMapper;
+    }
+
+    public List<DungeonRoom> getDungeonRoomList() {
+        return dungeonRoomList;
+    }
+
+    public List<RoomProcessor> getGlobalRoomProcessors() {
+        return globalRoomProcessors;
+    }
+
+    public Map<String, Integer> getDeaths() {
+        return deaths;
+    }
+
+    public List<String[]> getMilestoneReached() {
+        return milestoneReached;
+    }
+
+    public long getStarted() {
+        return started;
+    }
+
+    public BlockPos getDungeonMin() {
+        return dungeonMin;
+    }
+
+    public long getBossRoomEnterSeconds() {
+        return BossRoomEnterSeconds;
+    }
+
+    public long getInit() {
+        return init;
+    }
+
+    public BlockPos getBossroomSpawnPos() {
+        return bossroomSpawnPos;
+    }
+
+    public boolean isHasTrapRoom() {
+        return hasTrapRoom;
+    }
+
+    public int getLatestSecretCnt() {
+        return latestSecretCnt;
+    }
+
+    public int getLatestTotalSecret() {
+        return latestTotalSecret;
+    }
+
+    public int getMaxSpeed() {
+        return maxSpeed;
+    }
+
+    public double getSecretPercentage() {
+        return secretPercentage;
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    public boolean isDefeated() {
+        return defeated;
+    }
+
+    public static void setDungeonName(String dungeonName) {
+        DungeonContext.dungeonName = dungeonName;
+    }
+
     /**
      * This is static because it's used in the constructor,
      * it means we cannot set the name without having an object,
      * and we cannot create an object without the name
      * so its static
      */
-    @Getter
-    @Setter
     private static String dungeonName;
 
     public World getWorld() {
@@ -62,46 +135,70 @@ public class DungeonContext {
         return expositions;
     }
 
-    private Set<Vector3i> expositions = new HashSet<>();
+    private final Set<Vector3i> expositions = new HashSet<>();
 
     public MapProcessor getMapProcessor() {
         return mapProcessor;
     }
 
     private final MapProcessor mapProcessor;
-    @Getter
     private final Map<Vector2i, DungeonRoom> roomMapper = new HashMap<>();
-    @Getter
     private final List<DungeonRoom> dungeonRoomList = new ArrayList<>();
-    @Getter
     private final List<RoomProcessor> globalRoomProcessors = new ArrayList<>();
-    @Getter
     private final Map<String, Integer> deaths = new HashMap<>();
-    @Getter
     private final List<String[]> milestoneReached = new ArrayList<>();
-    @Getter
+
+    public Set<String> getPlayers() {
+        return players;
+    }
+
     private final Set<String> players = new HashSet<>();
     public static final Rectangle roomBoundary = new Rectangle(-10, -10, 138, 138);
-    @Getter
-    @Setter
+
+    public int getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(int percentage) {
+        this.percentage = percentage;
+    }
+
+    public void setStarted(long started) {
+        this.started = started;
+    }
+
+    public void setDungeonMin(BlockPos dungeonMin) {
+        this.dungeonMin = dungeonMin;
+    }
+
+    public void setBossRoomEnterSeconds(long bossRoomEnterSeconds) {
+        BossRoomEnterSeconds = bossRoomEnterSeconds;
+    }
+
+    public void setInit(long init) {
+        this.init = init;
+    }
+
+    public void setBossroomSpawnPos(BlockPos bossroomSpawnPos) {
+        this.bossroomSpawnPos = bossroomSpawnPos;
+    }
+
+    public void setHasTrapRoom(boolean hasTrapRoom) {
+        this.hasTrapRoom = hasTrapRoom;
+    }
+
     public int percentage;
-    @Getter
-    @Setter
+
     private long started = -1;
-    @Getter
-    @Setter
+
     private BlockPos dungeonMin;
-    @Getter
-    @Setter
+
     private long BossRoomEnterSeconds = -1;
-    @Getter
-    @Setter
+
     private long init;
-    @Getter
-    @Setter
+
     private BlockPos bossroomSpawnPos = null;
-    @Getter
-    @Setter
+
     private boolean hasTrapRoom = false;
 
     public boolean isGotMimic() {
@@ -109,25 +206,55 @@ public class DungeonContext {
     }
 
     private boolean gotMimic = false;
-    @Getter @Setter
+
+    public void setLatestSecretCnt(int latestSecretCnt) {
+        this.latestSecretCnt = latestSecretCnt;
+    }
+
+    public void setLatestTotalSecret(int latestTotalSecret) {
+        this.latestTotalSecret = latestTotalSecret;
+    }
+
     private int latestSecretCnt = 0;
-    @Getter @Setter
     private int latestTotalSecret = 0;
-    @Getter @Setter
+
+    public int getLatestCrypts() {
+        return latestCrypts;
+    }
+
+    public void setLatestCrypts(int latestCrypts) {
+        this.latestCrypts = latestCrypts;
+    }
+
     private int latestCrypts = 0;
-    @Getter
     private int maxSpeed = 600;
-    @Getter
     private double secretPercentage = 1.0;
-    @Getter
-    @Setter
+
+    public BossfightProcessor getBossfightProcessor() {
+        return bossfightProcessor;
+    }
+
+    public void setBossfightProcessor(BossfightProcessor bossfightProcessor) {
+        this.bossfightProcessor = bossfightProcessor;
+    }
+
     private BossfightProcessor bossfightProcessor;
-    @Getter @Setter
+
+    public void setEnded(boolean ended) {
+        this.ended = ended;
+    }
+
+    public void setDefeated(boolean defeated) {
+        this.defeated = defeated;
+    }
+
     private boolean ended = false;
-    @Getter @Setter
     private boolean defeated = false;
 
-    @Getter
+    public DungeonSpecificDataProvider getDataProvider() {
+        return dataProvider;
+    }
+
     final DungeonSpecificDataProvider dataProvider;
 
     public DungeonContext(World world) {
@@ -165,7 +292,7 @@ public class DungeonContext {
     }
 
     @Nullable
-    public DungeonRoom getCurrentRoom(){
+    public DungeonRoom getCurrentRoom() {
         Vector2i roomPt = mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
 
         return getRoomMapper().get(roomPt);
@@ -173,10 +300,8 @@ public class DungeonContext {
 
 
     @Nullable
-    public RoomProcessor getCurrentRoomProcessor(){
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
-                .map(a -> DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a));
+    public RoomProcessor getCurrentRoomProcessor() {
+        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext()).map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i())).map(a -> DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a));
 
 
         DungeonRoom dungeonRoom = dungeonRoomOpt.orElse(null);

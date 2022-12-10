@@ -58,12 +58,10 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
         // tick actions and remove finished actions
         for ((_, route) in actionPath) {
-            val id = MechanicId(route.mechanic)
             route.onTick()
 
-
-            if ((route.currentAction is ActionComplete) or (route.currentAction.isComplete(parent.dungeonRoom))) {
-                autoPathFindCandidates[id]?.let {
+            if ((route.currentAction is ActionComplete) || (route.currentAction.isComplete(parent.dungeonRoom))) {
+                autoPathFindCandidates[MechanicId(route.mechanic)]?.let {
                     it.isDone = true
                 }
             }
@@ -131,9 +129,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
     fun searchForNextTarget() {
         calculateMechanicCosts()
         getCheapestMechanic()?.let {
-            if (lastFoundMechanic == it) {
-                return
-            } else {
+            if (lastFoundMechanic != it) {
                 lastFoundMechanic = it
                 addAction(
                     "AUTO-BROWSE",
@@ -154,19 +150,17 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
             if (secretMechanic is DungeonSecret) {
                 if (!autoPathFindCandidates.contains(mechId)) {
                     val representingPoint = secretMechanic.getRepresentingPoint(parent.dungeonRoom)
-                    if (representingPoint != null) {
-                        val secretPos = representingPoint
-                            .getVector3i(parent.dungeonRoom)
+                    val secretPos = representingPoint
+                        .getVector3i(parent.dungeonRoom)
 
-                        autoPathFindCandidates[mechId] =
-                            AutoGuideSecretCandidate(
-                                secretMechanic,
-                                0.0,
-                                secretPos,
-                                secretMechanic.toString(),
-                                false
-                            )
-                    }
+                    autoPathFindCandidates[mechId] =
+                        AutoGuideSecretCandidate(
+                            secretMechanic,
+                            0.0,
+                            secretPos,
+                            secretMechanic.toString(),
+                            false
+                        )
 
                 }
             }
@@ -234,7 +228,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
     fun getCheapestMechanic(): MechanicId? {
         var lowestWeightMechanic: MechanicId? = null
-        var lowstCost: Double = Double.MAX_VALUE
+        var lowstCost = Double.MAX_VALUE
         for ((key, value) in autoPathFindCandidates) {
             if (value.cost < lowstCost && !value.isDone) {
                 lowestWeightMechanic = key
@@ -245,9 +239,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
     }
 
     fun navigateToLowestScoreSecret() {
-
         val lowestWeightMechanic = getCheapestMechanic() ?: return
-
 
         // make sure we don't start navigating to the same secret twice
         if (lowestWeightMechanic == lastFoundMechanic) {

@@ -8,7 +8,7 @@ import kr.syeyoung.dungeonsguide.oneconfig.secrets.PathfindToALlPage
 
 class PathfindToAllStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(parent) {
     override fun init() {
-        for ((mechanicName, mechanic) in parent.dungeonRoom.dungeonRoomInfo.mechanics) {
+        parent.dungeonRoom.dungeonRoomInfo.mechanics.forEach { (mechanicName, mechanic) ->
             if (mechanic is DungeonSecret && mechanic.getSecretStatus(parent.dungeonRoom) != DungeonSecret.SecretStatus.FOUND) {
                 if (PathfindToALlPage.pfTaBAT && mechanic.secretType == DungeonSecret.SecretType.BAT) {
                     addAction(

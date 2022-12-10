@@ -83,6 +83,11 @@ public class DungeonRoom implements DungeonRoomAccessor {
     }
 
     private final DungeonContext context;
+
+    public List<DungeonDoor> getDoors() {
+        return doors;
+    }
+
     private final List<DungeonDoor> doors = new ArrayList<>();
     private final int unitWidth; // X
     private final int unitHeight; // Z
@@ -126,6 +131,11 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
     private RoomState currentState = RoomState.DISCOVERED;
     private Map<String, DungeonMechanic> cached = null;
+
+    public RoomProcessor getRoomProcessor() {
+        return roomProcessor;
+    }
+
     private RoomProcessor roomProcessor;
 
     public RoomMatcher getRoomMatcher() {
@@ -182,27 +192,6 @@ public class DungeonRoom implements DungeonRoomAccessor {
     public void setCurrentState(RoomState currentState) {
         this.currentState = currentState;
     }
-
-//    public Future<List<org.joml.Vector3d>> createEntityPathTo(Entity entityIn, Vector3i targetPos) {
-//
-//        return DungeonFacade.INSTANCE.ex.submit(() -> {
-//            try {
-//
-//                val pfjob = new PfJob(
-//                        VectorUtils.vec3ToVec3d(entityIn.getPositionVector()),
-//                        new org.joml.Vector3d(targetPos).add(.5, .5, .5),
-//                        this
-//                );
-//
-//                return DungeonFacade.INSTANCE.getCachedPathFinder().pathFind(pfjob).getPath();
-//
-//            } catch (NullPointerException e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        });
-//    }
-
 
     private void buildDoors(Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
         Set<Tuple<Vector3i, EDungeonDoorType>> positions = new HashSet<>();

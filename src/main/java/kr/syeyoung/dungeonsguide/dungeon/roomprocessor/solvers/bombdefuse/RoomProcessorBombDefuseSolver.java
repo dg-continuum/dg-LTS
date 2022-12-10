@@ -401,8 +401,8 @@ public class RoomProcessorBombDefuseSolver extends GeneralRoomProcessor {
     }
 
     @Override
-    public void onInteractBlock(PlayerInteractEvent event) {
-        super.onInteractBlock(event);
+    public void onInteractBlock(PlayerInteractEvent playerInteractEvent) {
+        super.onInteractBlock(playerInteractEvent);
         if (bugged) return;
 
         BlockPos player = Minecraft.getMinecraft().thePlayer.getPosition();
@@ -410,12 +410,12 @@ public class RoomProcessorBombDefuseSolver extends GeneralRoomProcessor {
         for (ChamberSet ch : chambers) {
             if (ch.getLeft() != null && ch.getLeft().getProcessor() != null) {
                 if (ch.getLeft().getChamberBlocks().getOffsetPointList().contains(offsetPoint)) {
-                    ch.getLeft().getProcessor().onInteractBlock(event);
+                    ch.getLeft().getProcessor().onInteractBlock(playerInteractEvent);
                 }
             }
             if (ch.getRight() != null && ch.getRight().getProcessor() != null) {
                 if (ch.getRight().getChamberBlocks().getOffsetPointList().contains(offsetPoint)) {
-                    ch.getRight().getProcessor().onInteractBlock(event);
+                    ch.getRight().getProcessor().onInteractBlock(playerInteractEvent);
                 }
             }
         }

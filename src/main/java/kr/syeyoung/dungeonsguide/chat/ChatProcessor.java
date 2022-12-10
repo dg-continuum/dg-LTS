@@ -40,12 +40,6 @@ public class ChatProcessor {
 
     private static final Logger logger = LogManager.getLogger("DG-ChatProcessor");
     private ChatProcessor() {
-//        Logger l = LogManager.getLogger(GuiNewChat.class);
-//        if (l instanceof SimpleLogger) {
-//            ((SimpleLogger) l).setLevel(Level.OFF);
-//        } else if (l instanceof org.apache.logging.log4j.core.Logger) {
-//            ((org.apache.logging.log4j.core.Logger) l).setLevel(Level.OFF);
-//        }
     }
 
     private Queue<ChatSubscriber> chatSubscriberQueue = new ConcurrentLinkedQueue<>();

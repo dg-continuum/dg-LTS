@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.CachedPathFinder;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.impl.ThetaStar;
-import lombok.Setter;
 import lombok.val;
 import net.minecraftforge.common.MinecraftForge;
 import org.joml.Vector3d;
@@ -34,7 +33,10 @@ public class DungeonFacade {
         return context;
     }
 
-    @Setter
+    public void setContext(DungeonContext context) {
+        this.context = context;
+    }
+
     private DungeonContext context;
 
     public DungeonFacade() {
