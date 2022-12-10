@@ -19,6 +19,7 @@ open class ActionMove(val target: OffsetPoint) : AbstractAction() {
     private var latestFuture: Future<List<Vector3d>>? = null
 
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        dungeonRoom ?: return false
         return target.getVector3i(dungeonRoom).distanceSquared(VectorUtils.getPlayerVector3i()) < 2
     }
 
@@ -28,6 +29,7 @@ open class ActionMove(val target: OffsetPoint) : AbstractAction() {
         actionRouteProperties: ActionRouteProperties?,
         flag: Boolean
     ) {
+        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         val distance = pos.distance(VectorUtils.getPlayerVector3i()).toFloat()
         var multiplier = distance / 120f //mobs only render ~120 blocks away
@@ -85,6 +87,7 @@ open class ActionMove(val target: OffsetPoint) : AbstractAction() {
     }
 
     override fun onTick(dungeonRoom: DungeonRoom?, actionRouteProperties: ActionRouteProperties?) {
+        dungeonRoom ?: return
         tick = (tick + 1) % 1.coerceAtLeast(actionRouteProperties!!.lineRefreshRate)
 
         if (latestFuture == null){
@@ -92,7 +95,8 @@ open class ActionMove(val target: OffsetPoint) : AbstractAction() {
                 if (!DgOneCongifConfig.freezePathfindingStatus || poses == null) {
 
                     latestFuture = DungeonFacade.INSTANCE.cachedPathFinder.CreatePath(Minecraft.getMinecraft().thePlayer,
-                        target.getVector3i(dungeonRoom), dungeonRoom!!)
+                        target.getVector3i(dungeonRoom), dungeonRoom
+                    )
                 }
             }
         } else {

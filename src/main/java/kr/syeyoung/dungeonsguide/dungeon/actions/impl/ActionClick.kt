@@ -42,7 +42,12 @@ class ActionClick(private val target: OffsetPoint) : AbstractAction() {
         event: PlayerInteractEvent?,
         actionRouteProperties: ActionRouteProperties?
     ) {
-        if (clicked) return
+        if (clicked) {
+            return
+        }
+
+        dungeonRoom ?: return
+
         if (event?.pos != null){
             if (target.getVector3i(dungeonRoom) == VectorUtils.BlockPosToVec3i(event.pos)) {
                 clicked = true
@@ -57,6 +62,7 @@ class ActionClick(private val target: OffsetPoint) : AbstractAction() {
         actionRouteProperties: ActionRouteProperties?,
         flag: Boolean
     ) {
+        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
         RenderUtils.drawTextAtWorld(

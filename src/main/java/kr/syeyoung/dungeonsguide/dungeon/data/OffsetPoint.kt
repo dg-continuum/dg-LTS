@@ -1,138 +1,107 @@
-/*
- *     Dungeons Guide - The most intelligent Hypixel Skyblock Dungeons Mod
- *     Copyright (C) 2021  cyoung06
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Affero General Public License as published
- *     by the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Affero General Public License for more details.
- *
- *     You should have received a copy of the GNU Affero General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
-package kr.syeyoung.dungeonsguide.dungeon.data;
+package kr.syeyoung.dungeonsguide.dungeon.data
 
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
-import lombok.Data;
-import net.minecraft.block.Block;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
-import org.joml.Vector3d;
-import org.joml.Vector3i;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
+import kr.syeyoung.dungeonsguide.utils.VectorUtils
+import net.minecraft.block.Block
+import net.minecraft.util.BlockPos
+import net.minecraft.util.Vec3
+import org.joml.Vector3d
+import org.joml.Vector3i
+import java.io.Serializable
+import javax.vecmath.Vector2d
 
-import javax.vecmath.Vector2d;
-import java.io.Serializable;
+class OffsetPoint : Cloneable, Serializable {
+    var x = 0
+    var y = 0
+    var z = 0
 
-@Data
-public class OffsetPoint implements Cloneable, Serializable {
-    private static final long serialVersionUID = 3102336358774967540L;
-
-    private int x;
-    private int y;
-    private int z;
-
-    public OffsetPoint(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    constructor(x: Int, y: Int, z: Int) {
+        this.x = x
+        this.y = y
+        this.z = z
     }
 
-    public OffsetPoint(DungeonRoom dungeonRoom, Vector3i pos) {
-        setPosInWorld(dungeonRoom, pos);
+    constructor(dungeonRoom: DungeonRoom, pos: Vector3i) {
+        setPosInWorld(dungeonRoom, pos)
     }
 
-    public OffsetPoint(DungeonRoom dungeonRoom, Vec3 pos) {
-        setPosInWorld(dungeonRoom, new Vector3i((int) pos.xCoord, (int) pos.yCoord, (int) pos.zCoord));
+    constructor(dungeonRoom: DungeonRoom, pos: Vec3) {
+        setPosInWorld(dungeonRoom, Vector3i(pos.xCoord.toInt(), pos.yCoord.toInt(), pos.zCoord.toInt()))
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setPosInWorld(DungeonRoom dungeonRoom, Vector3i pos) {
-        Vector2d vector2d = new Vector2d(pos.x - dungeonRoom.getMin().x, pos.z - dungeonRoom.getMin().z);
-        for (int i = 0; i < dungeonRoom.getRoomMatcher().getRotation(); i++) {
-            vector2d = VectorUtils.rotateClockwise(vector2d);
+    fun setPosInWorld(dungeonRoom: DungeonRoom, pos: Vector3i) {
+        var vector2d = Vector2d((pos.x - dungeonRoom.min.x).toDouble(), (pos.z - dungeonRoom.min.z).toDouble())
+        for (i in 0 until dungeonRoom.roomMatcher.rotation) {
+            vector2d = VectorUtils.rotateClockwise(vector2d)
             if (i % 2 == 0) {
-                vector2d.x += dungeonRoom.getDungeonRoomInfo().getBlocks()[0].length - 1; // + Z
+                vector2d.x += (dungeonRoom.dungeonRoomInfo.blocks[0].size - 1).toDouble() // + Z
             } else {
-                vector2d.x += dungeonRoom.getDungeonRoomInfo().getBlocks().length - 1; // + X
+                vector2d.x += (dungeonRoom.dungeonRoomInfo.blocks.size - 1).toDouble() // + X
             }
         }
-
-        this.x = (int) vector2d.x;
-        this.z = (int) vector2d.y;
-        this.y = pos.y - dungeonRoom.getMin().y;
+        x = vector2d.x.toInt()
+        z = vector2d.y.toInt()
+        y = pos.y - dungeonRoom.min.y
     }
 
-    public Vector3i toRotatedRelBlockPos(DungeonRoom dungeonRoom) {
-        Vector2d rot = new Vector2d(x, z);
-        for (int i = 0; i < dungeonRoom.getRoomMatcher().getRotation(); i++) {
-            rot = VectorUtils.rotateCounterClockwise(rot);
+    fun toRotatedRelBlockPos(dungeonRoom: DungeonRoom): Vector3i {
+        var rot = Vector2d(x.toDouble(), z.toDouble())
+        for (i in 0 until dungeonRoom.roomMatcher.rotation) {
+            rot = VectorUtils.rotateCounterClockwise(rot)
             if (i % 2 == 0) {
-                rot.y += dungeonRoom.getMax().z - dungeonRoom.getMin().z + 1; // + Z
+                rot.y += (dungeonRoom.max.z - dungeonRoom.min.z + 1).toDouble() // + Z
             } else {
-                rot.y += dungeonRoom.getMax().x - dungeonRoom.getMin().x + 1; // + X
+                rot.y += (dungeonRoom.max.x - dungeonRoom.min.x + 1).toDouble() // + X
             }
         }
-
-        return new Vector3i((int) rot.x, y, (int) rot.y);
+        return Vector3i(rot.x.toInt(), y, rot.y.toInt())
     }
 
-    public Block getBlock(DungeonRoom dungeonRoom) {
-        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
-
-        return dungeonRoom.getRelativeBlockAt(relBp.x, relBp.y, relBp.z);
+    fun getBlock(dungeonRoom: DungeonRoom): Block {
+        val relBp = toRotatedRelBlockPos(dungeonRoom)
+        return dungeonRoom.getRelativeBlockAt(relBp.x, relBp.y, relBp.z)
     }
 
-    public Vector3i getVector3i(DungeonRoom dungeonRoom) {
-        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
-        return dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z);
+    fun getVector3i(dungeonRoom: DungeonRoom): Vector3i {
+        val relBp = toRotatedRelBlockPos(dungeonRoom)
+        return dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z)
     }
 
-    public Vector3d getVector3d(DungeonRoom dungeonRoom) {
-        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
-        Vector3i relativeBlockPosAt = dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z);
-        return new Vector3d(relativeBlockPosAt.x, relativeBlockPosAt.y, relativeBlockPosAt.z);
+    fun getVector3d(dungeonRoom: DungeonRoom): Vector3d {
+        val relBp = toRotatedRelBlockPos(dungeonRoom)
+        val relativeBlockPosAt = dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z)
+        return Vector3d(
+            relativeBlockPosAt.x.toDouble(),
+            relativeBlockPosAt.y.toDouble(),
+            relativeBlockPosAt.z.toDouble()
+        )
     }
 
-    public BlockPos getBlockPos(DungeonRoom dungeonRoom) {
-        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
-        Vector3i relativeBlockPosAt = dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z);
-        return new BlockPos(relativeBlockPosAt.x, relativeBlockPosAt.y, relativeBlockPosAt.z);
+    fun getBlockPos(dungeonRoom: DungeonRoom): BlockPos {
+        val relBp = toRotatedRelBlockPos(dungeonRoom)
+        val relativeBlockPosAt = dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z)
+        return BlockPos(relativeBlockPosAt.x, relativeBlockPosAt.y, relativeBlockPosAt.z)
     }
 
-    public int getData(DungeonRoom dungeonRoom) {
-        Vector3i relBp = toRotatedRelBlockPos(dungeonRoom);
-
-        return dungeonRoom.getRelativeBlockDataAt(relBp.x, relBp.y, relBp.z);
+    fun getData(dungeonRoom: DungeonRoom): Int {
+        val relBp = toRotatedRelBlockPos(dungeonRoom)
+        return dungeonRoom.getRelativeBlockDataAt(relBp.x, relBp.y, relBp.z)
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return new OffsetPoint(x, y, z);
+    @Throws(CloneNotSupportedException::class)
+    public override fun clone(): Any {
+        return OffsetPoint(x, y, z)
     }
 
-    @Override
-    public String toString() {
+    override fun toString(): String {
         return "OffsetPoint{x=" + x +
                 ", y=" + y +
                 ", z=" + z +
-                '}';
+                '}'
+    }
+
+    companion object {
+        private const val serialVersionUID = 3102336358774967540L
     }
 }

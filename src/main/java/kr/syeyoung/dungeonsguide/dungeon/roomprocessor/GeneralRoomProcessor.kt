@@ -278,26 +278,30 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
             if (deathEvent.entity is EntityBat) {
                 for (screen in EditingContext.getEditingContext().guiStack) {
                     if (screen is GuiDungeonRoomEdit) {
-                        val secret = DungeonSecret()
-                        secret.secretType = DungeonSecret.SecretType.BAT
-                        secret.secretPoint = OffsetPoint(
-                            dungeonRoom, context.batSpawnedLocations[deathEvent.entity.entityId]
-                        )
-                        screen.sep.createNewMechanic(
-                            "BAT-" + UUID.randomUUID(), secret
-                        )
+                        context.batSpawnedLocations[deathEvent.entity.entityId]?.let {
+                            val secret = DungeonSecret()
+                            secret.secretType = DungeonSecret.SecretType.BAT
+                            secret.secretPoint = OffsetPoint(
+                                dungeonRoom, it
+                            )
+                            screen.sep.createNewMechanic(
+                                "BAT-" + UUID.randomUUID(), secret
+                            )
+                        }
                         return
                     }
                 }
                 if (EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
-                    val secret = DungeonSecret()
-                    secret.secretType = DungeonSecret.SecretType.BAT
-                    secret.secretPoint = OffsetPoint(
-                        dungeonRoom, context.batSpawnedLocations[deathEvent.entity.entityId]
-                    )
-                    (EditingContext.getEditingContext().current as GuiDungeonRoomEdit).sep.createNewMechanic(
-                        "BAT-" + UUID.randomUUID(), secret
-                    )
+                    context.batSpawnedLocations[deathEvent.entity.entityId]?.let {
+                        val secret = DungeonSecret()
+                        secret.secretType = DungeonSecret.SecretType.BAT
+                        secret.secretPoint = OffsetPoint(
+                            dungeonRoom, it
+                        )
+                        (EditingContext.getEditingContext().current as GuiDungeonRoomEdit).sep.createNewMechanic(
+                            "BAT-" + UUID.randomUUID(), secret
+                        )
+                    }
                 }
             }
         }

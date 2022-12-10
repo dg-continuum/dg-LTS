@@ -36,6 +36,7 @@ import java.awt.Color
 class ActionBreakWithSuperBoom(private val target: OffsetPoint) : AbstractAction() {
 
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        dungeonRoom ?: return false
         val thing = target.getVector3i(dungeonRoom)
         for (el in DungeonsGuide.getDungeonsGuide().dungeonFacade.context.expositions) {
             if (thing.distance(el) < 5) {
@@ -51,6 +52,7 @@ class ActionBreakWithSuperBoom(private val target: OffsetPoint) : AbstractAction
         actionRouteProperties: ActionRouteProperties?,
         flag: Boolean
     ) {
+        dungeonRoom ?: return
         Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture)
         val blockpos = target.getVector3i(dungeonRoom)
         val viewingFrom = Minecraft.getMinecraft().renderViewEntity

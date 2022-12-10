@@ -17,6 +17,7 @@ class ActionKill(private val target: OffsetPoint) : AbstractAction() {
     private var killed = false
 
     override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+        dungeonRoom ?: return false
         val spawn = target.getVector3i(dungeonRoom)
         for (el in DungeonsGuide.getDungeonsGuide().dungeonFacade.context.killedBats) {
             DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[el]?.let {
@@ -36,6 +37,7 @@ class ActionKill(private val target: OffsetPoint) : AbstractAction() {
         if (killed) {
             return
         } else {
+            dungeonRoom ?: return
             val spawnLoc =
                 DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[event!!.entity.entityId]
                     ?: return
@@ -53,6 +55,7 @@ class ActionKill(private val target: OffsetPoint) : AbstractAction() {
         actionRouteProperties: ActionRouteProperties?,
         flag: Boolean
     ) {
+        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
         RenderUtils.drawTextAtWorld(

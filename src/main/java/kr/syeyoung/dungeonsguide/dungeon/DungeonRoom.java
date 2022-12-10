@@ -70,6 +70,11 @@ public class DungeonRoom implements DungeonRoomAccessor {
     }
 
     private final Vector3i min;
+
+    public Vector3i getMax() {
+        return max;
+    }
+
     private final Vector3i max;
     private final Vector2i minRoomPt;
 
@@ -122,6 +127,11 @@ public class DungeonRoom implements DungeonRoomAccessor {
     private RoomState currentState = RoomState.DISCOVERED;
     private Map<String, DungeonMechanic> cached = null;
     private RoomProcessor roomProcessor;
+
+    public RoomMatcher getRoomMatcher() {
+        return roomMatcher;
+    }
+
     private RoomMatcher roomMatcher = null;
 
     public DungeonRoom(List<Vector2i> points, short shape, byte color, Vector3i min, Vector3i max, DungeonContext context, Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {

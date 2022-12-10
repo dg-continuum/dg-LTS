@@ -23,12 +23,19 @@ class ActionInteract(private val target: OffsetPoint) : AbstractAction() {
     override fun onLivingInteract(
         dungeonRoom: DungeonRoom?,
         event: PlayerInteractEntityEvent?,
-        actionRouteProperties: ActionRouteProperties?
+        actionRouteProperties: ActionRouteProperties?,
     ) {
-        if (interacted) return
-        val entity = event!!.entity
+        if (interacted) {
+            return
+        }
+
+        dungeonRoom ?: return
+        event ?: return
+
+        val entity = event.entity ?: return
         val spawnLoc =
-            DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[entity!!.entityId] ?: return
+            DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[entity.entityId]
+                ?: return
         if (target.getVector3i(dungeonRoom)
                 .distanceSquared(spawnLoc.x, spawnLoc.y, spawnLoc.z) > radius.toLong() * radius
         ) {
@@ -38,14 +45,16 @@ class ActionInteract(private val target: OffsetPoint) : AbstractAction() {
             return
         }
         interacted = true
+
     }
 
     override fun onRenderWorld(
         dungeonRoom: DungeonRoom?,
         partialTicks: Float,
         actionRouteProperties: ActionRouteProperties?,
-        flag: Boolean
+        flag: Boolean,
     ) {
+        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
         RenderUtils.drawTextAtWorld(

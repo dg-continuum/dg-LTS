@@ -38,7 +38,11 @@ public class RoomMatcher {
     private final SimpleFuse matched = new SimpleFuse();
     @Getter
     private DungeonRoomInfo match;
-    @Getter
+
+    public int getRotation() {
+        return rotation;
+    }
+
     private int rotation; // how much the "found room" has to rotate clockwise to match the given dungeon room info. !
 
     public RoomMatcher(DungeonRoom dungeonRoom) {
