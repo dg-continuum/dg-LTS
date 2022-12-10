@@ -72,7 +72,7 @@ public class FeatureRoomDebugInfo extends GuiFeature {
             }
         } else {
                 fontRenderer.drawString("you're in the room... color/shape/rot " + dungeonRoom.getColor() + " / " + dungeonRoom.getShape() + " / "+dungeonRoom.getRoomMatcher().getRotation(), 0, 0, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
-                fontRenderer.drawString("room uuid: " + dungeonRoom.getDungeonRoomInfo().getUuid() + (dungeonRoom.getDungeonRoomInfo().isRegistered() ? "" : " (not registered)"), 0, 10, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
+                fontRenderer.drawString("room uuid: " + dungeonRoom.getDungeonRoomInfo().getUuid() + (dungeonRoom.getDungeonRoomInfo().registered ? "" : " (not registered)"), 0, 10, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
                 fontRenderer.drawString("room name: " + dungeonRoom.getDungeonRoomInfo().getName(), 0, 20, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
                 fontRenderer.drawString("room state / max secret: " + dungeonRoom.getCurrentState() + " / "+dungeonRoom.getTotalSecrets(), 0, 30, DgOneCongifConfig.dungeonRoominfoColor.getRGB());
 

@@ -20,13 +20,13 @@ package kr.syeyoung.dungeonsguide.dungeon;
 
 import com.google.common.collect.Sets;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
+import kr.syeyoung.dungeonsguide.dungeon.detection.RoomMatcher;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonRoomDoor;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonRoomDoor;
 import kr.syeyoung.dungeonsguide.dungeon.pathfinding.DungeonRoomAccessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
-import kr.syeyoung.dungeonsguide.dungeon.detection.RoomMatcher;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.BlockCache;

@@ -184,7 +184,7 @@ public class GeneralEditPane extends MPanel {
             add(schematic);
         }
         {
-            if (dungeonRoom.getDungeonRoomInfo().isRegistered()) return;
+            if (dungeonRoom.getDungeonRoomInfo().registered) return;
             save = new MButton();
             save.setText("Save RoomData");
             save.setOnActionPerformed(new Runnable() {

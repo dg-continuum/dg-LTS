@@ -19,7 +19,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.mechanicedit;
 
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonJournal;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonJournal;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
@@ -108,13 +108,7 @@ public class ValueEditJournal extends MPanel implements ValueEdit<DungeonJournal
 
         @Override
         public Object cloneObj(Object object) {
-            try {
-                return ((DungeonJournal) object).clone();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
-            assert false;
-            return null;
+            return ((DungeonJournal) object).clone();
         }
     }
 }

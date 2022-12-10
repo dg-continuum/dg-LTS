@@ -20,7 +20,7 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.mechanicedit;
 
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonBreakableWall;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonBreakableWall;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEdit;
@@ -129,13 +129,7 @@ public class ValueEditBreakableWall extends MPanel implements ValueEdit<DungeonB
 
         @Override
         public Object cloneObj(Object object) {
-            try {
-                return ((DungeonBreakableWall) object).clone();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
-            assert false;
-            return null;
+            return ((DungeonBreakableWall) object).clone();
         }
     }
 }

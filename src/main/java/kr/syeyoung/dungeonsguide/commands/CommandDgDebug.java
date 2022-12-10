@@ -6,6 +6,7 @@ import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.guiconfig.NestedCategory;
 import kr.syeyoung.dungeonsguide.cosmetics.data.ActiveCosmetic;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoomInfoRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
@@ -14,11 +15,10 @@ import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.detection.blockbased.BlockDetector;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
@@ -130,14 +130,9 @@ public class CommandDgDebug extends CommandBase {
             DungeonRoomInfoRegistry.saveAll(Main.getConfigDir());
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully saved user generated roomdata"));
         } else if ("loadrooms".equals(arg)) {
-            try {
-                DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
-                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully loaded roomdatas"));
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §cAn error has occurred while loading roomdata"));
+            DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
+            sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fSuccessfully loaded roomdatas"));
+            return;
         } else if ("brand".equals(arg)) {
             String serverBrand = Minecraft.getMinecraft().thePlayer.getClientBrand();
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §e" + serverBrand));

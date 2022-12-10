@@ -18,12 +18,12 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.Parameter;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditCreator;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit.ValueEditRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;
 import kr.syeyoung.dungeonsguide.gui.elements.MParameter;

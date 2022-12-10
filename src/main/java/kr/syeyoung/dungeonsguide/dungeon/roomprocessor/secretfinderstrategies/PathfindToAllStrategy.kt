@@ -1,7 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.secrets.PathfindToALlPage

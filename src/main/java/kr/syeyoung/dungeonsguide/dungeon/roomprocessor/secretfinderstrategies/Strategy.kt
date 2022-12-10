@@ -4,7 +4,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import java.util.*

@@ -20,11 +20,11 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret.mechanicbrowser;
 
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.gui.MPanel;

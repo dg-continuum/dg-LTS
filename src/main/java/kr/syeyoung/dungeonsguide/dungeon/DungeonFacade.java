@@ -10,7 +10,6 @@ import net.minecraftforge.common.MinecraftForge;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -49,12 +48,7 @@ public class DungeonFacade {
     public void init() {
         DungeonListener dgEventListener = new DungeonListener();
         MinecraftForge.EVENT_BUS.register(dgEventListener);
-        try {
-            DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
-            KotlinDungeonRoomInfoRegistry.INSTANCE.loadAll(Main.getConfigDir());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DungeonRoomInfoRegistry.loadAll(Main.getConfigDir());
     }
 
 

@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.valueedit;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet;
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.mechanicedit.*;
 
 import java.awt.*;

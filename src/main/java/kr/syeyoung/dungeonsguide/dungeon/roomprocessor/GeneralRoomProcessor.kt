@@ -7,7 +7,7 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonSecret
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonAddSet
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit
