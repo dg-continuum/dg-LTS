@@ -22,7 +22,7 @@ class DungeonRoomInfoKotlin() : Serializable {
     var name: String = uuid.toString()
     var processorId = "default"
     var properties: Map<String, Any> = HashMap()
-    var mechanics: Map<String, kr.syeyoung.dungeonsguide.dungeon.newmechanics.DungeonMechanic> = HashMap()
+    var mechanics: HashMap<String, kr.syeyoung.dungeonsguide.dungeon.newmechanics.DungeonMechanic> = HashMap()
     var totalSecrets = -1
 
 

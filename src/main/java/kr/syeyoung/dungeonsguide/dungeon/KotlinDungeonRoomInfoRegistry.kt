@@ -50,18 +50,7 @@ object KotlinDungeonRoomInfoRegistry {
 
 
     fun register(dungeonRoomInfo: DungeonRoomInfoKotlin) {
-
-//        System.out.println("Loading room: " + dungeonRoomInfo.getUuid());
-//
-//        File file = new File(Main.getConfigDir() + "/" + "rooms" + "/" + dungeonRoomInfo.getUuid() + ".json");
-//        if(!file.exists()){
-//            try {
-//                FileUtils.writeStringToFile(file, gson.toJson(dungeonRoomInfo));
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-
+        println("loading room ${dungeonRoomInfo.name}")
         if (uuidMap.containsKey(dungeonRoomInfo.uuid)) {
             val dri1 = uuidMap[dungeonRoomInfo.uuid]
             registered.remove(dri1)

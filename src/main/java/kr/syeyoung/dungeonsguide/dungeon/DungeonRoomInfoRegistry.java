@@ -22,12 +22,9 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
-import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfoKotlin;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.*;
 import kr.syeyoung.dungeonsguide.dungeon.newmechanics.DungeonMechanic;
 import lombok.Getter;
-import lombok.val;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,16 +43,16 @@ public class DungeonRoomInfoRegistry {
     static Gson gson = new Gson();
 
 
-    static DungeonMechanic dungeonMechanicTypeAdaptetr(kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic value){
+    static DungeonMechanic dungeonMechanicTypeAdaptetr(kr.syeyoung.dungeonsguide.dungeon.mechanics.dunegonmechanic.DungeonMechanic value) {
 
-        if(value instanceof DungeonBreakableWall){
+        if (value instanceof DungeonBreakableWall) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonBreakableWall aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonBreakableWall();
             aaa.setSecretPoint(((DungeonBreakableWall) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonBreakableWall) value).getPreRequisite());
             return aaa;
         }
 
-        if(value instanceof DungeonDoor){
+        if (value instanceof DungeonDoor) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonDoor aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonDoor();
             aaa.setSecretPoint(((DungeonDoor) value).getSecretPoint());
             aaa.setClosePreRequisite(((DungeonDoor) value).getClosePreRequisite());
@@ -63,14 +60,14 @@ public class DungeonRoomInfoRegistry {
             return aaa;
         }
 
-        if(value instanceof DungeonDummy){
+        if (value instanceof DungeonDummy) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonDummy aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonDummy();
             aaa.setSecretPoint(((DungeonDummy) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonDummy) value).getPreRequisite());
             return aaa;
         }
 
-        if(value instanceof DungeonFairySoul){
+        if (value instanceof DungeonFairySoul) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonFairySoul aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonFairySoul();
             aaa.setSecretPoint(((DungeonFairySoul) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonFairySoul) value).getPreRequisite());
@@ -78,28 +75,28 @@ public class DungeonRoomInfoRegistry {
         }
 
 
-        if(value instanceof DungeonJournal){
+        if (value instanceof DungeonJournal) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonJournal aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonJournal();
             aaa.setSecretPoint(((DungeonJournal) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonJournal) value).getPreRequisite());
             return aaa;
         }
 
-        if(value instanceof DungeonLever){
+        if (value instanceof DungeonLever) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonLever aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonLever();
             aaa.setLeverPoint(((DungeonLever) value).getLeverPoint());
             aaa.setTriggering(((DungeonLever) value).getTriggering());
             return aaa;
         }
 
-        if(value instanceof DungeonNPC){
+        if (value instanceof DungeonNPC) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonNPC aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonNPC();
             aaa.setSecretPoint(((DungeonNPC) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonNPC) value).getPreRequisite());
             return aaa;
         }
 
-        if(value instanceof DungeonOnewayDoor){
+        if (value instanceof DungeonOnewayDoor) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonOnewayDoor aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonOnewayDoor();
             aaa.setSecretPoint(((DungeonOnewayDoor) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonOnewayDoor) value).getPreRequisite());
@@ -107,7 +104,7 @@ public class DungeonRoomInfoRegistry {
         }
 
 
-        if(value instanceof DungeonOnewayLever){
+        if (value instanceof DungeonOnewayLever) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonOnewayLever aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonOnewayLever();
             aaa.setTriggering(((DungeonOnewayLever) value).getTriggering());
             aaa.setLeverPoint(((DungeonOnewayLever) value).getLeverPoint());
@@ -115,7 +112,7 @@ public class DungeonRoomInfoRegistry {
             return aaa;
         }
 
-        if(value instanceof DungeonPressurePlate){
+        if (value instanceof DungeonPressurePlate) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonPressurePlate aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonPressurePlate();
             aaa.setPlatePoint(((DungeonPressurePlate) value).getPlatePoint());
             aaa.setTriggering(((DungeonPressurePlate) value).getTriggering());
@@ -130,7 +127,7 @@ public class DungeonRoomInfoRegistry {
 //            return aaa;
 //        }
 
-        if(value instanceof DungeonSecret){
+        if (value instanceof DungeonSecret) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonSecret aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonSecret();
             aaa.setSecretPoint(((DungeonSecret) value).getSecretPoint());
             aaa.setSecretType(kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonSecret.SecretType.valueOf(((DungeonSecret) value).getSecretType().name()));
@@ -139,7 +136,7 @@ public class DungeonRoomInfoRegistry {
         }
 
 
-        if(value instanceof DungeonTomb){
+        if (value instanceof DungeonTomb) {
             kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonTomb aaa = new kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonTomb();
             aaa.setSecretPoint(((DungeonTomb) value).getSecretPoint());
             aaa.setPreRequisite(((DungeonTomb) value).getPreRequisite());
@@ -151,45 +148,46 @@ public class DungeonRoomInfoRegistry {
 
     public static void register(@NotNull DungeonRoomInfo dungeonRoomInfo) {
 
-        File file = new File(Main.getConfigDir() + "/" + "rooms" + "/" + dungeonRoomInfo.getUuid() + ".json");
-        if(!file.exists()){
-            try {
-                DungeonRoomInfoKotlin a = new DungeonRoomInfoKotlin();
-                a.setUserMade(dungeonRoomInfo.isUserMade());
-                a.setShape(dungeonRoomInfo.getShape());
-                a.setColor(dungeonRoomInfo.getColor());
-                a.setBlocks(dungeonRoomInfo.getBlocks());
-                a.setUuid(dungeonRoomInfo.getUuid());
-                a.setName(dungeonRoomInfo.getName());
-                a.setProcessorId(dungeonRoomInfo.getProcessorId());
-                a.setProperties(dungeonRoomInfo.getProperties());
-                a.setTotalSecrets(dungeonRoomInfo.getTotalSecrets());
-
-
-                for (val mechanic : dungeonRoomInfo.getMechanics().entrySet()) {
-                    val key = mechanic.getKey();
-                    val value = mechanic.getValue();
-
-                    DungeonMechanic value1 = dungeonMechanicTypeAdaptetr(value);
-//                    e22c44d7-4094-4230-89ba-efa438aa3615.json
-                    if(Objects.equals(dungeonRoomInfo.getName(), "catwalk")){
-                        System.out.println( dungeonRoomInfo.getName() + " name: "+ key+" type: "+value1.getMechType());
-                        System.out.println("Serialised Version: " + gson.toJson(value1));
-                        if(value1 instanceof kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonSecret){
-                            System.out.println("Serialised prereqs : " + gson.toJson(((kr.syeyoung.dungeonsguide.dungeon.newmechanics.impl.DungeonSecret)value1).getPreRequisite()));
-                        }
-
-                    }
-
-                    a.getMechanics().put(key, value1);
-
-                }
-
-                FileUtils.writeStringToFile(file, gson.toJson(a));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+//        String configPath = String.valueOf(Main.getConfigDir());
+//
+//        if (configPath == null) {
+//            configPath = System.getProperty("user.dir");
+//        }
+//
+//
+//        File file = new File(configPath + "/" + "rooms" + "/" + dungeonRoomInfo.getUuid() + ".json");
+//        if (!file.exists()) {
+//            try {
+//                DungeonRoomInfoKotlin a = new DungeonRoomInfoKotlin();
+//                a.setUserMade(dungeonRoomInfo.isUserMade());
+//                a.setShape(dungeonRoomInfo.getShape());
+//                a.setColor(dungeonRoomInfo.getColor());
+//                a.setBlocks(dungeonRoomInfo.getBlocks());
+//                a.setUuid(dungeonRoomInfo.getUuid());
+//                a.setName(dungeonRoomInfo.getName());
+//                a.setProcessorId(dungeonRoomInfo.getProcessorId());
+//                a.setProperties(dungeonRoomInfo.getProperties());
+//                a.setTotalSecrets(dungeonRoomInfo.getTotalSecrets());
+//
+//                logger.info("Serialising " + a.getName());
+//                for (val mechanic : dungeonRoomInfo.getMechanics().entrySet()) {
+//                    val key = mechanic.getKey();
+//                    val value = mechanic.getValue();
+//
+//                    DungeonMechanic value1 = dungeonMechanicTypeAdaptetr(value);
+//                    logger.info("mech name: " + key + " type: " + value1.getMechType());
+//                    logger.info("Serialised Version: " + gson.toJson(value1));
+//
+//
+//                    a.getMechanics().put(key, value1);
+//
+//                }
+//                logger.info("all mechanics: " + gson.toJson(a.getMechanics()));
+//                FileUtils.writeStringToFile(file, gson.toJson(a));
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
 
 
         if (uuidMap.containsKey(dungeonRoomInfo.getUuid())) {
@@ -290,21 +288,24 @@ public class DungeonRoomInfoRegistry {
                 }
             }
         }
-        for (File f : Objects.requireNonNull(dir.listFiles())) {
-            if (!f.getName().endsWith(".roomdata")) continue;
-            try {
-                DungeonRoomInfo dri;
-                try (InputStream fis = java.nio.file.Files.newInputStream(f.toPath())) {
-                    try (ObjectInputStream ois = new ObjectInputStream(fis)) {
-                        dri = (DungeonRoomInfo) ois.readObject();
+        if (dir != null) {
+            for (File f : Objects.requireNonNull(dir.listFiles())) {
+                if (!f.getName().endsWith(".roomdata")) continue;
+                try {
+                    DungeonRoomInfo dri;
+                    try (InputStream fis = java.nio.file.Files.newInputStream(f.toPath())) {
+                        try (ObjectInputStream ois = new ObjectInputStream(fis)) {
+                            dri = (DungeonRoomInfo) ois.readObject();
+                        }
                     }
+                    register(dri);
+                } catch (Exception e) {
+                    logger.error(f.getName());
+                    e.printStackTrace();
                 }
-                register(dri);
-            } catch (Exception e) {
-                logger.error(f.getName());
-                e.printStackTrace();
             }
         }
+
     }
 
 }

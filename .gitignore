@@ -40,3 +40,4 @@ servers.dat
 /saves/*
 /usernamecache.json
 /usercache.json
+/$buildDir/

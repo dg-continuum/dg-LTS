@@ -70,7 +70,7 @@ public class DungeonsGuide {
     private DungeonFacade dungeonFacade;
 
     @Getter
-    private final BlockCache blockCache = new BlockCache();
+    private BlockCache blockCache;
     @Getter @Setter
     private WhosOnlineManager whosOnlineManager;
 
@@ -95,6 +95,7 @@ public class DungeonsGuide {
 
     public void init() {
         ProgressManager.ProgressBar progressbar = ProgressManager.push("DungeonsGuide", 4);
+        blockCache = new BlockCache();
         config = new DgOneCongifConfig();
         this.dungeonFacade = new DungeonFacade();
         dungeonFacade.init();

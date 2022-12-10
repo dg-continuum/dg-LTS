@@ -39,6 +39,8 @@ import java.util.*;
 
 @Data
 public class DungeonOnewayDoor implements DungeonMechanic, RouteBlocker {
+    private static final long serialVersionUID = -1810891721127873330L;
+
     private OffsetPointSet secretPoint = new OffsetPointSet();
     private List<String> preRequisite = new ArrayList<>();
 

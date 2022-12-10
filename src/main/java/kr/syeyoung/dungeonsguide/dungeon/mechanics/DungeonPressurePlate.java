@@ -37,6 +37,8 @@ import java.util.*;
 
 @Data
 public class DungeonPressurePlate implements DungeonMechanic {
+
+    private static final long serialVersionUID = 7450034718355390645L;
     private OffsetPoint platePoint = new OffsetPoint(0, 0, 0);
     private List<String> preRequisite = new ArrayList<>();
     private String triggering = "";

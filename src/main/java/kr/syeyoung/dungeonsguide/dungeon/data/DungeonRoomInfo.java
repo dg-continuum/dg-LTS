@@ -40,7 +40,7 @@ public class DungeonRoomInfo implements Serializable {
     private String name;
     private String processorId = "default";
     private Map<String, Object> properties = new HashMap<>();
-    private Map<String, DungeonMechanic> mechanics = new HashMap<>();
+    HashMap<String, DungeonMechanic> mechanics = new HashMap<>();
     private int totalSecrets = -1;
 
 

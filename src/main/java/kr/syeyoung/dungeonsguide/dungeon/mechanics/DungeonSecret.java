@@ -49,6 +49,8 @@ import java.util.Set;
 @Data
 public class DungeonSecret implements DungeonMechanic {
 
+    private static final long serialVersionUID = 8784808599222706537L;
+
 
     public OffsetPoint getSecretPoint() {
         return secretPoint;
