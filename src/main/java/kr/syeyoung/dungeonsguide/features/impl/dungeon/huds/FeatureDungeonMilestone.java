@@ -48,11 +48,11 @@ public class FeatureDungeonMilestone extends SingleTextHud {
     public void onChat(ClientChatReceivedEvent event) {
         if (event.type == 2) return;
         if (!SkyblockStatus.isOnDungeon()) return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) return;
         String txt = event.message.getFormattedText();
         if (milestone_pattern.matcher(txt).matches()) {
-            context.getMilestoneReached().add(new String[]{
+            context.milestoneReached.add(new String[]{
                     TextUtils.formatTime(DungeonContext.getTimeElapsed()),
                     TextUtils.formatTime(DungeonUtil.getTimeElapsed())
             });

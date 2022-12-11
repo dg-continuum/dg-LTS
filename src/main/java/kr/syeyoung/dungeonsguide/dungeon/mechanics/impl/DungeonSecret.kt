@@ -1,7 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
 import com.google.common.collect.Sets
-import kr.syeyoung.dungeonsguide.DungeonsGuide
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
@@ -13,6 +13,7 @@ import kr.syeyoung.dungeonsguide.utils.BlockCache
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
 import net.minecraft.block.Block
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.init.Blocks
@@ -38,7 +39,7 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
             val pos = secretPoint.getBlockPos(dungeonRoom)
             val blockState = BlockCache.getBlockState(pos)
             if (blockState.block === Blocks.chest || blockState.block === Blocks.trapped_chest) {
-                val chest = dungeonRoom.context.world.getTileEntity(pos) as TileEntityChest
+                val chest = Minecraft.getMinecraft().theWorld.getTileEntity(pos) as TileEntityChest
                 if (chest.numPlayersUsing > 0) {
                     dungeonRoom.roomContext["c-$pos"] = 2
                 } else {
@@ -81,11 +82,12 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
                 }
             }
             SecretType.BAT -> {
-                val context = DungeonsGuide.getDungeonsGuide().dungeonFacade.context
+                val context = DungeonFacade.context ?: return SecretStatus.NOT_SURE
                 for (killed in context.killedBats) {
-                    if (context.batSpawnedLocations[killed] == null) continue
-                    if (context.batSpawnedLocations[killed]!!.distanceSquared(pos) < 100) {
-                        return SecretStatus.FOUND
+                    context.batSpawnedLocations[killed]?.let {
+                        if (it.distanceSquared(pos) < 100) {
+                            return SecretStatus.FOUND
+                        }
                     }
                 }
                 SecretStatus.NOT_SURE
@@ -97,7 +99,7 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
                 } else if (block !== Blocks.chest && block !== Blocks.trapped_chest) {
                     SecretStatus.ERROR
                 } else {
-                    val chest = dungeonRoom.context.world.getTileEntity(VectorUtils.Vec3iToBlockPos(pos)) as TileEntityChest
+                    val chest = Minecraft.getMinecraft().theWorld.getTileEntity(VectorUtils.Vec3iToBlockPos(pos)) as TileEntityChest
                     if (chest.numPlayersUsing > 0) {
                         SecretStatus.FOUND
                     } else {
@@ -132,7 +134,7 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
             var preRequisites = base
             val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
             preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(null)
+            preRequisites = actionMove.getPreRequisites(dungeonRoom)
             for (str in preRequisite) {
                 if (str.isNotEmpty()) {
                     val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -157,11 +159,11 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
             preRequisites.add(actionKill)
             actionKill.predicate = Predicate { obj: Entity? -> obj is EntityBat }
             actionKill.radius = 10
-            preRequisites = actionKill.getPreRequisites(null)
+            preRequisites = actionKill.getPreRequisites(dungeonRoom)
         }
         val actionMove = ActionMove(secretPoint)
         preRequisites.add(actionMove)
-        preRequisites = actionMove.getPreRequisites(null)
+        preRequisites = actionMove.getPreRequisites(dungeonRoom)
         for (str in preRequisite) {
             if (str.isNotEmpty()) {
                 val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()

@@ -3,7 +3,6 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionBreakWithSuperBoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir
@@ -26,55 +25,45 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
     public override fun clone(): Any {
         return super.clone()
     }
+
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        if (state.equals("navigate", ignoreCase = true)) {
-            getRepresentingPoint(dungeonRoom)?.let {
-                var base: MutableSet<AbstractAction> = HashSet()
-
-                val actionMove = ActionMoveNearestAir(it)
-                base.add(actionMove)
-                base = actionMove.getPreRequisites(dungeonRoom)
-
-                preRequisite.forEach { str ->
-                    if(str.isNotEmpty()){
-                        val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                            .toTypedArray()
-
-                        base.add(ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1])))
-                    }
+        return HashSet<AbstractAction>().also {
+            when(state.lowercase()){
+                "navigate" -> {
+                    val thaPoint = getRepresentingPoint(dungeonRoom) ?: return emptySet()
+                    it.add(ActionMoveNearestAir(thaPoint))
                 }
-                return base
+                "open" -> {
+                    if (!isBlocking(dungeonRoom)) {
+                        return emptySet()
+                    }
+                    it.add(ActionMoveNearestAir(this.secretPoint.offsetPointList[0]))
+                    it.add(ActionBreakWithSuperBoom(this.secretPoint.offsetPointList[0]))
+                }
+                else -> throw IllegalArgumentException("$state is not a valid state for DungeonTomb")
+            }
+
+            preRequisite.forEach { str ->
+                disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
+                }
             }
         }
-        require("open".equals(state, ignoreCase = true)) { "$state is not valid state for tomb" }
-        if (!isBlocking(dungeonRoom)) {
-            return emptySet()
-        }
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
-        var preRequisites = base
-        val actionClick = ActionBreakWithSuperBoom(secretPoint.offsetPointList[0])
-        preRequisites.add(actionClick)
-        preRequisites = actionClick.getPreRequisites(dungeonRoom)
-        val actionMove = ActionMoveNearestAir(secretPoint.offsetPointList[0])
-        preRequisites.add(actionMove)
-        preRequisites = actionMove.getPreRequisites(dungeonRoom)
-        for (str in preRequisite) {
-            if (str.isEmpty()) continue
-            val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-            preRequisites.add(actionChangeState)
-        }
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
         if (secretPoint.offsetPointList.isNotEmpty()) {
-            val firstpt = secretPoint.offsetPointList[0]
-            val pos = firstpt.getVector3i(dungeonRoom)
+            val pos = secretPoint.offsetPointList[0].getVector3i(dungeonRoom)
             RenderUtils.drawTextAtWorld(
-                name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, -0x1, 0.03f, false, true, partialTicks
+                name,
+                pos.x + 0.5f,
+                pos.y + 0.75f,
+                pos.z + 0.5f,
+                -0x1,
+                0.03f,
+                false,
+                true,
+                partialTicks
             )
             RenderUtils.drawTextAtWorld(
                 getCurrentState(dungeonRoom),
@@ -102,7 +91,7 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
 
     override fun getCurrentState(dungeonRoom: DungeonRoom): String {
         var b = Blocks.air
-        if (!secretPoint.offsetPointList.isEmpty()) b = secretPoint.offsetPointList[0].getBlock(dungeonRoom)
+        if (secretPoint.offsetPointList.isNotEmpty()) b = secretPoint.offsetPointList[0].getBlock(dungeonRoom)
         return if (b === Blocks.air) "open" else "closed"
     }
 

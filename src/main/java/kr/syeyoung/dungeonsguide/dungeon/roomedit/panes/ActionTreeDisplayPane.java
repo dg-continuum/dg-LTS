@@ -19,9 +19,9 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionTree;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionTreeUtil;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionTree;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionTreeKt;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -50,7 +50,7 @@ public class ActionTreeDisplayPane extends MPanel {
         this.dungeonRoom = dungeonRoom;
         this.tree = tree;
         try {
-            this.linearified = ActionTreeUtil.linearityActionTree(tree);
+            this.linearified = ActionTreeKt.linearityActionTree(tree);
         } catch (Exception e) {
             linearified = new ArrayList<AbstractAction>();
             e.printStackTrace();

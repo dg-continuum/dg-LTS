@@ -3,7 +3,7 @@ package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlanProperties
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
@@ -18,35 +18,33 @@ open class ActionMove(val target: OffsetPoint) : AbstractAction() {
     private var poses: List<Vector3d?>? = null
     private var latestFuture: Future<List<Vector3d>>? = null
 
-    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
-        dungeonRoom ?: return false
-        return target.getVector3i(dungeonRoom).distanceSquared(VectorUtils.getPlayerVector3i()) < 2
+    override fun isComplete(dungeonRoom: DungeonRoom): Boolean {
+        return target.getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()) < 2
     }
 
     override fun onRenderWorld(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         partialTicks: Float,
-        actionRouteProperties: ActionRouteProperties?,
-        flag: Boolean
+        actionPlanProperties: ActionPlanProperties?,
+        flag: Boolean,
     ) {
-        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         val distance = pos.distance(VectorUtils.getPlayerVector3i()).toFloat()
         var multiplier = distance / 120f //mobs only render ~120 blocks away
         if (flag) multiplier *= 2.0f
         var scale = 0.45f * multiplier
         scale *= (25.0 / 6.0).toFloat()
-        if (actionRouteProperties!!.beacon) {
+        if (actionPlanProperties!!.beacon) {
             if (DgOneCongifConfig.renderSecretBeacons) {
                 RenderUtils.renderBeaconBeam(
                     pos.x.toDouble(),
                     pos.y.toDouble(),
                     pos.z.toDouble(),
-                    actionRouteProperties.beaconBeamColor,
+                    actionPlanProperties.beaconBeamColor,
                     partialTicks
                 )
             }
-            RenderUtils.highlightBlock(pos, actionRouteProperties.beaconColor, partialTicks)
+            RenderUtils.highlightBlock(pos, actionPlanProperties.beaconColor, partialTicks)
         }
         if (DgOneCongifConfig.renderSecretDestText) {
             RenderUtils.drawTextAtWorld(
@@ -78,39 +76,42 @@ open class ActionMove(val target: OffsetPoint) : AbstractAction() {
         if (!DgOneCongifConfig.togglePathfindStatus) {
             RenderUtils.drawLinesVec3(
                 poses,
-                actionRouteProperties.lineColor,
-                actionRouteProperties.lineWidth,
+                actionPlanProperties.lineColor,
+                actionPlanProperties.lineWidth,
                 partialTicks,
                 true
             )
         }
     }
 
-    override fun onTick(dungeonRoom: DungeonRoom?, actionRouteProperties: ActionRouteProperties?) {
-        dungeonRoom ?: return
-        tick = (tick + 1) % 1.coerceAtLeast(actionRouteProperties!!.lineRefreshRate)
+    override fun onTick(dungeonRoom: DungeonRoom, actionPlanProperties: ActionPlanProperties?) {
+        tick = (tick + 1) % 1.coerceAtLeast(actionPlanProperties!!.lineRefreshRate)
 
-        if (latestFuture == null){
-            if (tick == 0 && actionRouteProperties.isPathfind) {
+
+        if (latestFuture != null) {
+            if (latestFuture!!.isDone) {
+                poses = latestFuture!!.get()
+                latestFuture = null
+            }
+        } else {
+            if (tick == 0 && actionPlanProperties.isPathfind) {
                 if (!DgOneCongifConfig.freezePathfindingStatus || poses == null) {
 
-                    latestFuture = DungeonFacade.INSTANCE.cachedPathFinder.CreatePath(Minecraft.getMinecraft().thePlayer,
+                    latestFuture = DungeonFacade.INSTANCE.cachedPathFinder.CreatePath(
+                        Minecraft.getMinecraft().thePlayer,
                         target.getVector3i(dungeonRoom), dungeonRoom
                     )
                 }
-            }
-        } else {
-            if(latestFuture!!.isDone){
-                poses = latestFuture!!.get()
-                latestFuture = null
             }
         }
 
     }
 
     fun forceRefresh(dungeonRoom: DungeonRoom) {
-        latestFuture = DungeonFacade.INSTANCE.cachedPathFinder.CreatePath(Minecraft.getMinecraft().thePlayer,
-            target.getVector3i(dungeonRoom), dungeonRoom)
+        latestFuture = DungeonFacade.INSTANCE.cachedPathFinder.CreatePath(
+            Minecraft.getMinecraft().thePlayer,
+            target.getVector3i(dungeonRoom), dungeonRoom
+        )
     }
 
     override fun toString(): String {

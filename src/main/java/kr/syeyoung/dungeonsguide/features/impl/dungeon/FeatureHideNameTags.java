@@ -32,7 +32,7 @@ public class FeatureHideNameTags extends SimpleFeatureV2 {
     }
 
     @SubscribeEvent
-    public void onRender(RenderLivingEvent.Pre preRender) {
+    public void onRender(RenderLivingEvent.Pre<?> preRender) {
         if (!DgOneCongifConfig.hideMobNametags) return;
         if (!SkyblockStatus.isOnDungeon()) return;
 

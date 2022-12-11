@@ -19,12 +19,13 @@
 package kr.syeyoung.dungeonsguide.features.impl.party;
 
 import cc.polyfrost.oneconfig.hud.TextHud;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonStartedEvent;
 import kr.syeyoung.dungeonsguide.party.PartyContext;
 import kr.syeyoung.dungeonsguide.party.PartyManager;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
+import lombok.val;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -94,7 +95,11 @@ public class FeaturePartyReady extends TextHud {
 
     @Override
     protected boolean shouldShow() {
-        return PartyManager.INSTANCE.getPartyContext() != null && PartyManager.INSTANCE.getPartyContext().isPartyExistHypixel() && "Dungeon Hub".equals(DungeonContext.getDungeonName());
+        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        if (context != null){
+            return PartyManager.INSTANCE.getPartyContext() != null && PartyManager.INSTANCE.getPartyContext().isPartyExistHypixel() && "Dungeon Hub".equals(SkyblockStatus.dungeonNameStrriped);
+        }
+        return false;
     }
 
     @Override

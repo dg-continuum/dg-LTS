@@ -8,6 +8,7 @@ import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonContextInitializationEvent;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -83,12 +84,12 @@ public class DungeonMapData {
             topLeftY -= unitRoomDimension.height + doorDimensions.height;
         topLeftMapPoint = new Point(topLeftX, topLeftY);
         // determine door location based on npc, and determine map min from there
-        DungeonSpecificDataProvider doorFinder = DungeonSpecificDataProviderRegistry.getDoorFinder(DungeonContext.getDungeonName());
+        DungeonSpecificDataProvider doorFinder = DungeonSpecificDataProviderRegistry.getDoorFinder(SkyblockStatus.dungeonNameStrriped);
         if (doorFinder == null) {
             bugged = true;
             return;
         }
-        BlockPos door = doorFinder.findDoor(mc.theWorld, DungeonContext.getDungeonName());
+        BlockPos door = doorFinder.findDoor(mc.theWorld, SkyblockStatus.dungeonNameStrriped);
         if (door == null) {
             bugged = true;
             return;
@@ -100,17 +101,17 @@ public class DungeonMapData {
         unitPoint.translate(unitPoint.x + 1, unitPoint.y + 1);
         unitPoint.translate((int) doorDir.x, (int) doorDir.y);
 
-        Vector2d offset = doorFinder.findDoorOffset(mc.theWorld, DungeonContext.getDungeonName());
+        Vector2d offset = doorFinder.findDoorOffset(mc.theWorld, SkyblockStatus.dungeonNameStrriped);
         boolean axisMatch = doorDir.equals(offset);
 
         int worldX = unitPoint.x * 16;
         int worldY = unitPoint.y * 16;
         BlockPos worldMin = door.add(-worldX, 0, -worldY);
-        context.setDungeonMin(worldMin);
+        context.dungeonMin = worldMin;
 
         ChatTransmitter.sendDebugChat(new ChatComponentText("Found Green room:" + firstRoom));
         ChatTransmitter.sendDebugChat(new ChatComponentText("Axis match:" + axisMatch));
-        ChatTransmitter.sendDebugChat(new ChatComponentText("World Min:" + context.getDungeonMin()));
+        ChatTransmitter.sendDebugChat(new ChatComponentText("World Min:" + context.dungeonMin));
         ChatTransmitter.sendDebugChat(new ChatComponentText("Dimension:" + unitRoomDimension));
         ChatTransmitter.sendDebugChat(new ChatComponentText("top Left:" + topLeftMapPoint));
         ChatTransmitter.sendDebugChat(new ChatComponentText("door dimension:" + doorDimensions));

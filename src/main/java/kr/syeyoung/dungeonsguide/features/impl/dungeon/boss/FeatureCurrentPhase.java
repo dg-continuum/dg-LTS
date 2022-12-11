@@ -31,7 +31,7 @@ public class FeatureCurrentPhase extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() != null;
+        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor != null;
     }
 
     @Override
@@ -40,9 +40,9 @@ public class FeatureCurrentPhase extends SingleTextHud {
             return "fight-2";
         }
 
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if(context == null) return "";
-        if(context.getBossfightProcessor() == null) return "";
-        return context.getBossfightProcessor().getCurrentPhase();
+        if(context.bossfightProcessor == null) return "";
+        return context.bossfightProcessor.getCurrentPhase();
     }
 }

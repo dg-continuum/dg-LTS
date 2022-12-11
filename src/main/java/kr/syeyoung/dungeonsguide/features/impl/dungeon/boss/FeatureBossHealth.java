@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss;
 import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.HealthData;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.HealthData;
 import kr.syeyoung.dungeonsguide.oneconfig.dungeon.huds.BossHealthPage;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 
@@ -74,10 +74,10 @@ public class FeatureBossHealth extends TextHud {
             lines.addAll(getDummyText());
         } else {
             if (!SkyblockStatus.isOnDungeon()) return;
-            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null) return;
-            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() == null) return;
+            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null) return;
+            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor == null) return;
 
-            List<HealthData> healths = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor().getHealths();
+            List<HealthData> healths = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor.getHealths();
             for (HealthData heal : healths) {
                 addLine(heal, lines);
             }

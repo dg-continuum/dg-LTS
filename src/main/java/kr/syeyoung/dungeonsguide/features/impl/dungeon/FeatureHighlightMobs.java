@@ -22,24 +22,24 @@ public class FeatureHighlightMobs extends SimpleFeatureV2 {
 
 
     @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent postRender) {
+    public void onRenderWorld(RenderWorldLastEvent renderWorldLastEvent) {
         if (!SkyblockStatus.isOnDungeon()) return;
 
 
-        val player = Minecraft.getMinecraft().thePlayer.getPosition();
+        val playerPosition = Minecraft.getMinecraft().thePlayer.getPosition();
 
         if(DgOneCongifConfig.highlightStaredMobs){
             val radius = (int) HighlightMobsPage.starRadius;
             val sq = radius * radius;
             List<EntityArmorStand> skeletonList = Minecraft.getMinecraft().theWorld.getEntities(EntityArmorStand.class, input -> {
-                if (player.distanceSq(input.getPosition()) > sq) return false;
+                if (playerPosition.distanceSq(input.getPosition()) > sq) return false;
                 if (!input.getAlwaysRenderNameTag()) return false;
                 return input.getName().contains("✯");
             });
 
             AColor c = DgOneCongifConfig.oneconftodgcolor(HighlightMobsPage.starColor);
             for (val entity : skeletonList) {
-                RenderUtils.highlightBox(entity, c, postRender.partialTicks, true);
+                RenderUtils.highlightBox(entity, c, renderWorldLastEvent.partialTicks, true);
             }
         }
 
@@ -48,12 +48,12 @@ public class FeatureHighlightMobs extends SimpleFeatureV2 {
             val sq = radius * radius;
             List<EntityBat> batList = Minecraft.getMinecraft().theWorld.getEntities(EntityBat.class, input -> {
                 if (input != null && input.isInvisible()) return false;
-                return input != null && input.getDistanceSq(player) < sq;
+                return input != null && input.getDistanceSq(playerPosition) < sq;
             });
 
             AColor c = DgOneCongifConfig.oneconftodgcolor(HighlightMobsPage.batColor);
             for (val entitySkeleton : batList) {
-                RenderUtils.highlightBox(entitySkeleton, c, postRender.partialTicks, true);
+                RenderUtils.highlightBox(entitySkeleton, c, renderWorldLastEvent.partialTicks, true);
             }
         }
 
@@ -61,14 +61,14 @@ public class FeatureHighlightMobs extends SimpleFeatureV2 {
             val radius = (int) HighlightMobsPage.masterRadius;
             val sq = radius * radius;
             List<EntityArmorStand> skeletonMasterList = Minecraft.getMinecraft().theWorld.getEntities(EntityArmorStand.class, input -> {
-                if (player.distanceSq(input.getPosition()) > sq) return false;
+                if (playerPosition.distanceSq(input.getPosition()) > sq) return false;
                 if (!input.getAlwaysRenderNameTag()) return false;
                 return input.getName().contains("Skeleton Master");
             });
 
             AColor c = DgOneCongifConfig.oneconftodgcolor(HighlightMobsPage.masterColor);
             for (val entitySkeleton : skeletonMasterList) {
-                RenderUtils.highlightBox(entitySkeleton, c, postRender.partialTicks, true);
+                RenderUtils.highlightBox(entitySkeleton, c, renderWorldLastEvent.partialTicks, true);
             }
         }
 

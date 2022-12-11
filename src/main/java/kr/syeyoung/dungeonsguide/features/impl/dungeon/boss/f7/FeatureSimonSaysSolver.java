@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f7;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessorNecron;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorNecron;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
@@ -54,9 +54,9 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
         if (!SkyblockStatus.isOnSkyblock()) return;
         if (!DgOneCongifConfig.simonySaysSolver) return;
 
-        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (dc == null) return;
-        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
+        if (!(dc.bossfightProcessor instanceof BossfightProcessorNecron)) return;
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
 
         BlockPos pos = event.pos.add(1, 0, 0);
@@ -75,12 +75,12 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
             return;
         }
         if (!SkyblockStatus.isOnSkyblock()) return;
-        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (dc == null) {
             wasButton = false;
             return;
         }
-        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
+        if (!(dc.bossfightProcessor instanceof BossfightProcessorNecron)) return;
 
         if (wasButton && DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.air) {
             orderclick.clear();
@@ -105,11 +105,11 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
     public void onRenderWorld(RenderWorldLastEvent e) {
         if (!SkyblockStatus.isOnSkyblock()) return;
         if (!DgOneCongifConfig.simonySaysSolver) return;
-        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (dc == null) {
             return;
         }
-        if (!(dc.getBossfightProcessor() instanceof BossfightProcessorNecron)) return;
+        if (!(dc.bossfightProcessor instanceof BossfightProcessorNecron)) return;
         if (Minecraft.getMinecraft().thePlayer.getPosition().distanceSq(309, 123, 291) > 400) return;
 
 

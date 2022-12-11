@@ -123,7 +123,7 @@ public class MapProcessor {
                 }
 
                 latestMapData = mapData;
-                if (mapIconToPlayerMap.size() < context.getPlayers().size() && initialized) {
+                if (mapIconToPlayerMap.size() < context.players.size() && initialized) {
                     getPlayersFromMap(latestMapData);
                 }
             }
@@ -173,8 +173,8 @@ public class MapProcessor {
     }
 
     public BlockPos mapPointToWorldPoint(Point mapPoint) {
-        int x = (int) ((mapPoint.x - topLeftMapPoint.x) / ((double) unitRoomDimension.width + doorDimensions.height) * 32 + context.getDungeonMin().getX());
-        int y = (int) ((mapPoint.y - topLeftMapPoint.y) / ((double) unitRoomDimension.height + doorDimensions.height) * 32 + context.getDungeonMin().getZ());
+        int x = (int) ((mapPoint.x - topLeftMapPoint.x) / ((double) unitRoomDimension.width + doorDimensions.height) * 32 + context.dungeonMin.getX());
+        int y = (int) ((mapPoint.y - topLeftMapPoint.y) / ((double) unitRoomDimension.height + doorDimensions.height) * 32 + context.dungeonMin.getZ());
         return new BlockPos(x, 70, y);
     }
 
@@ -183,25 +183,25 @@ public class MapProcessor {
     }
 
     public Vector3i roomPointToWorldPoint(Vector2i roomPoint) {
-        return new Vector3i(context.getDungeonMin().getX() + (roomPoint.x * 32), context.getDungeonMin().getY(), context.getDungeonMin().getZ() + (roomPoint.y * 32));
+        return new Vector3i(context.dungeonMin.getX() + (roomPoint.x * 32), context.dungeonMin.getY(), context.dungeonMin.getZ() + (roomPoint.y * 32));
     }
     @Nullable
     public Vector2i worldPointToRoomPoint(Vector3i worldPoint) {
-        if (context.getDungeonMin() == null) return null;
-        return new Vector2i((worldPoint.x - context.getDungeonMin().getX()) / 32, (worldPoint.z - context.getDungeonMin().getZ()) / 32);
+        if (context.dungeonMin == null) return null;
+        return new Vector2i((worldPoint.x - context.dungeonMin.getX()) / 32, (worldPoint.z - context.dungeonMin.getZ()) / 32);
     }
 
     @Nullable
     public Vector2i worldPointToMapPoint(Vec3 worldPoint) {
-        if (context.getDungeonMin() == null) return null;
-        return new Vector2i(topLeftMapPoint.x + (int) ((worldPoint.xCoord - context.getDungeonMin().getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height)), topLeftMapPoint.y + (int) ((worldPoint.zCoord - context.getDungeonMin().getZ()) / 32.0f * (unitRoomDimension.height + doorDimensions.height)));
+        if (context.dungeonMin == null) return null;
+        return new Vector2i(topLeftMapPoint.x + (int) ((worldPoint.xCoord - context.dungeonMin.getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height)), topLeftMapPoint.y + (int) ((worldPoint.zCoord - context.dungeonMin.getZ()) / 32.0f * (unitRoomDimension.height + doorDimensions.height)));
     }
 
     @Nullable
     public Vector2d worldPointToMapPointFLOAT(Vec3 worldPoint) {
-        if (context.getDungeonMin() == null) return null;
-        double x = topLeftMapPoint.x + ((worldPoint.xCoord - context.getDungeonMin().getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height));
-        double y = topLeftMapPoint.y + ((worldPoint.zCoord - context.getDungeonMin().getZ()) / 32.0f * (unitRoomDimension.height + doorDimensions.height));
+        if (context.dungeonMin == null) return null;
+        double x = topLeftMapPoint.x + ((worldPoint.xCoord - context.dungeonMin.getX()) / 32.0f * (unitRoomDimension.width + doorDimensions.height));
+        double y = topLeftMapPoint.y + ((worldPoint.zCoord - context.dungeonMin.getZ()) / 32.0f * (unitRoomDimension.height + doorDimensions.height));
         return new Vector2d(x, y);
     }
 
@@ -217,7 +217,7 @@ public class MapProcessor {
                 byte color = MapUtils.getMapColorAt(mapData, mapPoint.x, mapPoint.y);
                 MapUtils.record(mapData, mapPoint.x, mapPoint.y, new Color(255, 255, 0, 80));
                 if (roomsFound.contains(o)) {
-                    DungeonRoom dungeonRoom = context.getRoomMapper().get(o);
+                    DungeonRoom dungeonRoom = context.roomMapper.get(o);
                     if (color == 18 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.FINISHED) {
                         dungeonRoom.setCurrentState(DungeonRoom.RoomState.COMPLETE_WITHOUT_SECRETS);
                         dungeonRoom.setTotalSecrets(0);
@@ -261,13 +261,13 @@ public class MapProcessor {
                     // END
 
 
-                    context.getDungeonRoomList().add(room);
+                    context.dungeonRoomList.add(room);
                     for (Vector2i p : room.getUnitPoints()) {
                         roomsFound.add(p);
-                        context.getRoomMapper().put(p, room);
+                        context.roomMapper.put(p, room);
                     }
                     if (room.getRoomProcessor() != null && room.getRoomProcessor().readGlobalChat()) {
-                        context.getGlobalRoomProcessors().add(room.getRoomProcessor());
+                        context.globalRoomProcessors.add(room.getRoomProcessor());
                     }
                 } else if (color == 85) {
                     undiscoveredRoom++;
@@ -455,7 +455,7 @@ public class MapProcessor {
                 BlockPos mapPos = mapPointToWorldPoint(new Point(x, y));
                 String potentialPlayer = null;
 
-                for (String player : context.getPlayers()) {
+                for (String player : context.players) {
                     if (DungeonsGuide.getDungeonsGuide().verbose)
                         logger.info("Player: {} isNear: {} ", player, isPlayerNear(player, mapPos));
 //                        if (!mapIconToPlayerMap.containsKey(player) && isPlayerNear(player, mapPos)) {

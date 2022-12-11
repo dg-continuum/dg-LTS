@@ -25,7 +25,7 @@ public class DungeonScoreUtil {
     public static int getTotalRooms() {
         int compRooms = getCompleteRooms();
         if (compRooms == 0) return 100;
-        return (int) (100 * (compRooms / (double) DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage()));
+        return (int) (100 * (compRooms / (double) DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.percentage));
     }
 
     public static int getUndiscoveredPuzzles() {
@@ -41,9 +41,9 @@ public class DungeonScoreUtil {
 
     public static ScoreCalculation calculateScore() {
         if (!SkyblockStatus.isOnDungeon()) return null;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) return null;
-        if (!context.getMapProcessor().isInitialized()) return null;
+        if (!context.mapProcessor.isInitialized()) return null;
 
         int skill = 100;
         int deaths = 0;
@@ -57,7 +57,7 @@ public class DungeonScoreUtil {
             boolean traproomIncomplete = context.isHasTrapRoom();
             int incompletePuzzles = getUndiscoveredPuzzles();
 
-            for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+            for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
 //                if (dungeonRoom.getColor() == 74 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
 //                    bossroomIncomplete = false;
                 if (dungeonRoom.getColor() == 62 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
@@ -69,7 +69,7 @@ public class DungeonScoreUtil {
                 roomCnt += dungeonRoom.getUnitPoints().size();
             }
             roomSkillPenalty += incompletePuzzles * 10;
-            if (context.getMapProcessor().getUndiscoveredRoom() != 0)
+            if (context.mapProcessor.getUndiscoveredRoom() != 0)
                 roomCnt = getTotalRooms();
             roomSkillPenalty += (roomCnt - totalCompRooms) * 4;
 //            if (bossroomIncomplete) roomSkillPenalty -=1;
@@ -90,7 +90,7 @@ public class DungeonScoreUtil {
             int completed = 0;
             double total = 0;
 
-            for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+            for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
                 if (dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.FAILED)
                     completed += dungeonRoom.getUnitPoints().size();
                 total += dungeonRoom.getUnitPoints().size();
@@ -99,13 +99,13 @@ public class DungeonScoreUtil {
             totalSecrets = DungeonUtil.getTotalSecretsInt();
             totalSecretsKnown = DungeonUtil.sureOfTotalSecrets();
 
-            fullyCleared = completed >= getTotalRooms() && context.getMapProcessor().getUndiscoveredRoom() == 0;
-            explorer += MathHelper.clamp_int((int) Math.floor(6.0 / 10.0 * (context.getMapProcessor().getUndiscoveredRoom() != 0 ? DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() : completed / total * 100)), 0, 60);
-            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = DungeonUtil.getSecretsFound()) / Math.ceil(totalSecrets * context.getSecretPercentage())), 0, 40);
+            fullyCleared = completed >= getTotalRooms() && context.mapProcessor.getUndiscoveredRoom() == 0;
+            explorer += MathHelper.clamp_int((int) Math.floor(6.0 / 10.0 * (context.mapProcessor.getUndiscoveredRoom() != 0 ? DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.percentage : completed / total * 100)), 0, 60);
+            explorer += MathHelper.clamp_int((int) Math.floor(40 * (secrets = DungeonUtil.getSecretsFound()) / Math.ceil(totalSecrets * context.secretPercentage)), 0, 40);
         }
         int time = 0;
         {
-            int maxTime = context.getMaxSpeed();
+            int maxTime = context.maxSpeed;
 //            int timeSec = FeatureRegistry.DUNGEON_SBTIME.getTimeElapsed() / 1000 - maxTime + 480;
 //
 //            if (timeSec <= 480) time = 100;
@@ -123,7 +123,7 @@ public class DungeonScoreUtil {
         }
 
         // amazing thing
-        return new ScoreCalculation(skill, explorer, time, bonus, tombs, fullyCleared, secrets, totalSecrets, (int) Math.ceil(totalSecrets * context.getSecretPercentage()), totalSecretsKnown, deaths);
+        return new ScoreCalculation(skill, explorer, time, bonus, tombs, fullyCleared, secrets, totalSecrets, (int) Math.ceil(totalSecrets * context.secretPercentage), totalSecretsKnown, deaths);
     }
 
     public static String getLetter(int score) {

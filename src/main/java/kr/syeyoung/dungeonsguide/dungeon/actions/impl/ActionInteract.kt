@@ -1,9 +1,9 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlanProperties
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
@@ -16,29 +16,24 @@ class ActionInteract(private val target: OffsetPoint) : AbstractAction() {
     var radius = 0
     private var interacted = false
 
-    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+    override fun isComplete(dungeonRoom: DungeonRoom): Boolean {
         return interacted
     }
 
     override fun onLivingInteract(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         event: PlayerInteractEntityEvent?,
-        actionRouteProperties: ActionRouteProperties?,
+        actionPlanProperties: ActionPlanProperties?,
     ) {
         if (interacted) {
             return
         }
 
-        dungeonRoom ?: return
-        event ?: return
+        val entity = event?.entity ?: return
 
-        val entity = event.entity ?: return
-        val spawnLoc =
-            DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[entity.entityId]
-                ?: return
-        if (target.getVector3i(dungeonRoom)
-                .distanceSquared(spawnLoc.x, spawnLoc.y, spawnLoc.z) > radius.toLong() * radius
-        ) {
+        val spawnLoc = DungeonFacade.context?.batSpawnedLocations?.get(entity.entityId) ?: return
+
+        if (target.getVector3i(dungeonRoom).distanceSquared(spawnLoc.x, spawnLoc.y, spawnLoc.z) > radius.toLong() * radius) {
             return
         }
         if (!predicate.test(entity)) {
@@ -49,12 +44,11 @@ class ActionInteract(private val target: OffsetPoint) : AbstractAction() {
     }
 
     override fun onRenderWorld(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         partialTicks: Float,
-        actionRouteProperties: ActionRouteProperties?,
+        actionPlanProperties: ActionPlanProperties?,
         flag: Boolean,
     ) {
-        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
         RenderUtils.drawTextAtWorld(

@@ -24,6 +24,7 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraft.util.ChatComponentText;
 import org.json.JSONObject;
 
@@ -43,8 +44,8 @@ public class FeatureCollectScore extends SimpleFeatureV2 {
                 .put("timeScore", time)
                 .put("completionStage", context.getBossRoomEnterSeconds() == -1 ? 0 :
                         context.isDefeated() ? 2 : 1)
-                .put("percentage", DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() / 100.0)
-                .put("floor", DungeonContext.getDungeonName());
+                .put("percentage", DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.percentage / 100.0)
+                .put("floor", SkyblockStatus.dungeonNameStrriped);
         ChatTransmitter.sendDebugChat(new ChatComponentText(payload.toString()));
     }
 

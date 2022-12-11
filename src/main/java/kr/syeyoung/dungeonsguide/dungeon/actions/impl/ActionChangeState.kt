@@ -10,9 +10,9 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
 class ActionChangeState(private val mechanicName: String, private val state: ActionState) : AbstractAction() {
 
     private val preRequisite2: Set<AbstractAction> = HashSet()
-    override fun getPreRequisites(dungeonRoom: DungeonRoom?): MutableSet<AbstractAction> {
+    override fun getPreRequisites(dungeonRoom: DungeonRoom): MutableSet<AbstractAction> {
         val set: MutableSet<AbstractAction> = HashSet(preRequisite2)
-        val mechanic = dungeonRoom!!.mechanics[mechanicName] ?: return set
+        val mechanic = dungeonRoom.mechanics[mechanicName] ?: return set
         mechanic.getAction(state.name, dungeonRoom)?.let { set.addAll(it) }
         return set
     }
@@ -21,11 +21,10 @@ class ActionChangeState(private val mechanicName: String, private val state: Act
         return "ChangeState\n- target: $mechanicName\n- state: $state"
     }
 
-    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+    override fun isComplete(dungeonRoom: DungeonRoom): Boolean {
         if (state == ActionState.navigate) {
             return true
         }
-        dungeonRoom ?: return false
 
         val mechanic = dungeonRoom.mechanics[mechanicName] ?: return false
         if (mechanic is DungeonSecret && mechanic.secretType != DungeonSecret.SecretType.CHEST) {

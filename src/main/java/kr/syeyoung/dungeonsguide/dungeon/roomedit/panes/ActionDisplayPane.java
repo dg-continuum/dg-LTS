@@ -20,7 +20,7 @@ package kr.syeyoung.dungeonsguide.dungeon.roomedit.panes;
 
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionTree;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionTree;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MButton;

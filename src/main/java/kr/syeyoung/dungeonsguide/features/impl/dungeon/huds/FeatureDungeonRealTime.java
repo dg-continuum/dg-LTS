@@ -33,9 +33,9 @@ public class FeatureDungeonRealTime extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        DungeonContext ctx = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext ctx = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
 
-        return ctx != null && ctx.getStarted() != -1;
+        return ctx != null && ctx.started != -1;
     }
 
 

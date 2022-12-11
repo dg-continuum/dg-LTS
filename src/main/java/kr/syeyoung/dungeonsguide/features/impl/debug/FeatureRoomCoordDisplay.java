@@ -52,12 +52,12 @@ public class FeatureRoomCoordDisplay extends GuiFeature {
     @Override
     public void drawHUD(float partialTicks) {
         if (!skyblockStatus.isOnDungeon()) return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) return;
 
         EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
-        Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(new Vector3i(thePlayer.getPosition().getX(), thePlayer.getPosition().getY(), thePlayer.getPosition().getZ()));
-        DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
+        Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(new Vector3i(thePlayer.getPosition().getX(), thePlayer.getPosition().getY(), thePlayer.getPosition().getZ()));
+        DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
         if (dungeonRoom == null) {
             return;
         }

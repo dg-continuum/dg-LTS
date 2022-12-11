@@ -1,6 +1,5 @@
 package kr.syeyoung.dungeonsguide.dungeon
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.config.Config
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
@@ -43,7 +42,7 @@ import java.io.IOException
 class DungeonListener {
     @SubscribeEvent
     fun onExplosion(event: ExplosionEvent) {
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let {
+        DungeonFacade.context?.let {
             val pos = event.explosion.position
             it.expositions.add(Vector3i(pos.xCoord.toInt(), pos.yCoord.toInt(), pos.zCoord.toInt()))
         }
@@ -62,8 +61,9 @@ class DungeonListener {
     fun onPostDraw(e: DrawScreenEvent.Post?) {
         if (!SkyblockStatus.isOnDungeon()) return
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let {
-            Minecraft.getMinecraft().thePlayer ?: return
+        Minecraft.getMinecraft().thePlayer ?: return
+
+        DungeonFacade.context?.let {
             it.bossfightProcessor?.onPostGuiRender(e)
             it.currentRoomProcessor?.onPostGuiRender(e)
 
@@ -84,7 +84,7 @@ class DungeonListener {
         if (!SkyblockStatus.isOnDungeon()) return
         Minecraft.getMinecraft().thePlayer ?: return
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let {
+        DungeonFacade.context?.let {
             it.bossfightProcessor?.onEntityUpdate(e)
             it.currentRoomProcessor?.onEntityUpdate(e)
         }
@@ -92,21 +92,14 @@ class DungeonListener {
 
     @SubscribeEvent
     fun onDungeonLeave(ev: DungeonLeftEvent?) {
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let {
+        DungeonFacade.context?.let {
             it.batSpawnedLocations.clear()
             it.killedBats.clear()
-            DungeonsGuide.getDungeonsGuide().dungeonFacade.context = null
+            DungeonFacade.context = null
             if (!FeatureRegistry.ADVANCED_DEBUGGABLE_MAP.isEnabled) {
                 MapUtils.clearMap()
             }
         }
-    }
-
-    fun createDungeonContext() {
-        val context = DungeonContext(Minecraft.getMinecraft().thePlayer.worldObj)
-        context.started = System.currentTimeMillis()
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context = context
-        MinecraftForge.EVENT_BUS.post(DungeonStartedEvent())
     }
 
     @SubscribeEvent
@@ -115,9 +108,12 @@ class DungeonListener {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         if (!SkyblockStatus.isOnDungeon()) return
 
-        val context = DungeonsGuide.getDungeonsGuide().dungeonFacade.context
+        val context = DungeonFacade.context
         if (context == null) {
-            createDungeonContext()
+            val newContext = DungeonContext()
+            newContext.started = System.currentTimeMillis()
+            DungeonFacade.context = newContext
+            MinecraftForge.EVENT_BUS.post(DungeonStartedEvent())
             return
         }
 
@@ -133,7 +129,7 @@ class DungeonListener {
                 MinecraftForge.EVENT_BUS.post(BossroomEnterEvent())
                 if (context.dataProvider != null) {
                     context.bossfightProcessor = context.dataProvider.createBossfightProcessor(
-                        Minecraft.getMinecraft().theWorld, DungeonContext.getDungeonName()
+                        Minecraft.getMinecraft().theWorld, SkyblockStatus.dungeonNameStrriped
                     )
                 } else {
                     ChatTransmitter.sendDebugChat(ChatComponentText("Error:: Null Data Providier"))
@@ -165,7 +161,7 @@ class DungeonListener {
     fun onRender(postRender: RenderGameOverlayEvent.Post) {
         if (!(postRender.type == RenderGameOverlayEvent.ElementType.EXPERIENCE || postRender.type == RenderGameOverlayEvent.ElementType.JUMPBAR)) return
         if (!SkyblockStatus.isOnDungeon()) return
-        val context = DungeonsGuide.getDungeonsGuide().dungeonFacade.context ?: return
+        val context = DungeonFacade.context ?: return
 
         context.bossfightProcessor?.drawScreen(postRender.partialTicks)
         context.currentRoomProcessor?.drawScreen(postRender.partialTicks)
@@ -193,7 +189,7 @@ class DungeonListener {
             processActionBarMessage(clientChatReceivedEvent)
         }
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let {
+        DungeonFacade.context?.let {
             val component = clientChatReceivedEvent.message
             val formatted = component.formattedText
             if (formatted.contains("§6> §e§lEXTRA STATS §6<")) {
@@ -204,19 +200,19 @@ class DungeonListener {
         }
     }
 
-    fun processActionBarMessage(e: ClientChatReceivedEvent) {
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let {
-            it.bossfightProcessor?.actionbarReceived(e.message)
+    private fun processActionBarMessage(clientChatReceivedEvent: ClientChatReceivedEvent) {
+        DungeonFacade.context?.let {
+            it.bossfightProcessor?.actionbarReceived(clientChatReceivedEvent.message)
         }
     }
 
-    fun processSystemChatMessage(e: ClientChatReceivedEvent) {
-        val message = e.message
+    private fun processSystemChatMessage(clientChatReceivedEvent: ClientChatReceivedEvent) {
+        val message = clientChatReceivedEvent.message
         if (message.formattedText.contains("§6> §e§lEXTRA STATS §6<")) {
             MinecraftForge.EVENT_BUS.post(DungeonEndedEvent())
         }
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
+        DungeonFacade.context?.let { context ->
 
             context.bossfightProcessor?.chatReceived(message)
 
@@ -239,7 +235,8 @@ class DungeonListener {
     @SubscribeEvent
     fun onWorldRender(renderWorldLastEvent: RenderWorldLastEvent) {
         if (!SkyblockStatus.isOnDungeon()) return
-        val context = DungeonsGuide.getDungeonsGuide().dungeonFacade.context ?: return
+        val context = DungeonFacade.context ?: return
+
         if (DgOneCongifConfig.debugMode) {
             val rooms: List<DungeonRoom> = ArrayList(context.dungeonRoomList)
             for (dungeonRoom in rooms) {
@@ -252,8 +249,8 @@ class DungeonListener {
         context.currentRoom?.let { dungeonRoom ->
             dungeonRoom.roomProcessor?.drawWorld(renderWorldLastEvent.partialTicks)
             if (DgOneCongifConfig.debugMode) {
-                val player = Minecraft.getMinecraft().thePlayer.positionVector
-                val real = BlockPos(player.xCoord * 2, player.yCoord * 2, player.zCoord * 2)
+                val playerPos = Minecraft.getMinecraft().thePlayer.positionVector
+                val real = BlockPos(playerPos.xCoord * 2, playerPos.yCoord * 2, playerPos.zCoord * 2)
                 for (allInBox in BlockPos.getAllInBox(real.add(-1, -1, -1), real.add(1, 1, 1))) {
                     val blocked = dungeonRoom.isBlocked(allInBox.x, allInBox.y, allInBox.z)
                     RenderUtils.highlightBox(
@@ -296,7 +293,7 @@ class DungeonListener {
     fun onKey2(keyInputEvent: KeyBindPressedEvent?) {
         if (!SkyblockStatus.isOnDungeon()) return
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
+        DungeonFacade.context?.let { context ->
             context.bossfightProcessor?.onKeybindPress(keyInputEvent)
             context.currentRoomProcessor?.onKeybindPress(keyInputEvent)
         }
@@ -306,7 +303,7 @@ class DungeonListener {
     fun onInteract(interact: PlayerInteractEntityEvent?) {
         if (!SkyblockStatus.isOnDungeon()) return
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
+        DungeonFacade.context?.let { context ->
             context.bossfightProcessor?.onInteract(interact)
             context.currentRoomProcessor?.onInteract(interact)
         }
@@ -314,9 +311,9 @@ class DungeonListener {
 
     val currentRoomName: String
         get() {
-            val context = DungeonsGuide.getDungeonsGuide().dungeonFacade.context
-            val roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i())
-            val dungeonRoom = context.roomMapper[roomPt]
+            val context = DungeonFacade.context
+            val roomPt = context?.mapProcessor?.worldPointToRoomPoint(VectorUtils.getPlayerVector3i())
+            val dungeonRoom = context?.roomMapper?.get(roomPt)
             var `in` = "unknown"
             if (dungeonRoom != null) {
                 `in` = dungeonRoom.dungeonRoomInfo.name
@@ -328,7 +325,7 @@ class DungeonListener {
     fun onBlockChange(blockUpdateEventPost: BlockUpdateEvent.Post?) {
         if (!SkyblockStatus.isOnDungeon()) return
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
+        DungeonFacade.context?.let { context ->
             context.bossfightProcessor?.onBlockUpdate(blockUpdateEventPost)
             context.currentRoomProcessor?.onBlockUpdate(blockUpdateEventPost)
         }
@@ -340,7 +337,7 @@ class DungeonListener {
         if (DgOneCongifConfig.debugMode && DgOneCongifConfig.debugRoomEdit && keyInputEvent.key == DgOneCongifConfig.debugRoomeditKeybind.keyBinds[0]) {
             val ec = EditingContext.getEditingContext()
             if (ec == null) {
-                val context = DungeonsGuide.getDungeonsGuide().dungeonFacade.context
+                val context = DungeonFacade.context
                 if (context == null) {
                     ChatTransmitter.addToQueue(ChatComponentText("Not in dungeons"))
                     return
@@ -365,17 +362,19 @@ class DungeonListener {
         if (!playerInteractEvent.world.isRemote) return
         if (!SkyblockStatus.isOnDungeon()) return
 
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
+        DungeonFacade.context?.let { context ->
             context.bossfightProcessor?.onInteractBlock(playerInteractEvent)
             context.currentRoomProcessor?.onInteractBlock(playerInteractEvent)
         }
     }
 
     @SubscribeEvent
-    fun onEntitySpawn(spawn: EntityJoinWorldEvent) {
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
-            context.batSpawnedLocations[spawn.entity.entityId] =
-                Vector3i(spawn.entity.posX.toInt(), spawn.entity.posY.toInt(), spawn.entity.posZ.toInt())
+    fun onEntitySpawn(entityJoinWorldEvent: EntityJoinWorldEvent) {
+        DungeonFacade.context?.let { context ->
+            if(entityJoinWorldEvent.entity is EntityBat){
+                context.batSpawnedLocations[entityJoinWorldEvent.entity.entityId] =
+                    Vector3i(entityJoinWorldEvent.entity.posX.toInt(), entityJoinWorldEvent.entity.posY.toInt(), entityJoinWorldEvent.entity.posZ.toInt())
+            }
 
         }
     }
@@ -383,7 +382,7 @@ class DungeonListener {
     @SubscribeEvent
     fun onEntityDeSpawn(deathEvent: LivingDeathEvent) {
         if (!SkyblockStatus.isOnDungeon()) return
-        DungeonsGuide.getDungeonsGuide().dungeonFacade.context?.let { context ->
+        DungeonFacade.context?.let { context ->
             if (deathEvent.entityLiving is EntityBat) {
                 context.killedBats.add(deathEvent.entity.entityId)
             } else {

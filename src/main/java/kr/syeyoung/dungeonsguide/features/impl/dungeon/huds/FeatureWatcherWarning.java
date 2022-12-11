@@ -60,9 +60,9 @@ public class FeatureWatcherWarning extends TextHud {
         if (!SkyblockStatus.isOnSkyblock()) return;
         if (event.message.getFormattedText().equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")) {
             warning = System.currentTimeMillis() + 2500;
-            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
             if (context == null) return;
-            for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+            for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
                 if (dungeonRoom != null && dungeonRoom.getColor() == 18)
                     dungeonRoom.setCurrentState(DungeonRoom.RoomState.DISCOVERED);
             }

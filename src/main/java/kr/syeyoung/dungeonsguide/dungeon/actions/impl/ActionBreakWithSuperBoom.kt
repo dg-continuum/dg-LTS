@@ -1,9 +1,9 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlanProperties
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
@@ -18,24 +18,25 @@ import java.awt.Color
 
 class ActionBreakWithSuperBoom(private val target: OffsetPoint) : AbstractAction() {
 
-    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
-        dungeonRoom ?: return false
-        val thing = target.getVector3i(dungeonRoom)
-        for (el in DungeonsGuide.getDungeonsGuide().dungeonFacade.context.expositions) {
-            if (thing.distance(el) < 5) {
-                return true
+    override fun isComplete(dungeonRoom: DungeonRoom): Boolean {
+        DungeonFacade.context?.let {
+            val thing = target.getVector3i(dungeonRoom)
+            for (el in it.expositions) {
+                if (thing.distance(el) < 5) {
+                    return true
+                }
             }
         }
+
         return false
     }
 
     override fun onRenderWorld(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         partialTicks: Float,
-        actionRouteProperties: ActionRouteProperties?,
+        actionPlanProperties: ActionPlanProperties?,
         flag: Boolean
     ) {
-        dungeonRoom ?: return
         Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.locationBlocksTexture)
         val blockpos = target.getVector3i(dungeonRoom)
         val viewingFrom = Minecraft.getMinecraft().renderViewEntity

@@ -21,12 +21,8 @@ public class TestMap extends BasicHud {
 
         GlStateManager.translate(position.getX(), position.getY(), 0);
 
-//        // this line (is taking) -took- 6 hours of hair silvering trial and error btw
-        int height = ((int) (getHeight(scale, false) + y) * 2);
-
-
-//        int width = (int) ((int) ((getWidth(scale, false) + x)) * 1.5);
-        int width = (int) ((int) (((getWidth(scale, false)) + x)) );
+        int height = (int) (getHeight(scale, false) + y) * 2;
+        int width = ((int) (getWidth(scale, false) + x));
         GL11.glScissor((int) x, (int) (Minecraft.getMinecraft().displayHeight - y - height), width, height);
 
         if(!example){
@@ -34,9 +30,6 @@ public class TestMap extends BasicHud {
 
             logger.info("Y: {}, MOD HEIGHT: {}, CALC HEIGH: {}, Y GIVEN: {}", y, getHeight(scale, false), height, Minecraft.getMinecraft().displayHeight - y - height);
         }
-
-
-//        GL11.glScissor((int) x, (int) (Minecraft.getMinecraft().displayHeight - y - getHeight(scale, false)), (int) ((int) ((getWidth(scale, false) * 2) + x)), (int) ((int) ((getHeight(scale, false) * 2) + y) + (getHeight(scale, false) / 2)));
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
 

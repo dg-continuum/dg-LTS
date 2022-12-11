@@ -19,13 +19,13 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret.mechanicbrowser;
 
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
 import kr.syeyoung.dungeonsguide.gui.elements.MList;
@@ -83,12 +83,9 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         if (Minecraft.getMinecraft().thePlayer == null) return;
 
 
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
-                .map(a -> {
-
-                    return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
-                });
+        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonFacade.context)
+                .map(context -> context.mapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
+                .map(a -> DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.roomMapper.get(a));
 
 
         DungeonRoom dungeonRoom = dungeonRoomOpt.orElse(null);
@@ -112,8 +109,8 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         if (grp.getStrategy().getPath("MECH-BROWSER") == null)
             fr.drawString("Nothing", fr.getStringWidth("Selected: ") + 2, 2, 0xFFAA0000);
         else {
-            ActionRoute route = grp.getStrategy().getPath("MECH-BROWSER");
-            fr.drawString(route.getMechanic() + " -> " + route.getState(), fr.getStringWidth("Selected: ") + 2, 2, 0xFFFFFF00);
+            ActionPlan route = grp.getStrategy().getPath("MECH-BROWSER");
+            fr.drawString(route.getMechanicName() + " -> " + route.getState(), fr.getStringWidth("Selected: ") + 2, 2, 0xFFFFFF00);
         }
         fr.drawString("Open Chat to Select Secrets", 2, fr.FONT_HEIGHT + 5, 0xFFAAAAAA);
 
@@ -247,11 +244,11 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
 
     public void onElementClick(String id, DungeonMechanic dungeonMechanic, Point pt, MechanicBrowserElement mechanicBrowserElement) {
 
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
+        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().context)
+                .map(context -> context.mapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
                 .map(a -> {
 
-                    return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
+                    return DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.roomMapper.get(a);
                 });
         selectedID = id;
 
@@ -273,7 +270,7 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
             mechanicBrowserTooltip.getMList().add(new MechanicBrowserElement(() -> state, false, (m2, pt2) -> {
                 if (dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor) {
                     ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor())
-                            .getStrategy().addAction("MECH-BROWSER",
+                            .getStrategy().createActionRoute("MECH-BROWSER",
                                     id,
                                     ActionState.valueOf(state),
                                     FeatureRegistry.SECRET_LINE_PROPERTIES_SECRET_BROWSER.getRouteProperties());
@@ -291,12 +288,9 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
 
     public void cancel(MechanicBrowserElement mechanicBrowserElement) {
 
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext())
-                .map(DungeonContext::getMapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
-                .map(a -> {
-
-                    return DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getRoomMapper().get(a);
-                });
+        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonFacade.context)
+                .map(context -> context.mapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
+                .map(a -> DungeonFacade.context.roomMapper.get(a));
         mechanicBrowserElement.setFocused(false);
         if (!dungeonRoomOpt.isPresent()) return;
         DungeonRoom dungeonRoom = dungeonRoomOpt.get();

@@ -6,7 +6,7 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonFairySoul;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
@@ -30,13 +30,13 @@ public class FeatureSoulRoomWarning extends SingleTextHud {
     public void onTick(TickEvent.ClientTickEvent tick) {
         if (tick.phase == TickEvent.Phase.END && tick.type == TickEvent.Type.CLIENT ) {
             if (!SkyblockStatus.isOnDungeon()) return;
-            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().isInitialized()) return;
-            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor.isInitialized()) return;
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
 
             EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
             if (thePlayer == null) return;
-            Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
-            DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
+            Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
+            DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
             if (dungeonRoom == null) return;
             if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
 

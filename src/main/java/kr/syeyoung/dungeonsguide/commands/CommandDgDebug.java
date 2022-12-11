@@ -5,10 +5,7 @@ import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.guiconfig.NestedCategory;
 import kr.syeyoung.dungeonsguide.cosmetics.data.ActiveCosmetic;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoomInfoRegistry;
-import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.*;
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
@@ -19,8 +16,8 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
@@ -138,15 +135,15 @@ public class CommandDgDebug extends CommandBase {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §e" + serverBrand));
         } else if ("pathfind".equals(arg)) {
             try {
-                DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+                DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
                 EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
                 if (thePlayer == null) return;
-                if (context.getBossfightProcessor() != null) context.getBossfightProcessor().tick();
-                Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
+                if (context.bossfightProcessor != null) context.bossfightProcessor.tick();
+                Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
 
-                DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
+                DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
                 GeneralRoomProcessor grp = (GeneralRoomProcessor) dungeonRoom.getRoomProcessor();
-                grp.getStrategy().addAction("COMMAND", args[1], ActionState.turnIntoForm(args[2]), FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
+                grp.getStrategy().createActionRoute("COMMAND", args[1], ActionState.turnIntoForm(args[2]), FeatureRegistry.SECRET_LINE_PROPERTIES_GLOBAL.getRouteProperties());
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -237,7 +234,7 @@ public class CommandDgDebug extends CommandBase {
         } else if ("reloaddungeon".equals(arg)) {
             try {
                 MinecraftForge.EVENT_BUS.post(new DungeonLeftEvent());
-                DungeonsGuide.getDungeonsGuide().getDungeonFacade().setContext(null);
+                DungeonsGuide.getDungeonsGuide().getDungeonFacade().context = null;
                 MapUtils.clearMap();
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -249,7 +246,12 @@ public class CommandDgDebug extends CommandBase {
         } else if ("partyid".equals(arg)) {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fInternal Party id: " + Optional.ofNullable(PartyManager.INSTANCE.getPartyContext()).map(PartyContext::getPartyID).orElse(null)));
         } else if ("loc".equals(arg)) {
-            sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fYou're in " + DungeonContext.getDungeonName()));
+
+            val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+            if (context != null){
+                sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §fYou're in " + SkyblockStatus.dungeonNameStrriped));
+            }
+
         }  else if ("createfakeroom".equals(arg)) {// load schematic
             File f = new File(Main.getConfigDir(), "schematics/new roonm-b2df250c-4af2-4201-963c-0ee1cb6bd3de-5efb1f0c-c05f-4064-bde7-cad0874fdf39.schematic");
             NBTTagCompound compound;
@@ -305,21 +307,21 @@ public class CommandDgDebug extends CommandBase {
                     return 0;
                 }
             });
-            DungeonContext.setDungeonName("TEST DG");
-            DungeonContext fakeContext = new DungeonContext(Minecraft.getMinecraft().theWorld);
-            DungeonsGuide.getDungeonsGuide().getDungeonFacade().setContext(fakeContext);
+            DungeonContext fakeContext = new DungeonContext();
+            SkyblockStatus.dungeonNameStrriped = "TEST DG";
+            DungeonFacade.context = fakeContext;
             DungeonsGuide.getDungeonsGuide().getSkyblockStatus().setForceIsOnDungeon(true);
-            MapProcessor mapProcessor = fakeContext.getMapProcessor();
+            MapProcessor mapProcessor = fakeContext.mapProcessor;
             mapProcessor.setUnitRoomDimension(new Dimension(16, 16));
             mapProcessor.setDoorDimensions(new Dimension(4, 4));
             mapProcessor.setTopLeftMapPoint(new Point(0, 0));
-            fakeContext.setDungeonMin(new BlockPos(0, 70, 0));
+            fakeContext.dungeonMin = new BlockPos(0, 70, 0);
 
-            DungeonRoom dungeonRoom = new DungeonRoom(Arrays.asList(new Vector2i(0, 0)), ShortUtils.topLeftifyInt((short) 1), (byte) 63, new Vector3i(0, 70, 0), new Vector3i(31, 70, 31), fakeContext, Collections.emptySet());
+            DungeonRoom dungeonRoom = new DungeonRoom(Collections.singletonList(new Vector2i(0, 0)), ShortUtils.topLeftifyInt((short) 1), (byte) 63, new Vector3i(0, 70, 0), new Vector3i(31, 70, 31), fakeContext, Collections.emptySet());
 
-            fakeContext.getDungeonRoomList().add(dungeonRoom);
-            for (Vector2i p : Arrays.asList(new Vector2i(0, 0))) {
-                fakeContext.getRoomMapper().put(p, dungeonRoom);
+            fakeContext.dungeonRoomList.add(dungeonRoom);
+            for (Vector2i p : Collections.singletonList(new Vector2i(0, 0))) {
+                fakeContext.roomMapper.put(p, dungeonRoom);
             }
 
             EditingContext.createEditingContext(dungeonRoom);
@@ -327,7 +329,7 @@ public class CommandDgDebug extends CommandBase {
         } else if ("closecontext".equals(arg)) {
             DungeonsGuide.getDungeonsGuide().getSkyblockStatus().setForceIsOnDungeon(false);
 
-            DungeonsGuide.getDungeonsGuide().getDungeonFacade().setContext(null);
+            DungeonFacade.context = null;
         } else if ("dumpsettings".equals(arg)) {
             NestedCategory nestedCategory = new NestedCategory("ROOT");
             for (AbstractFeature abstractFeature : FeatureRegistry.getFeatureList()) {

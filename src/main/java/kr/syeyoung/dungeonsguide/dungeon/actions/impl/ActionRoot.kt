@@ -6,7 +6,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
 
 class ActionRoot : AbstractAction() {
 
-    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
+    override fun isComplete(dungeonRoom: DungeonRoom): Boolean {
         return true
     }
 

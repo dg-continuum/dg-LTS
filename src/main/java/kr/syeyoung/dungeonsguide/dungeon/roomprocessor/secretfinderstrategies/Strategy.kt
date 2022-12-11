@@ -2,10 +2,10 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlanProperties
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import java.util.*
 
@@ -20,22 +20,22 @@ fun buildSecretStrategy(e: Int, parent: GeneralRoomProcessor): SecretGuideStrate
 }
 
 abstract class SecretGuideStrategy(val parent: GeneralRoomProcessor) {
-    open val actionPath: MutableMap<String, ActionRoute> = HashMap()
-    fun addAction(mechanic: String, state: ActionState, actionRouteProperties: ActionRouteProperties): String {
+    open val actionPath: MutableMap<String, ActionPlan> = HashMap()
+    fun createActionRoute(mechanic: String, state: ActionState, actionPlanProperties: ActionPlanProperties): String {
         val str = UUID.randomUUID().toString()
-        addAction(str, mechanic, state, actionRouteProperties)
+        createActionRoute(str, mechanic, state, actionPlanProperties)
         return str
     }
-    fun addAction(id: String, mechanic: String, state: ActionState, actionRouteProperties: ActionRouteProperties) {
+    fun createActionRoute(id: String, mechanic: String, state: ActionState, actionPlanProperties: ActionPlanProperties) {
         if(DgOneCongifConfig.debugMode){
-            println("Creating action,  mechanic: $mechanic , state: $state")
+            println("Creating action route,  mechanic: $mechanic , state: $state")
         }
-        actionPath[id] = ActionRoute(parent.dungeonRoom, mechanic, state, actionRouteProperties)
+        actionPath[id] = ActionPlan(parent.dungeonRoom, mechanic, state, actionPlanProperties)
     }
     fun cancel(id: String) {
         actionPath.remove(id)
     }
-    fun getPath(id: String): ActionRoute? {
+    fun getPath(id: String): ActionPlan? {
         return actionPath[id]
     }
     open fun update(){

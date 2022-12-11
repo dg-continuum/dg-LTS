@@ -22,7 +22,7 @@ import cc.polyfrost.oneconfig.hud.SingleTextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessorThorn;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorThorn;
 
 public class FeatureThornBearPercentage extends SingleTextHud {
     public FeatureThornBearPercentage() {
@@ -31,7 +31,7 @@ public class FeatureThornBearPercentage extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getBossfightProcessor() instanceof BossfightProcessorThorn;
+        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor instanceof BossfightProcessorThorn;
     }
 
     @Override
@@ -39,11 +39,11 @@ public class FeatureThornBearPercentage extends SingleTextHud {
         if(example) {
             return "50%";
         } else {
-            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
             if(context == null) return "";
-            if(context.getBossfightProcessor() == null) return "";
-            if(!(context.getBossfightProcessor() instanceof BossfightProcessorThorn)) return "";
-            int percentage = (int) (((BossfightProcessorThorn) context.getBossfightProcessor()).calculatePercentage() * 100);
+            if(context.bossfightProcessor == null) return "";
+            if(!(context.bossfightProcessor instanceof BossfightProcessorThorn)) return "";
+            int percentage = (int) (((BossfightProcessorThorn) context.bossfightProcessor).calculatePercentage() * 100);
             return percentage+"%";
         }
     }

@@ -43,6 +43,8 @@ import java.util.Set;
 public class SkyblockStatus {
     boolean wasOnHypixel = false;
 
+    public static String dungeonNameStrriped = "";
+
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent ev) {
         if (ev.side == Side.SERVER || ev.phase != TickEvent.Phase.START) return;
@@ -136,13 +138,13 @@ public class SkyblockStatus {
             if (strippedLine.contains("Cleared: ")) {
                 foundDungeon = true;
 
-                DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+                DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
                 if(context != null){
-                    context.setPercentage(Integer.parseInt(strippedLine.substring(9).split(" ")[0]));
+                    context.percentage = Integer.parseInt(strippedLine.substring(9).split(" ")[0]);
                 }
             }
             if (ScorePlayerTeam.formatPlayerName(scorePlayerTeam, sc.getPlayerName()).startsWith(" §7⏣")) {
-                DungeonContext.setDungeonName(strippedLine.trim());
+                dungeonNameStrriped = strippedLine.trim();
             }
         }
 

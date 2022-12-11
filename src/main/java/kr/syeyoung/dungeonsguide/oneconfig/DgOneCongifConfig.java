@@ -11,7 +11,7 @@ import kr.syeyoung.dungeonsguide.Main;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.features.impl.debug.TestMap;
 import kr.syeyoung.dungeonsguide.features.impl.dungeon.huds.FeatureDungeonMap;
@@ -848,7 +848,7 @@ public class DgOneCongifConfig extends Config {
         });
 
         addListener("secretFindMode", () -> {
-            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
             if(context != null){
                 RoomProcessor roomProcessor = context.getCurrentRoomProcessor();
                 if(roomProcessor instanceof GeneralRoomProcessor){

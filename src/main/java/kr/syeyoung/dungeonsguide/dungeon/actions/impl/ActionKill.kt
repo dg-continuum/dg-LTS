@@ -1,9 +1,9 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions.impl
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlanProperties
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import net.minecraft.entity.Entity
@@ -16,11 +16,11 @@ class ActionKill(private val target: OffsetPoint) : AbstractAction() {
     var radius = 0
     private var killed = false
 
-    override fun isComplete(dungeonRoom: DungeonRoom?): Boolean {
-        dungeonRoom ?: return false
+    override fun isComplete(dungeonRoom: DungeonRoom): Boolean {
+        val context = DungeonFacade.context ?: return false
         val spawn = target.getVector3i(dungeonRoom)
-        for (el in DungeonsGuide.getDungeonsGuide().dungeonFacade.context.killedBats) {
-            DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[el]?.let {
+        for (el in context.killedBats) {
+            context.batSpawnedLocations[el]?.let {
                 if (it.distance(spawn) < 100){
                     return true
                 }
@@ -30,16 +30,16 @@ class ActionKill(private val target: OffsetPoint) : AbstractAction() {
     }
 
     override fun onLivingDeath(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         event: LivingDeathEvent?,
-        actionRouteProperties: ActionRouteProperties?
+        actionPlanProperties: ActionPlanProperties?
     ) {
         if (killed) {
             return
         } else {
-            dungeonRoom ?: return
+            val context = DungeonFacade.context ?: return
             val spawnLoc =
-                DungeonsGuide.getDungeonsGuide().dungeonFacade.context.batSpawnedLocations[event!!.entity.entityId]
+                context.batSpawnedLocations[event!!.entity.entityId]
                     ?: return
             if (target.getVector3i(dungeonRoom)
                     .distanceSquared(spawnLoc.x, spawnLoc.y, spawnLoc.z) > radius * radius
@@ -50,12 +50,11 @@ class ActionKill(private val target: OffsetPoint) : AbstractAction() {
     }
 
     override fun onRenderWorld(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         partialTicks: Float,
-        actionRouteProperties: ActionRouteProperties?,
+        actionPlanProperties: ActionPlanProperties?,
         flag: Boolean
     ) {
-        dungeonRoom ?: return
         val pos = target.getVector3i(dungeonRoom)
         RenderUtils.highlightBlock(pos, Color(0, 255, 255, 50), partialTicks, true)
         RenderUtils.drawTextAtWorld(

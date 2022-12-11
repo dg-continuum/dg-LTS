@@ -20,7 +20,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f5;
 
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessorLivid;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorLivid;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
@@ -40,11 +40,11 @@ public class FeatureBoxRealLivid extends SimpleFeatureV2 {
     public void onRenderWorld(RenderWorldLastEvent postRender) {
         if (!DgOneCongifConfig.boxRealLivid) return;
         if (!SkyblockStatus.isOnDungeon()) return;
-        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) {
             return;
         }
-        val bossfightProcessor = context.getBossfightProcessor();
+        val bossfightProcessor = context.bossfightProcessor;
         if (bossfightProcessor instanceof BossfightProcessorLivid) {
             val playerMP = ((BossfightProcessorLivid) bossfightProcessor).getRealLivid();
 

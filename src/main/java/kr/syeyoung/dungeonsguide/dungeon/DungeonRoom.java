@@ -195,7 +195,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
     private void buildDoors(Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
         Set<Tuple<Vector3i, EDungeonDoorType>> positions = new HashSet<>();
-        Vector3i pos = context.getMapProcessor().roomPointToWorldPoint(minRoomPt).add(16, 0, 16);
+        Vector3i pos = context.mapProcessor.roomPointToWorldPoint(minRoomPt).add(16, 0, 16);
         for (Tuple<Vector2d, EDungeonDoorType> doorsAndState : doorsAndStates) {
             Vector2d vector2d = doorsAndState.getFirst();
             Vector3i neu = pos.add((int) (vector2d.x * 32), 0, (int) (vector2d.y * 32));
@@ -203,7 +203,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
         }
 
         for (Tuple<Vector3i, EDungeonDoorType> door : positions) {
-            doors.add(new DungeonDoor(context.getWorld(), door.getFirst(), door.getSecond()));
+            doors.add(new DungeonDoor(Minecraft.getMinecraft().theWorld, door.getFirst(), door.getSecond()));
         }
     }
 
@@ -261,10 +261,10 @@ public class DungeonRoom implements DungeonRoomAccessor {
      * If the bit is not set to 1, the method returns false to indicate that the point is not accessible.
      */
     public boolean canAccessAbsolute(Vector3i pos) {
-        MapProcessor mapProcessor = this.context.getMapProcessor();
+        MapProcessor mapProcessor = this.context.mapProcessor;
         Vector2i roomPt = mapProcessor.worldPointToRoomPoint(pos);
-        roomPt.add(-minRoomPt.x, -minRoomPt.y);
 
+        roomPt.add(-minRoomPt.x, -minRoomPt.y);
         return (shape >> (roomPt.y * 4 + roomPt.x) & 0x1) > 0;
     }
 
@@ -369,7 +369,9 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
     private void resetBlock(int x, int y, int z) {
         if (x < minx || z < minz || x >= maxx || z >= maxz || y < miny || y >= maxy) return;
-        int dx = x - minx, dy = y - miny, dz = z - minz;
+        int dx = x - minx;
+        int dy = y - miny;
+        int dz = z - minz;
         int bitIdx = dx * leny * lenz + dy * lenz + dz;
         int location = bitIdx / 4;
         arr[location] = 0;

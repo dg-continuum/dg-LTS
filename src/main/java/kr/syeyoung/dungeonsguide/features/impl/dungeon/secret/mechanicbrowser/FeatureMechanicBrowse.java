@@ -23,7 +23,7 @@ import kr.syeyoung.dungeonsguide.config.guiconfig.location.GuiGuiLocationConfig;
 import kr.syeyoung.dungeonsguide.config.types.GUIRectangle;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
@@ -150,12 +150,12 @@ public class FeatureMechanicBrowse extends GuiFeature {
         if (!isEnabled()) return;
         SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
         if (!skyblockStatus.isOnDungeon()) return;
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().isInitialized())
+        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor.isInitialized())
             return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
 
-        Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
-        DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
+        Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
+        DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
         if (dungeonRoom == null) return;
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
         String id = mGuiMechanicBrowser.getPanelMechanicBrowser().getSelectedID();

@@ -32,7 +32,7 @@ public class FeatureDungeonRoomName extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor() != null;
+        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor != null;
     }
 
 
@@ -45,12 +45,12 @@ public class FeatureDungeonRoomName extends SingleTextHud {
         val player = Minecraft.getMinecraft().thePlayer;
         if(player == null) return "";
 
-        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if(context == null || context.getMapProcessor() == null) return "";
-        val roomPt = context.getMapProcessor().worldPointToRoomPoint(new Vector3i(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ()));
+        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        if(context == null || context.mapProcessor == null) return "";
+        val roomPt = context.mapProcessor.worldPointToRoomPoint(new Vector3i(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ()));
         if(roomPt == null) return "";
 
-        val dungeonRoom = context.getRoomMapper().get(roomPt);
+        val dungeonRoom = context.roomMapper.get(roomPt);
         if(dungeonRoom == null) return "";
         return dungeonRoom.getDungeonRoomInfo().getName();
     }

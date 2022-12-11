@@ -20,7 +20,7 @@ class DungeonNPC : DungeonMechanic(), Cloneable {
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        return DungeonFairySoul.getAbstractActions(state, secretPoint, preRequisite)
+        return DungeonFairySoul.getAbstractActions(state, secretPoint, preRequisite, dungeonRoom)
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {

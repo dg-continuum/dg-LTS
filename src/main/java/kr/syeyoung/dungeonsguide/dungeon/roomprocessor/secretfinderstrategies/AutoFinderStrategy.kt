@@ -7,7 +7,7 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import kr.syeyoung.dungeonsguide.oneconfig.secrets.AutoPathfindPage
@@ -61,7 +61,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
             route.onTick()
 
             if ((route.currentAction is ActionComplete) || (route.currentAction.isComplete(parent.dungeonRoom))) {
-                autoPathFindCandidates[MechanicId(route.mechanic)]?.let {
+                autoPathFindCandidates[MechanicId(route.mechanicName)]?.let {
                     it.isDone = true
                 }
             }
@@ -131,7 +131,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         getCheapestMechanic()?.let {
             if (lastFoundMechanic != it) {
                 lastFoundMechanic = it
-                addAction(
+                createActionRoute(
                     "AUTO-BROWSE",
                     it.id,
                     ActionState.found,
@@ -263,7 +263,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         navigateBiasLastUpdate = now
 
         // start navigating to the new one
-        addAction(
+        createActionRoute(
             "AUTO-BROWSE",
             lowestWeightMechanic.id,
             ActionState.found,

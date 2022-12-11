@@ -48,22 +48,22 @@ public class FeatureDungeonDeaths extends TextHud {
     public void onChat(ClientChatReceivedEvent event) {
         if (event.type == 2) return;
         if (!SkyblockStatus.isOnDungeon()) return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) return;
 
         String txt = event.message.getFormattedText();
         Matcher m = deathPattern.matcher(txt);
         if (m.matches()) {
             String nickname = TextUtils.stripColor(m.group(1));
-            int deaths = context.getDeaths().getOrDefault(nickname, 0);
-            context.getDeaths().put(nickname, deaths + 1);
+            int deaths = context.deaths.getOrDefault(nickname, 0);
+            context.deaths.put(nickname, deaths + 1);
             ChatTransmitter.sendDebugChat(new ChatComponentText("Death verified :: " + nickname + " / " + (deaths + 1)));
         }
         Matcher m2 = meDeathPattern.matcher(txt);
         if (m2.matches()) {
             String nickname = "me";
-            int deaths = context.getDeaths().getOrDefault(nickname, 0);
-            context.getDeaths().put(nickname, deaths + 1);
+            int deaths = context.deaths.getOrDefault(nickname, 0);
+            context.deaths.put(nickname, deaths + 1);
             ChatTransmitter.sendDebugChat(new ChatComponentText("Death verified :: me / " + (deaths + 1)));
         }
     }
@@ -71,7 +71,7 @@ public class FeatureDungeonDeaths extends TextHud {
     @Override
     protected boolean shouldShow() {
         if (!SkyblockStatus.isOnDungeon()) return false;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         return context != null;
     }
 
@@ -89,10 +89,10 @@ public class FeatureDungeonDeaths extends TextHud {
         }
 
 
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if(context == null) return;
-        if(context.getDeaths().isEmpty()) return;
-        for (val death : context.getDeaths().entrySet()) {
+        if(context.deaths.isEmpty()) return;
+        for (val death : context.deaths.entrySet()) {
             lines.add(death.getKey() + ": " + death.getValue());
         }
         lines.add("Total Deaths: " + DungeonUtil.getTotalDeaths());

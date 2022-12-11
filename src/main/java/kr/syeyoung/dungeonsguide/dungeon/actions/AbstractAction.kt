@@ -1,7 +1,6 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions
 
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties
 import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -11,40 +10,40 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
  */
 abstract class AbstractAction {
     var preRequisite: Set<AbstractAction> = HashSet()
-    open fun getPreRequisites(dungeonRoom: DungeonRoom?): MutableSet<AbstractAction> {
+    open fun getPreRequisites(dungeonRoom: DungeonRoom): MutableSet<AbstractAction> {
         return preRequisite.toMutableSet()
     }
 
     open fun onPlayerInteract(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         event: PlayerInteractEvent?,
-        actionRouteProperties: ActionRouteProperties?
+        actionPlanProperties: ActionPlanProperties?
     ) {
     }
 
     open fun onRenderWorld(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         partialTicks: Float,
-        actionRouteProperties: ActionRouteProperties?,
+        actionPlanProperties: ActionPlanProperties?,
         flag: Boolean
     ) {
     }
 
     open fun onLivingDeath(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         event: LivingDeathEvent?,
-        actionRouteProperties: ActionRouteProperties?
+        actionPlanProperties: ActionPlanProperties?
     ) {
     }
 
-    fun onRenderScreen(dungeonRoom: DungeonRoom?, partialTicks: Float, actionRouteProperties: ActionRouteProperties?) {}
+    fun onRenderScreen(dungeonRoom: DungeonRoom, partialTicks: Float, actionPlanProperties: ActionPlanProperties?) {}
     open fun onLivingInteract(
-        dungeonRoom: DungeonRoom?,
+        dungeonRoom: DungeonRoom,
         event: PlayerInteractEntityEvent?,
-        actionRouteProperties: ActionRouteProperties?
+        actionPlanProperties: ActionPlanProperties?
     ) {
     }
 
-    open fun onTick(dungeonRoom: DungeonRoom?, actionRouteProperties: ActionRouteProperties?) {}
-    abstract fun isComplete(dungeonRoom: DungeonRoom?): Boolean
+    open fun onTick(dungeonRoom: DungeonRoom, actionPlanProperties: ActionPlanProperties?) {}
+    abstract fun isComplete(dungeonRoom: DungeonRoom): Boolean
 }

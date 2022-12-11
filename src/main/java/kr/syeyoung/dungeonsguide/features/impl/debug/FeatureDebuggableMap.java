@@ -18,16 +18,13 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.debug;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.MapUtils;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
@@ -47,14 +44,9 @@ public class FeatureDebuggableMap extends GuiFeature  {
     DynamicTexture dynamicTexture = new DynamicTexture(128, 128);
     ResourceLocation location = Minecraft.getMinecraft().renderEngine.getDynamicTextureLocation("dungeons/map/", dynamicTexture);
 
-    SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
     @Override
     public void drawHUD(float partialTicks) {
         if(!DgOneCongifConfig.debugMode || !DgOneCongifConfig.debugableMap) return;
-
-//        if (!skyblockStatus.isOnDungeon()) return;
-//        DungeonContext context = skyblockStatus.getContext();
-//        if (context == null) return;
 
         GlStateManager.pushMatrix();
         double factor = getFeatureRect().getRectangle().getWidth() / 128;
@@ -64,7 +56,7 @@ public class FeatureDebuggableMap extends GuiFeature  {
         dynamicTexture.updateDynamicTexture();
         Minecraft.getMinecraft().getTextureManager().bindTexture(location);
         GlStateManager.enableAlpha();
-        GuiScreen.drawModalRectWithCustomSizedTexture(0, 0, 0, 0, 128, 128, 128, 128);
+        Gui.drawModalRectWithCustomSizedTexture(0, 0, 0, 0, 128, 128, 128, 128);
         GlStateManager.popMatrix();
 
 
@@ -80,7 +72,6 @@ public class FeatureDebuggableMap extends GuiFeature  {
 
     @Override
     public void drawDemo(float partialTicks) {
-        FontRenderer fr = getFontRenderer();
         Rectangle featureRect = getFeatureRect().getRectangle();
         GL11.glLineWidth(2);
         RenderUtils.drawUnfilledBox(0,0,featureRect.width, featureRect.height, 0xff000000, false);

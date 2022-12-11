@@ -147,8 +147,8 @@ public class FeatureDungeonMap extends BasicHud {
     protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
 
         if (example) {
-            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-            if (SkyblockStatus.isOnDungeon() && context != null && context.getMapProcessor().isInitialized() && on) {
+            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+            if (SkyblockStatus.isOnDungeon() && context != null && context.mapProcessor.isInitialized() && on) {
 
                 GlStateManager.pushMatrix();
 
@@ -203,11 +203,11 @@ public class FeatureDungeonMap extends BasicHud {
     }
 
     void drawHUD(float partialTicks) {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (context == null || !context.getMapProcessor().isInitialized()) return;
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        if (context == null || !context.mapProcessor.isInitialized()) return;
         GlStateManager.pushMatrix();
 
-        MapProcessor mapProcessor = context.getMapProcessor();
+        MapProcessor mapProcessor = context.mapProcessor;
         MapData mapData = mapProcessor.getLatestMapData();
         if (mapData != null) {
             renderMap(partialTicks, mapProcessor, mapData, context);
@@ -246,7 +246,7 @@ public class FeatureDungeonMap extends BasicHud {
             GlStateManager.translate(-64, -64, 0);
         }
 
-        updateMapTexture(mapData.colors, mapProcessor, context.getDungeonRoomList());
+        updateMapTexture(mapData.colors, mapProcessor, context.dungeonRoomList);
 
         drawMap();
 
@@ -262,7 +262,7 @@ public class FeatureDungeonMap extends BasicHud {
 
         if (showSecretCount) {
             FontRenderer fr = getFontRenderer();
-            for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+            for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
                 GlStateManager.pushMatrix();
 
                 Vector2i mapPt = mapProcessor.roomPointToMapPoint(dungeonRoom.getUnitPoints().get(0));

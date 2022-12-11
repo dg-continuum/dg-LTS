@@ -19,7 +19,6 @@
 package kr.syeyoung.dungeonsguide;
 
 import cc.polyfrost.oneconfig.events.EventManager;
-import lombok.Getter;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -75,7 +74,10 @@ public class Main {
 
     }
 
-    @Getter
+    public static File getConfigDir() {
+        return configDir;
+    }
+
     static File configDir;
 
     @EventHandler

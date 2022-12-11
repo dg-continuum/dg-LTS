@@ -20,6 +20,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon;
 
 import com.google.common.base.Supplier;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.config.guiconfig.ConfigPanelCreator;
 import kr.syeyoung.dungeonsguide.config.guiconfig.MFeatureEdit;
@@ -108,13 +109,13 @@ public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextP
     SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
     @Override
     public List<StyledText> getText() {
-        ArrayList<StyledText> texts = new ArrayList<StyledText>();
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        ArrayList<StyledText> texts = new ArrayList<>();
+        DungeonContext context = DungeonFacade.context;
         DungeonScoreUtil.ScoreCalculation scoreCalculation = DungeonScoreUtil.calculateScore();
 
-        boolean failed = context.getDungeonRoomList().stream().anyMatch(a -> a.getCurrentState() == DungeonRoom.RoomState.FAILED);
-        if (context.getMapProcessor().getUndiscoveredRoom() > 0) {
-            texts.add(new StyledText("There are at least "+context.getMapProcessor().getUndiscoveredRoom()+" undiscovered rooms!\n", "warning"));
+        boolean failed = context.dungeonRoomList.stream().anyMatch(a -> a.getCurrentState() == DungeonRoom.RoomState.FAILED);
+        if (context.mapProcessor.getUndiscoveredRoom() > 0) {
+            texts.add(new StyledText("There are at least "+ context.mapProcessor.getUndiscoveredRoom()+" undiscovered rooms!\n", "warning"));
         } else if (failed) {
             texts.add(new StyledText("There is a failed puzzle room! Yikes!\n", "warning"));
         } else if (!scoreCalculation.isFullyCleared()) {
@@ -155,7 +156,7 @@ public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextP
         texts.add(new StyledText("Explorer","field_name"));
         texts.add(new StyledText(": ","field_separator"));
         texts.add(new StyledText(scoreCalculation.getExplorer()+" ","field_value"));
-        texts.add(new StyledText("("+ DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getPercentage() +"% + secrets)\n","field_etc"));
+        texts.add(new StyledText("("+ DungeonFacade.context.percentage +"% + secrets)\n","field_etc"));
 
         texts.add(new StyledText("Time","field_name"));
         texts.add(new StyledText(": ","field_separator"));

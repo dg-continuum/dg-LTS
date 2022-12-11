@@ -24,7 +24,7 @@ import kr.syeyoung.dungeonsguide.config.guiconfig.MFeatureEdit;
 import kr.syeyoung.dungeonsguide.config.guiconfig.MParameterEdit;
 import kr.syeyoung.dungeonsguide.config.guiconfig.RootConfigPanel;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRouteProperties;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlanProperties;
 import kr.syeyoung.dungeonsguide.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.gui.MPanel;
@@ -101,15 +101,15 @@ public class PathfindLineProperties extends SimpleFeature {
     public AColor getTargetColor() {
         return isGlobal() ? parent.getTargetColor() : this.<AColor>getParameter("beamTargetColor").getValue();
     }
-    public ActionRouteProperties getRouteProperties() {
-        ActionRouteProperties actionRouteProperties = new ActionRouteProperties();
-        actionRouteProperties.setPathfind(isPathfind());
-        actionRouteProperties.setLineColor(getLineColor());
-        actionRouteProperties.setLineWidth(getLineWidth());
-        actionRouteProperties.setLineRefreshRate(getRefreshRate());
-        actionRouteProperties.setBeacon(isBeacon());
-        actionRouteProperties.setBeaconBeamColor(getBeamColor());
-        actionRouteProperties.setBeaconColor(getTargetColor());
-        return actionRouteProperties;
+    public ActionPlanProperties getRouteProperties() {
+        ActionPlanProperties actionPlanProperties = new ActionPlanProperties();
+        actionPlanProperties.setPathfind(isPathfind());
+        actionPlanProperties.setLineColor(getLineColor());
+        actionPlanProperties.setLineWidth(getLineWidth());
+        actionPlanProperties.setLineRefreshRate(getRefreshRate());
+        actionPlanProperties.setBeacon(isBeacon());
+        actionPlanProperties.setBeaconBeamColor(getBeamColor());
+        actionPlanProperties.setBeaconColor(getTargetColor());
+        return actionPlanProperties;
     }
 }

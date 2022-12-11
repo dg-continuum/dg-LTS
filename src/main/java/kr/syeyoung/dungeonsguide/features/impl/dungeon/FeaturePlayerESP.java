@@ -18,11 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -48,9 +47,8 @@ public class FeaturePlayerESP extends SimpleFeatureV2 {
         if (!DgOneCongifConfig.playerEps) return;
 
 
-        DungeonContext dungeonContext = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (dungeonContext == null) return;
-        if (!dungeonContext.getPlayers().contains(preRender.entityPlayer.getName())) {
+        if (DungeonFacade.context == null) return;
+        if (!DungeonFacade.context.players.contains(preRender.entityPlayer.getName())) {
             return;
         }
 

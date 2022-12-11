@@ -21,9 +21,9 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret;
 import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.actions.tree.ActionRoute;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.GeneralRoomProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.val;
@@ -42,11 +42,11 @@ public class FeatureActions extends TextHud {
     @Override
     protected boolean shouldShow() {
         if (!SkyblockStatus.isOnDungeon()) return false;
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext().getMapProcessor().isInitialized()) return false;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor.isInitialized()) return false;
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
 
-        Vector2i roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
-        DungeonRoom dungeonRoom = context.getRoomMapper().get(roomPt);
+        Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
+        DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
         if (dungeonRoom == null) return false;
         return dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor;
     }
@@ -66,16 +66,16 @@ public class FeatureActions extends TextHud {
 
         val thePlayer = Minecraft.getMinecraft().thePlayer;
 
-        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if(context == null) return;
 
-        val roomPt = context.getMapProcessor().worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
+        val roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
 
-        val dungeonRoom = context.getRoomMapper().get(roomPt);
+        val dungeonRoom = context.roomMapper.get(roomPt);
         if(!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
 
-        for (final ActionRoute path : ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getStrategy().getActionPath().values()) {
-            lines.add("Pathfinding " + path.getMechanic() + " -> " + path.getState());
+        for (final ActionPlan path : ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getStrategy().getActionPath().values()) {
+            lines.add("Pathfinding " + path.getMechanicName() + " -> " + path.getState());
 
             for (var i = Math.max(0,path.getCurrent()-2); i < path.getActions().size(); i++) {
                 val lineBuilder = new StringBuilder();

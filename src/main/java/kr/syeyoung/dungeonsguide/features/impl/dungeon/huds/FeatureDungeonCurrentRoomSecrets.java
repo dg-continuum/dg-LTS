@@ -71,7 +71,7 @@ public class FeatureDungeonCurrentRoomSecrets extends SingleTextHud {
         if (example) {
             return "8/8";
         }
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext() == null) return "";
+        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null) return "";
         return latestCurrSecrets + "/" + latestTotalSecrets;
     }
 }

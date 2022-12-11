@@ -1,11 +1,12 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor
 
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.*
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bombdefuse.RoomProcessorBombDefuseSolver
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.boxpuzzle.RoomProcessorBoxSolver
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.icefill.RoomProcessorIcePath2
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.waterpuzzle.RoomProcessorWaterPuzzle
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.solvers.*
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.solvers.bombdefuse.RoomProcessorBombDefuseSolver
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.solvers.boxpuzzle.RoomProcessorBoxSolver
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.solvers.icefill.RoomProcessorIcePath2
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.solvers.waterpuzzle.RoomProcessorWaterPuzzle
 
 object ProcessorFactory {
     @JvmStatic

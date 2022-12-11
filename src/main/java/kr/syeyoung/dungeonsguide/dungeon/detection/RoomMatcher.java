@@ -119,8 +119,8 @@ public class RoomMatcher {
     public DungeonRoomInfo createNew() {
         DungeonRoomInfo roomInfo = new DungeonRoomInfo(dungeonRoom.getShape(), dungeonRoom.getColor());
 
-        Vector3i max = dungeonRoom.getMax();
-        Vector3i min = dungeonRoom.getMin();
+        Vector3i max = new Vector3i(dungeonRoom.getMax());
+        Vector3i min = new Vector3i(dungeonRoom.getMin());
         int[][] data = new int[max.z - min.z + 2][max.x - min.x + 2];
 
         for (int z = 0; z < data.length; z++) {

@@ -32,11 +32,11 @@ public class FeatureDungeonSecrets extends SingleTextHud {
     }
 
     public String getTotalSecrets() {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) return "?";
         int totalSecrets = 0;
         boolean allknown = true;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+        for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
             if (dungeonRoom.getTotalSecrets() != -1)
                 totalSecrets += dungeonRoom.getTotalSecrets();
             else allknown = false;
@@ -56,12 +56,12 @@ public class FeatureDungeonSecrets extends SingleTextHud {
             return "999/2+";
         }
 
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if(context == null) return "";
 
         return DungeonUtil.getSecretsFound() +
                 "/" +
-                (int) Math.ceil(DungeonUtil.getTotalSecretsInt() * context.getSecretPercentage()) +
+                (int) Math.ceil(DungeonUtil.getTotalSecretsInt() * context.secretPercentage) +
                 " of " +
                 DungeonUtil.getTotalSecretsInt() +
                 (getTotalSecrets().contains("+") ? "+" : "");

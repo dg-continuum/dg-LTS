@@ -29,6 +29,7 @@ import kr.syeyoung.dungeonsguide.gui.elements.*;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -243,7 +244,7 @@ public class GeneralEditPane extends MPanel {
                     }
 
                     if (blockState.getBlock().hasTileEntity(blockState)) {
-                        TileEntity tileEntity = dungeonRoom.getContext().getWorld().getTileEntity(VectorUtils.Vec3iToBlockPos(pos));
+                        TileEntity tileEntity = Minecraft.getMinecraft().theWorld.getTileEntity(VectorUtils.Vec3iToBlockPos(pos));
                         try {
                             final NBTTagCompound tileEntityCompound = new NBTTagCompound();
                             tileEntity.writeToNBT(tileEntityCompound);

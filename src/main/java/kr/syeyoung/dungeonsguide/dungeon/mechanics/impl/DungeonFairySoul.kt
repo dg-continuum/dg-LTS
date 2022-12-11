@@ -22,7 +22,7 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
     var preRequisite: List<String> = ArrayList()
     override val mechType: MechanicType = MechanicType.Fairysoul
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        return getAbstractActions(state, secretPoint, preRequisite)
+        return getAbstractActions(state, secretPoint, preRequisite, dungeonRoom)
     }
 
     public override fun clone(): Any {
@@ -77,7 +77,8 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
         fun getAbstractActions(
             state: String,
             secretPoint: OffsetPoint?,
-            preRequisite: List<String>
+            preRequisite: List<String>,
+            dungeonRoom: DungeonRoom
         ): Set<AbstractAction> {
             require("navigate".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
             var base: MutableSet<AbstractAction> = HashSet()
@@ -85,9 +86,9 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
             actionClick.predicate = (PredicateArmorStand.INSTANCE as Predicate<Entity?>)
             actionClick.radius = 3
             base.add(actionClick)
-            base = actionClick.getPreRequisites(null).toMutableSet()
+            base = actionClick.getPreRequisites(dungeonRoom).toMutableSet()
             base.add(ActionMove(secretPoint))
-            base = ActionMove(secretPoint).getPreRequisites(null).toMutableSet()
+            base = ActionMove(secretPoint).getPreRequisites(dungeonRoom).toMutableSet()
 
             preRequisite.forEach { str ->
                 if (str.isNotEmpty()) {

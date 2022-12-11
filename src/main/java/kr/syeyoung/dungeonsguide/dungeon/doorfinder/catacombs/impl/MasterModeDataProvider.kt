@@ -2,8 +2,8 @@ package kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.impl
 
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.catacombs.CatacombsDataProvider
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessor
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.solvers.bossfight.BossfightProcessorLivid
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorLivid
 import net.minecraft.util.ChatComponentText
 import net.minecraft.world.World
 

@@ -35,10 +35,10 @@ public class DungeonUtil {
                 return Integer.parseInt(whatever);
             }
         }
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         if (context == null) return 0;
         int d = 0;
-        for (Integer value : context.getDeaths().values()) {
+        for (Integer value : context.deaths.values()) {
             d += value;
         }
         return d;
@@ -82,9 +82,9 @@ public class DungeonUtil {
         if (getSecretsFound() != 0) {
             return (int) Math.ceil(getSecretsFound() / getSecretPercentage() * 100);
         }
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
         int totalSecrets = 0;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+        for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
             if (dungeonRoom.getTotalSecrets() != -1) {
                 totalSecrets += dungeonRoom.getTotalSecrets();
             }
@@ -94,10 +94,10 @@ public class DungeonUtil {
 
     public static boolean sureOfTotalSecrets() {
         if (getSecretsFound() != 0) return true;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().getContext();
-        if (context.getMapProcessor().getUndiscoveredRoom() > 0) return false;
+        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        if (context.mapProcessor.getUndiscoveredRoom() > 0) return false;
         boolean allknown = true;
-        for (DungeonRoom dungeonRoom : context.getDungeonRoomList()) {
+        for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
             if (dungeonRoom.getTotalSecrets() == -1) {
                 allknown = false;
                 break;
