@@ -3,7 +3,6 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPointSet
@@ -26,26 +25,20 @@ class DungeonDoor : DungeonMechanic(), RouteBlocker, Cloneable {
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         require(
-            "open".equals(state, ignoreCase = true) || "closed".equals(
-                state, ignoreCase = true
-            )
+            "open".equals(state, ignoreCase = true) || "closed".equals(state, ignoreCase = true)
         ) { "$state is not valid state for door" }
-        if (state.equals(getCurrentState(dungeonRoom), ignoreCase = true)) return emptySet()
-        val base: MutableSet<AbstractAction> = HashSet()
 
-        for (str in (if (state == "open") openPreRequisite else closePreRequisite)) {
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
-                val element = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+        return HashSet<AbstractAction>().also {
+            if (state.equals(getCurrentState(dungeonRoom), ignoreCase = true)) return emptySet()
 
-                base.add(element)
+            (if (state == "open") openPreRequisite else closePreRequisite).forEach { str ->
+                DungeonMechanic.disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
+                }
             }
 
-
         }
-
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {

@@ -44,7 +44,7 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
             }
 
             preRequisite.forEach { str ->
-                disassemblePreRequisite(str)?.let { (name, state) ->
+                DungeonMechanic.disassemblePreRequisite(str)?.let { (name, state) ->
                     it.add(ActionChangeState(name, state))
                 }
             }

@@ -18,13 +18,15 @@ abstract class DungeonMechanic : Serializable {
     abstract fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint?
 
 
-    fun disassemblePreRequisite(input: String): Pair<String, ActionState>? {
-        if(input.isEmpty()){
-            return null
-        }
-        val arr = input.split(":").toTypedArray()
+    companion object {
+        fun disassemblePreRequisite(input: String): Pair<String, ActionState>? {
+            if(input.isEmpty()){
+                return null
+            }
+            val arr = input.split(":").toTypedArray()
 
-        return Pair(arr[0], ActionState.turnIntoForm(arr[1]))
+            return Pair(arr[0], ActionState.turnIntoForm(arr[1]))
+        }
     }
 
 }

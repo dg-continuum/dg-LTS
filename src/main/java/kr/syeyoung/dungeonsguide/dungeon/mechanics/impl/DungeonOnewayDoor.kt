@@ -1,9 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMoveNearestAir
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
@@ -22,44 +20,33 @@ class DungeonOnewayDoor : DungeonMechanic(), RouteBlocker, Cloneable {
     override val mechType: MechanicType =
         MechanicType.OnewayDoor
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonOnewayDoor {
+        return DungeonOnewayDoor().also {
+            it.secretPoint = secretPoint
+            it.preRequisite = preRequisite
+        }
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        if (state.equals("navigate", ignoreCase = true)) {
-            val base: MutableSet<AbstractAction>
-            base = HashSet()
-            var preRequisites = base
-            val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-            preRequisite.forEach { str ->
-                if (str.isNotEmpty()) {
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+        return HashSet<AbstractAction>().also {
 
-                    preRequisites.add(actionChangeState)
+            when(state.lowercase()){
+                "open" -> {
+                    if (!isBlocking(dungeonRoom)) {
+                        return emptySet()
+                    }
+                }
+                "navigate" -> {
+                    it.add(ActionMoveNearestAir(getRepresentingPoint(dungeonRoom)))
                 }
             }
 
-            return base
-        }
-        require("open".equals(state, ignoreCase = true)) { "$state is not valid state for door" }
-        if (!isBlocking(dungeonRoom)) {
-            return emptySet()
-        }
-        val base: MutableSet<AbstractAction> = HashSet()
-
-        preRequisite.forEach { str ->
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-                base.add(actionChangeState)
+            preRequisite.forEach { str ->
+                Companion.disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
+                }
             }
         }
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
@@ -87,7 +74,7 @@ class DungeonOnewayDoor : DungeonMechanic(), RouteBlocker, Cloneable {
 
     override fun isBlocking(dungeonRoom: DungeonRoom): Boolean {
         for (offsetPoint in secretPoint.offsetPointList) {
-            if (offsetPoint.getBlock(dungeonRoom) !== Blocks.air) return true
+            if (offsetPoint.getBlock(dungeonRoom) != Blocks.air) return true
         }
         return false
     }
@@ -98,28 +85,19 @@ class DungeonOnewayDoor : DungeonMechanic(), RouteBlocker, Cloneable {
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
         val currentStatus = getCurrentState(dungeonRoom)
-        return if (currentStatus.equals("closed", ignoreCase = true)) Sets.newHashSet(
+        return if (currentStatus.equals("closed", ignoreCase = true)) setOf(
             "navigate", "open"
-        ) else Sets.newHashSet("navigate")
+        ) else setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("open", "closed")
+        return setOf("open", "closed")
     }
+
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
-        var leastY = Int.MAX_VALUE
-        var thatPt: OffsetPoint? = null
-        for (offsetPoint in secretPoint.offsetPointList) {
-            if (offsetPoint.y < leastY) {
-                thatPt = offsetPoint
-                leastY = offsetPoint.y
-            }
-        }
-        return thatPt!!
-    }
-
-    companion object {
-        private const val serialVersionUID = -1810891721127873330L
+        return secretPoint.offsetPointList.stream()
+            .min(Comparator.comparingInt(OffsetPoint::y))
+        .orElseThrow { NoSuchElementException() }
     }
 }

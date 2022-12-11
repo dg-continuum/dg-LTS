@@ -1,9 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionDropItem
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
@@ -22,63 +20,44 @@ class DungeonPressurePlate : DungeonMechanic(), Cloneable {
     var preRequisite: List<String> = ArrayList()
     var triggering: String? = ""
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonPressurePlate {
+        return DungeonPressurePlate().apply {
+            platePoint = platePoint
+            preRequisite = ArrayList(preRequisite)
+            triggering = triggering
+        }
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         if (state == getCurrentState(dungeonRoom)) {
             return emptySet()
         }
-        if (state.equals("navigate", ignoreCase = true)) {
-            val base: MutableSet<AbstractAction>
-            base = HashSet()
-            var preRequisites = base
-            val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
+
+
+        return HashSet<AbstractAction>().also {
+
+            when (state.lowercase()) {
+                "triggered"  -> {
+                    it.add(ActionMove(platePoint))
+                    it.add(ActionDropItem(platePoint))
+                }
+                "untriggered" -> {
+                    it.add(ActionMove(platePoint))
+                }
+
+                "navigate" -> {
+                    it.add(ActionMoveNearestAir(getRepresentingPoint(dungeonRoom)))
+                }
+
+                else -> throw IllegalArgumentException("$state is not valid state for DungeonPressurePlate")
+            }
 
             preRequisite.forEach { str ->
-                if (str.isNotEmpty()) {
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-                    preRequisites.add(actionChangeState)
+                Companion.disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
                 }
             }
-
-            return base
         }
-
-
-        require(
-            "triggered".equals(state, ignoreCase = true) || "untriggered".equals(
-                state, ignoreCase = true
-            )
-        ) { "$state is not valid state for secret" }
-        if (state.equals(getCurrentState(dungeonRoom), ignoreCase = true)) {
-            return emptySet()
-        }
-        val base: MutableSet<AbstractAction> = HashSet()
-        var preRequisites: MutableSet<AbstractAction?> = HashSet()
-        if ("triggered".equals(state, ignoreCase = true)) {
-            val actionClick = ActionDropItem(platePoint)
-            preRequisites.add(actionClick)
-            preRequisites = actionClick.getPreRequisites(dungeonRoom).toMutableSet()
-        }
-        val actionMove = ActionMove(platePoint)
-        preRequisites.add(actionMove)
-        preRequisites = actionMove.getPreRequisites(dungeonRoom).toMutableSet()
-        preRequisite.forEach { str ->
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-                preRequisites.add(actionChangeState)
-            }
-        }
-
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
@@ -118,22 +97,19 @@ class DungeonPressurePlate : DungeonMechanic(), Cloneable {
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
         val currentStatus = getCurrentState(dungeonRoom)
         if (currentStatus.equals("triggered", ignoreCase = true)) {
-            return Sets.newHashSet("navigate", "untriggered")
+            return setOf("navigate", "untriggered")
         } else if (currentStatus.equals("untriggered", ignoreCase = true)) {
-            return Sets.newHashSet("navigate", "triggered")
+            return setOf("navigate", "triggered")
         }
-        return Sets.newHashSet("navigate")
+        return setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("triggered", "untriggered")
+        return setOf("triggered", "untriggered")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
         return platePoint
     }
 
-    companion object {
-        private const val serialVersionUID = 7450034718355390645L
-    }
 }

@@ -3,7 +3,6 @@ package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
@@ -18,28 +17,25 @@ class DungeonJournal : DungeonMechanic(), Cloneable {
     var preRequisite: List<String> = ArrayList()
     override val mechType: MechanicType = MechanicType.Journal
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonJournal {
+        return DungeonJournal().also {
+            it.secretPoint = secretPoint
+            it.preRequisite = preRequisite
+        }
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        require("navigate".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
-        var base: MutableSet<AbstractAction> = HashSet()
+        require("navigate".equals(state, ignoreCase = true)) { "$state is not valid state for DungeonJournal" }
 
-        val actionMove = ActionMove(secretPoint)
-        base.add(actionMove)
-        base = actionMove.getPreRequisites(dungeonRoom)
-
-        preRequisite.forEach { str ->
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-                base.add(actionChangeState)
+        return HashSet<AbstractAction>().also {
+            it.add(ActionMove(secretPoint))
+            preRequisite.forEach { str ->
+                DungeonMechanic.disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
+                }
             }
         }
 
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {

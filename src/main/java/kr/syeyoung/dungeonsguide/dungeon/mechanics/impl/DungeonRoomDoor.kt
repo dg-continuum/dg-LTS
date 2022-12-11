@@ -1,6 +1,5 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
@@ -14,11 +13,11 @@ import java.awt.Color
 class DungeonRoomDoor(val dungeonRoom: DungeonRoom, val doorfinder: DungeonDoor) : DungeonMechanic(), Cloneable {
 
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonRoomDoor {
+        return DungeonRoomDoor(dungeonRoom, doorfinder)
     }
 
-    var offsetPoint: OffsetPoint? = null
+    lateinit var offsetPoint: OffsetPoint
 
 
     override val mechType: MechanicType =
@@ -26,35 +25,54 @@ class DungeonRoomDoor(val dungeonRoom: DungeonRoom, val doorfinder: DungeonDoor)
 
     init {
         if (doorfinder.isZDir) {
-            if (dungeonRoom.canAccessAbsolute(doorfinder.position.add(0, 0, 2))) offsetPoint =
-                OffsetPoint(dungeonRoom, doorfinder.position.add(0, 0, 2)) else if (dungeonRoom.canAccessAbsolute(
+            if (dungeonRoom.canAccessAbsolute(doorfinder.position.add(0, 0, 2))) {
+                offsetPoint =
+                    OffsetPoint(dungeonRoom, doorfinder.position.add(0, 0, 2))
+            } else if (dungeonRoom.canAccessAbsolute(
                     doorfinder.position.add(0, 0, -2)
                 )
-            ) offsetPoint = OffsetPoint(dungeonRoom, doorfinder.position.add(0, 0, -2))
+            ) {
+                offsetPoint = OffsetPoint(dungeonRoom, doorfinder.position.add(0, 0, -2))
+            }
         } else {
-            if (dungeonRoom.canAccessAbsolute(doorfinder.position.add(2, 0, 0))) offsetPoint =
-                OffsetPoint(dungeonRoom, doorfinder.position.add(2, 0, 0)) else if (dungeonRoom.canAccessAbsolute(
+            offsetPoint = if (dungeonRoom.canAccessAbsolute(doorfinder.position.add(2, 0, 0))) {
+                OffsetPoint(dungeonRoom, doorfinder.position.add(2, 0, 0))
+            } else if (dungeonRoom.canAccessAbsolute(
                     doorfinder.position.add(-2, 0, 0)
                 )
-            ) offsetPoint = OffsetPoint(dungeonRoom, doorfinder.position.add(-2, 0, 0))
-        }
-        if (offsetPoint == null) {
-            offsetPoint = OffsetPoint(dungeonRoom, doorfinder.position)
+            ) {
+                OffsetPoint(dungeonRoom, doorfinder.position.add(-2, 0, 0))
+            }else {
+
+                OffsetPoint(dungeonRoom, doorfinder.position)
+            }
         }
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         require("navigate".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
-        val preRequisites: MutableSet<AbstractAction> = HashSet()
-        preRequisites.add(ActionMove(offsetPoint!!))
-        return preRequisites
+        return HashSet<AbstractAction>().also {
+            it.add(ActionMove(offsetPoint))
+        }
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
-        val pos = offsetPoint!!.getVector3i(dungeonRoom)
-        RenderUtils.highlightBlock(pos, color, partialTicks)
+        val pos = offsetPoint.getVector3i(dungeonRoom)
+        RenderUtils.highlightBlock(
+            pos,
+            color,
+            partialTicks
+        )
         RenderUtils.drawTextAtWorld(
-            name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, -0x1, 0.03f, false, true, partialTicks
+            name,
+            pos.x + 0.5f,
+            pos.y + 0.75f,
+            pos.z + 0.5f,
+            -0x1,
+            0.03f,
+            false,
+            true,
+            partialTicks
         )
         RenderUtils.drawTextAtWorld(
             getCurrentState(dungeonRoom),
@@ -74,14 +92,14 @@ class DungeonRoomDoor(val dungeonRoom: DungeonRoom, val doorfinder: DungeonDoor)
     }
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("navigate")
+        return setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("key-open", "key-closed", "normal")
+        return setOf("key-open", "key-closed", "normal")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
-        return offsetPoint!!
+        return offsetPoint
     }
 }

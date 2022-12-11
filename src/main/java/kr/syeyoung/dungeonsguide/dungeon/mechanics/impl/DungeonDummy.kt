@@ -1,9 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionClick
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
@@ -19,37 +17,31 @@ class DungeonDummy : DungeonMechanic(), Cloneable {
     var preRequisite: List<String> = ArrayList()
     override val mechType: MechanicType = MechanicType.Dummy
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonDummy {
+        return DungeonDummy().also {
+            it.secretPoint = secretPoint
+            it.preRequisite = preRequisite
+        }
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        var base: MutableSet<AbstractAction> = HashSet()
-
-        when(state.lowercase()){
-            "navigate" -> {
-                val actionMove = ActionMove(secretPoint)
-                base.add(actionMove)
-                base = actionMove.getPreRequisites(dungeonRoom)
+        return HashSet<AbstractAction>().also {
+            when(state.lowercase()){
+                "navigate" -> {
+                    it.add(ActionMove(secretPoint))
+                }
+                "click" -> {
+                    it.add(ActionMove(secretPoint))
+                    it.add(ActionClick(secretPoint))
+                }
             }
-            "click" -> {
-                val actionClick = ActionClick(secretPoint)
-                base.add(actionClick)
-                base = actionClick.getPreRequisites(dungeonRoom)
-                val actionMove = ActionMove(secretPoint)
-                base.add(actionMove)
-                base = actionMove.getPreRequisites(dungeonRoom)
-            }
-        }
 
-        preRequisite.forEach { str ->
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                base.add(ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1])))
+            preRequisite.forEach { str ->
+                Companion.disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
+                }
             }
         }
-
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
@@ -68,18 +60,15 @@ class DungeonDummy : DungeonMechanic(), Cloneable {
     }
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("navigate", "click")
+        return setOf("navigate", "click")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("no-state", "navigate,click")
+        return setOf("no-state", "navigate,click")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
         return secretPoint
     }
 
-    companion object {
-        private const val serialVersionUID = -8449664812034435765L
-    }
 }

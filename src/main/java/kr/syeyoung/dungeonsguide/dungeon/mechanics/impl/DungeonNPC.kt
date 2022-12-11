@@ -1,6 +1,5 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
@@ -15,8 +14,11 @@ class DungeonNPC : DungeonMechanic(), Cloneable {
     var preRequisite: List<String> = ArrayList()
     override val mechType: MechanicType = MechanicType.Npc
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonNPC {
+        return DungeonNPC().also {
+            it.secretPoint = secretPoint
+            it.preRequisite = preRequisite
+        }
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
@@ -39,18 +41,14 @@ class DungeonNPC : DungeonMechanic(), Cloneable {
     }
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("navigate")
+        return setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("no-state", "navigate")
+        return setOf("no-state", "navigate")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
         return secretPoint
-    }
-
-    companion object {
-        private const val serialVersionUID = -89487601113028763L
     }
 }

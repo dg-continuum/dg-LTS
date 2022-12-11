@@ -1,9 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionInteract
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
@@ -25,8 +23,11 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
         return getAbstractActions(state, secretPoint, preRequisite, dungeonRoom)
     }
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonFairySoul {
+        return DungeonFairySoul().also {
+            it.secretPoint = secretPoint
+            it.preRequisite = preRequisite
+        }
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
@@ -61,11 +62,11 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
     }
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("navigate")
+        return setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("no-state", "navigate")
+        return setOf("no-state", "navigate")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
@@ -73,7 +74,6 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
     }
 
     companion object {
-        private const val serialVersionUID = 156412742320519783L
         fun getAbstractActions(
             state: String,
             secretPoint: OffsetPoint?,
@@ -81,24 +81,20 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
             dungeonRoom: DungeonRoom
         ): Set<AbstractAction> {
             require("navigate".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
-            var base: MutableSet<AbstractAction> = HashSet()
-            val actionClick = ActionInteract(secretPoint!!)
-            actionClick.predicate = (PredicateArmorStand.INSTANCE as Predicate<Entity?>)
-            actionClick.radius = 3
-            base.add(actionClick)
-            base = actionClick.getPreRequisites(dungeonRoom).toMutableSet()
-            base.add(ActionMove(secretPoint))
-            base = ActionMove(secretPoint).getPreRequisites(dungeonRoom).toMutableSet()
 
-            preRequisite.forEach { str ->
-                if (str.isNotEmpty()) {
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
-                    base.add(ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1])))
+            return HashSet<AbstractAction>().also {
+                it.add(ActionInteract(secretPoint!!).apply {
+                    predicate = (PredicateArmorStand.INSTANCE as Predicate<Entity?>)
+                    radius = 3
+                })
+                it.add(ActionMove(secretPoint))
+
+                preRequisite.forEach { str ->
+                    disassemblePreRequisite(str)?.let { (name, state) ->
+                        it.add(ActionChangeState(name, state))
+                    }
                 }
             }
-
-            return base
         }
     }
 }

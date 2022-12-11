@@ -202,7 +202,7 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
                 else -> throw IllegalArgumentException("$state is not valid state for secret")
             }
             preRequisite.forEach { str ->
-                disassemblePreRequisite(str)?.let { (name, state) ->
+                Companion.disassemblePreRequisite(str)?.let { (name, state) ->
                     base.add(ActionChangeState(name, state))
                 }
             }

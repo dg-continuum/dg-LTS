@@ -1,9 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionChangeState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionClick
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
@@ -21,73 +19,49 @@ class DungeonLever : DungeonMechanic(), Cloneable {
     var triggering: String? = ""
     override val mechType: MechanicType = MechanicType.Lever
 
-    public override fun clone(): Any {
-        return super.clone()
+    public override fun clone(): DungeonLever {
+        return DungeonLever().also {
+            it.leverPoint = leverPoint
+            it.preRequisite = ArrayList(preRequisite)
+            it.triggering = triggering
+        }
     }
+
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
         if (state == getCurrentState(dungeonRoom)) return emptySet()
-        if (state.equals("navigate", ignoreCase = true)) {
-            val base: MutableSet<AbstractAction>
-            base = HashSet()
-            var preRequisites = base
-            val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom)
+
+
+        return HashSet<AbstractAction>().also {
+
+            when (state.lowercase()) {
+                "navigate" -> {
+                    it.add(ActionMoveNearestAir(getRepresentingPoint(dungeonRoom)))
+                }
+
+                "triggered", "untriggered" -> {
+                    it.add(ActionMove(leverPoint))
+                    if (!state.equals(getCurrentState(dungeonRoom), ignoreCase = true)) {
+                        it.add(ActionClick(leverPoint))
+                    }
+                }
+
+                else -> throw IllegalArgumentException("Unknown state $state")
+            }
+
 
             preRequisite.forEach { str ->
-                if (str.isNotEmpty()) {
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-                    preRequisites.add(actionChangeState)
+                Companion.disassemblePreRequisite(str)?.let { (name, state) ->
+                    it.add(ActionChangeState(name, state))
                 }
             }
-
-            return base
         }
-        require(
-            "triggered".equals(state, ignoreCase = true) || "untriggered".equals(
-                state,
-                ignoreCase = true
-            )
-        ) { "$state is not valid state for secret" }
-        val base: MutableSet<AbstractAction> = HashSet()
-        var preRequisites: MutableSet<AbstractAction> = HashSet()
-        if (!state.equals(getCurrentState(dungeonRoom), ignoreCase = true)) {
-            val actionClick = ActionClick(leverPoint)
-            preRequisites.add(actionClick)
-
-            preRequisites = actionClick.getPreRequisites(dungeonRoom)
-        }
-        val actionMove = ActionMove(leverPoint)
-        preRequisites.add(actionMove)
-        preRequisites = actionMove.getPreRequisites(dungeonRoom)
-        for (str in preRequisite) {
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-
-                preRequisites.add(actionChangeState)
-
-            }
-        }
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
         val pos: Vector3i = leverPoint.getVector3i(dungeonRoom)
         RenderUtils.highlightBlock(pos, color, partialTicks)
         RenderUtils.drawTextAtWorld(
-            name,
-            pos.x + 0.5f,
-            pos.y + 0.75f,
-            pos.z + 0.5f,
-            -0x1,
-            0.03f,
-            false,
-            true,
-            partialTicks
+            name, pos.x + 0.5f, pos.y + 0.75f, pos.z + 0.5f, -0x1, 0.03f, false, true, partialTicks
         )
         RenderUtils.drawTextAtWorld(
             getCurrentState(dungeonRoom),
@@ -122,18 +96,16 @@ class DungeonLever : DungeonMechanic(), Cloneable {
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
         val currentStatus = getCurrentState(dungeonRoom)
-        if (currentStatus.equals("untriggered", ignoreCase = true)) return Sets.newHashSet(
-            "navigate",
-            "triggered"
-        ) else if (currentStatus.equals("triggered", ignoreCase = true)) return Sets.newHashSet(
-            "navigate",
-            "untriggered"
+        if (currentStatus.equals("untriggered", ignoreCase = true)) return setOf(
+            "navigate", "triggered"
+        ) else if (currentStatus.equals("triggered", ignoreCase = true)) return setOf(
+            "navigate", "untriggered"
         )
-        return Sets.newHashSet("navigate")
+        return setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("triggered", "untriggered")
+        return setOf("triggered", "untriggered")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
