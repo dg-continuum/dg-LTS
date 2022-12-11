@@ -53,7 +53,7 @@ jobs:
         if: ${{ env.WEBHOOK_URL && success() }}
         run: |
           ./.github/workflows/send_webhook_update.sh
-           curl -H "Content-Type: application/json" -d '{"username": "Beta Build Ping", "content": "<@&1042906817283498064>"}' "$WEBHOOK_URL"
+#           curl -H "Content-Type: application/json" -d '{"username": "Beta Build Ping", "content": "<@&1042906817283498064>"}' "$WEBHOOK_URL"
         env:
           STATUS: SUCCESS
           MESSAGE_ID: ${{ steps.sendmsg.outputs.MESSAGE_ID }}
