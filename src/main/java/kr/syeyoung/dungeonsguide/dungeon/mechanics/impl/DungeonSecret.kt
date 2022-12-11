@@ -1,10 +1,8 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.*
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic
@@ -12,7 +10,6 @@ import kr.syeyoung.dungeonsguide.dungeon.mechanics.MechanicType
 import kr.syeyoung.dungeonsguide.utils.BlockCache
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
-import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.passive.EntityBat
@@ -31,96 +28,136 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
     var preRequisite: List<String> = ArrayList()
 
     public override fun clone(): Any {
-        return super.clone()
+        return DungeonSecret().also {
+            it.secretPoint = secretPoint
+            it.secretType = secretType
+            it.preRequisite = preRequisite
+        }
     }
 
     fun tick(dungeonRoom: DungeonRoom) {
-        if (secretType == SecretType.CHEST) {
-            val pos = secretPoint.getBlockPos(dungeonRoom)
-            val blockState = BlockCache.getBlockState(pos)
-            if (blockState.block === Blocks.chest || blockState.block === Blocks.trapped_chest) {
-                val chest = Minecraft.getMinecraft().theWorld.getTileEntity(pos) as TileEntityChest
-                if (chest.numPlayersUsing > 0) {
-                    dungeonRoom.roomContext["c-$pos"] = 2
-                } else {
-                    dungeonRoom.roomContext["c-$pos"] = 1
+        when (secretType) {
+            SecretType.CHEST -> {
+                val pos = secretPoint.getBlockPos(dungeonRoom)
+                val blockState = BlockCache.getBlockState(pos)
+                if (blockState.block == Blocks.chest || blockState.block == Blocks.trapped_chest) {
+                    val chest = Minecraft.getMinecraft().theWorld.getTileEntity(pos) as TileEntityChest
+                    if (chest.numPlayersUsing > 0) {
+                        dungeonRoom.discoveredChests[VectorUtils.BlockPosToVec3i(pos)] = 2
+                    } else {
+                        dungeonRoom.discoveredChests[VectorUtils.BlockPosToVec3i(pos)] = 1
+                    }
                 }
             }
-        } else if (secretType == SecretType.ESSENCE) {
-            val pos: Vector3i = secretPoint.getVector3i(dungeonRoom)
-            if (BlockCache.getBlock(pos) === Blocks.skull) {
-                dungeonRoom.roomContext["e-$pos"] = true
-            }
-        } else if (secretType == SecretType.ITEM_DROP) {
-            val pos = Vector3d(secretPoint.getVector3i(dungeonRoom))
-            val player = VectorUtils.getPlayerVector3d()
-            if (player.distanceSquared(pos) < 16) {
-                val vec3 = pos.sub(player).normalize()
-                var i = 0
-                while (i < player.distance(pos)) {
-                    val vec = player.add(vec3.x * i, vec3.y * i, vec3.z * i)
-                    val blockState = BlockCache.getBlockState(vec)
-                    if (!DungeonRoom.isValidBlock(blockState)) return
-                    i++
+
+            SecretType.ESSENCE -> {
+                val pos: Vector3i = secretPoint.getVector3i(dungeonRoom)
+                if (BlockCache.getBlock(pos) == Blocks.skull) {
+                    dungeonRoom.discoveredEssence[pos] = true
                 }
-                dungeonRoom.roomContext["i-$pos"] = true
+            }
+
+            SecretType.ITEM_DROP -> {
+                val secretPos = secretPoint.getVector3d(dungeonRoom)
+                val playerPos = VectorUtils.getPlayerVector3d()
+                if (playerPos.distanceSquared(secretPos) < 16) {
+                    val vec3 = secretPos.sub(playerPos).normalize()
+                    var i = 0
+                    while (i < playerPos.distance(secretPos)) {
+                        val vec = playerPos.add(vec3.x * i, vec3.y * i, vec3.z * i)
+                        val blockState = BlockCache.getBlockState(vec)
+                        if (!DungeonRoom.isValidBlock(blockState)) return
+                        i++
+                    }
+                    dungeonRoom.discoveredItemDrops[secretPos] = true
+                }
+            }
+
+            SecretType.BAT -> {
+                // the compiler yelled at me,
+                // so here it is
+                // a useless branch cuz "when branches need to be exhaustive"
             }
         }
     }
 
     fun getSecretStatus(dungeonRoom: DungeonRoom): SecretStatus {
         val pos: Vector3i = secretPoint.getVector3i(dungeonRoom)
-        val block: Block = BlockCache.getBlock(pos)
+        val secretBlock = BlockCache.getBlock(pos)
 
-        return when (secretType){
+        return when (secretType) {
             SecretType.ESSENCE -> {
-                if (block === Blocks.skull) {
-                    dungeonRoom.roomContext["e-$pos"] = true
+                if (secretBlock == Blocks.skull) {
+                    dungeonRoom.discoveredEssence[pos] = true
                     SecretStatus.DEFINITELY_NOT
                 } else {
-                    if (dungeonRoom.roomContext.containsKey("e-$pos")) SecretStatus.FOUND else SecretStatus.NOT_SURE
+                    if (dungeonRoom.discoveredEssence.containsKey(pos)) {
+                        SecretStatus.FOUND
+                    } else {
+                        SecretStatus.NOT_SURE
+                    }
                 }
             }
+
             SecretType.BAT -> {
                 val context = DungeonFacade.context ?: return SecretStatus.NOT_SURE
-                for (killed in context.killedBats) {
-                    context.batSpawnedLocations[killed]?.let {
-                        if (it.distanceSquared(pos) < 100) {
+
+                context.killedBats.forEach { killedBat ->
+                    context.batSpawnedLocations[killedBat]?.let { killedBatSpawn ->
+                        if (killedBatSpawn.distanceSquared(pos) < 100) {
                             return SecretStatus.FOUND
                         }
                     }
                 }
+
                 SecretStatus.NOT_SURE
             }
+
             SecretType.CHEST -> {
-                if (dungeonRoom.roomContext.containsKey("c-$pos")) return if (dungeonRoom.roomContext["c-$pos"] as Int == 2 || block === Blocks.air) SecretStatus.FOUND else SecretStatus.CREATED
-                if (block === Blocks.air) {
-                    SecretStatus.DEFINITELY_NOT
-                } else if (block !== Blocks.chest && block !== Blocks.trapped_chest) {
-                    SecretStatus.ERROR
-                } else {
-                    val chest = Minecraft.getMinecraft().theWorld.getTileEntity(VectorUtils.Vec3iToBlockPos(pos)) as TileEntityChest
-                    if (chest.numPlayersUsing > 0) {
+                if (dungeonRoom.discoveredChests.containsKey(pos)) {
+                    return if (dungeonRoom.discoveredChests[pos] as Int == 2 || secretBlock == Blocks.air) {
                         SecretStatus.FOUND
                     } else {
                         SecretStatus.CREATED
                     }
                 }
+                when {
+                    secretBlock == Blocks.air -> {
+                        SecretStatus.DEFINITELY_NOT
+                    }
+
+                    secretBlock != Blocks.chest && secretBlock != Blocks.trapped_chest -> {
+                        SecretStatus.ERROR
+                    }
+
+                    else -> {
+                        val chest =
+                            Minecraft.getMinecraft().theWorld.getTileEntity(VectorUtils.Vec3iToBlockPos(pos)) as TileEntityChest
+                        if (chest.numPlayersUsing > 0) {
+                            SecretStatus.FOUND
+                        } else {
+                            SecretStatus.CREATED
+                        }
+                    }
+                }
             }
-            else -> {
-                if (dungeonRoom.roomContext.containsKey("i-$pos")) return SecretStatus.FOUND
-                val secret = secretPoint.getVector3d(dungeonRoom)
-                val player = VectorUtils.getPlayerVector3d()
-                if (player.distance(secret) < 16) {
-                    secret.sub(player).normalize()
+
+            SecretType.ITEM_DROP -> {
+                if (dungeonRoom.discoveredItemDrops.containsKey(Vector3d(pos))) {
+                    return SecretStatus.FOUND
+                }
+                val secretPos = secretPoint.getVector3d(dungeonRoom)
+                val playerPos = VectorUtils.getPlayerVector3d()
+                if (playerPos.distance(secretPos) < 16) {
+                    secretPos.sub(playerPos).normalize()
                     var i = 0
-                    while (i < player.distance(secret)) {
-                        player.add(secret.x * i, secret.y * i, secret.z * i)
-                        val blockState = BlockCache.getBlockState(player)
+                    while (i < playerPos.distance(secretPos)) {
+                        playerPos.add(secretPos.x * i, secretPos.y * i, secretPos.z * i)
+                        val blockState = BlockCache.getBlockState(playerPos)
                         if (!DungeonRoom.isValidBlock(blockState)) return SecretStatus.NOT_SURE
                         i++
                     }
-                    dungeonRoom.roomContext["i-$secret"] = true
+                    dungeonRoom.discoveredItemDrops[secretPos] = true
                 }
                 SecretStatus.NOT_SURE
             }
@@ -128,50 +165,48 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
     }
 
     override fun getAction(state: String, dungeonRoom: DungeonRoom): Set<AbstractAction> {
-        if (state.equals("navigate", ignoreCase = true)) {
-            val base: Set<AbstractAction>
-            base = HashSet()
-            var preRequisites = base
-            val actionMove = ActionMoveNearestAir(getRepresentingPoint(dungeonRoom))
-            preRequisites.add(actionMove)
-            preRequisites = actionMove.getPreRequisites(dungeonRoom)
-            for (str in preRequisite) {
-                if (str.isNotEmpty()) {
-                    val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
+        return HashSet<AbstractAction>().also { base ->
+            when (state.lowercase()) {
+                "navigate" -> {
+                    base.add(ActionMoveNearestAir(getRepresentingPoint(dungeonRoom)))
+                }
 
-                    preRequisites.add(actionChangeState)
+                "found" -> {
+                    if (getSecretStatus(dungeonRoom) == SecretStatus.FOUND) {
+                        return emptySet()
+                    }
+
+
+                    base.add(ActionMove(secretPoint))
+
+                    when (secretType) {
+                        SecretType.CHEST, SecretType.ESSENCE -> {
+                            base.add(ActionClick(secretPoint))
+                        }
+
+                        SecretType.BAT -> {
+                            base.add(ActionKill(secretPoint).apply {
+                                predicate = Predicate { obj: Entity? -> obj is EntityBat }
+                                radius = 10
+                            })
+                        }
+
+                        SecretType.ITEM_DROP -> {
+                            // nothing since we be near it to pick it up
+                            // not like we need to click it or something
+                        }
+                    }
+
+                }
+
+                else -> throw IllegalArgumentException("$state is not valid state for secret")
+            }
+            preRequisite.forEach { str ->
+                disassemblePreRequisite(str)?.let { (name, state) ->
+                    base.add(ActionChangeState(name, state))
                 }
             }
-            return base
         }
-        require("found".equals(state, ignoreCase = true)) { "$state is not valid state for secret" }
-        if (state == "found" && getSecretStatus(dungeonRoom) == SecretStatus.FOUND) return HashSet()
-        val base: MutableSet<AbstractAction>
-        base = HashSet()
-        var preRequisites = base
-        if (secretType == SecretType.CHEST || secretType == SecretType.ESSENCE) {
-            val actionClick = ActionClick(secretPoint)
-            preRequisites.add(actionClick)
-            preRequisites = actionClick.getPreRequisites(dungeonRoom)
-        } else if (secretType == SecretType.BAT) {
-            val actionKill = ActionKill(secretPoint)
-            preRequisites.add(actionKill)
-            actionKill.predicate = Predicate { obj: Entity? -> obj is EntityBat }
-            actionKill.radius = 10
-            preRequisites = actionKill.getPreRequisites(dungeonRoom)
-        }
-        val actionMove = ActionMove(secretPoint)
-        preRequisites.add(actionMove)
-        preRequisites = actionMove.getPreRequisites(dungeonRoom)
-        for (str in preRequisite) {
-            if (str.isNotEmpty()) {
-                val toTypedArray = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val actionChangeState = ActionChangeState(toTypedArray[0], ActionState.turnIntoForm(toTypedArray[1]))
-                preRequisites.add(actionChangeState)
-            }
-        }
-        return base
     }
 
     override fun highlight(color: Color, name: String, dungeonRoom: DungeonRoom, partialTicks: Float) {
@@ -193,14 +228,17 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
     }
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        val status = getSecretStatus(dungeonRoom)
-        return if (status == SecretStatus.FOUND) Sets.newHashSet(
-            "navigate"
-        ) else Sets.newHashSet("found", "navigate")
+        return if (getSecretStatus(dungeonRoom) == SecretStatus.FOUND) {
+            hashSetOf(
+                "navigate"
+            )
+        } else {
+            hashSetOf("found", "navigate")
+        }
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("found")
+        return hashSetOf("found")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {
@@ -211,11 +249,8 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
         BAT, CHEST, ITEM_DROP, ESSENCE
     }
 
-    enum class SecretStatus(stateName: String) {
-        DEFINITELY_NOT("definitely_not"), NOT_SURE("not_sure"), CREATED("created"), FOUND("found"), ERROR("error");
+    enum class SecretStatus {
+        DEFINITELY_NOT, NOT_SURE, CREATED, FOUND, ERROR
     }
 
-    companion object {
-        private const val serialVersionUID = 8784808599222706537L
-    }
 }

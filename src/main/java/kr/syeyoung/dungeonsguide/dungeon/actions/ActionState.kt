@@ -1,7 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.actions
 
 enum class ActionState(val state: String) {
-    navigate("navigate"), `open`("open"), found("found"), click("click");
+    navigate("navigate"), `open`("open"), found("found"), click("click"), triggered("triggered");
 
     companion object {
 

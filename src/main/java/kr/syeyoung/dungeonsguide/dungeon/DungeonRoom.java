@@ -44,6 +44,7 @@ import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
+import org.joml.Vector3d;
 import org.joml.Vector3i;
 
 import javax.vecmath.Vector2d;
@@ -92,11 +93,24 @@ public class DungeonRoom implements DungeonRoomAccessor {
     private final int unitWidth; // X
     private final int unitHeight; // Z
 
-    public Map<String, Object> getRoomContext() {
-        return roomContext;
+
+    public Map<Vector3i, Boolean> getDiscoveredEssence() {
+        return discoveredEssence;
     }
 
-    private final Map<String, Object> roomContext = new HashMap<>();
+    public Map<Vector3d, Boolean> getDiscoveredItemDrops() {
+        return discoveredItemDrops;
+    }
+
+    public Map<Vector3i, Integer> getDiscoveredChests() {
+        return discoveredChests;
+    }
+
+    Map<Vector3i, Boolean> discoveredEssence = new HashMap<>();
+    Map<Vector3d, Boolean> discoveredItemDrops = new HashMap<>();
+    Map<Vector3i, Integer> discoveredChests = new HashMap<>();
+
+
     // These values are doubled
     private final int minx;
     private final int miny;

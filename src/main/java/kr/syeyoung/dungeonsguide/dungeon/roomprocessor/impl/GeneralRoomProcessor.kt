@@ -4,8 +4,8 @@ import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
-import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan
+import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
@@ -111,7 +111,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     override fun chatReceived(chat: IChatComponent) {
         if (previousChest != null) {
             if (chat.formattedText == "§r§cThis chest has already been searched!§r") {
-                dungeonRoom.roomContext["c-" + previousChest.toString()] = 2
+                dungeonRoom.discoveredChests[VectorUtils.BlockPosToVec3i(previousChest!!)] = 2
                 previousChest = null
             }
         }
