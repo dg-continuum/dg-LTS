@@ -76,7 +76,7 @@ public class VectorUtils {
 
     public static Vector3i getPlayerVector3i(){
         val player = Minecraft.getMinecraft().thePlayer;
-        return new Vector3i((int) player.posX, (int) player.posY, (int) player.posZ);
+        return new Vector3i((int) (player.posX + 0.5), (int) (player.posY + 0.5), (int) (player.posZ + 0.5));
     }
 
     public static Vector3d getPlayerVector3d(){

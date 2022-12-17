@@ -8,9 +8,9 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.MechanicType
-import kr.syeyoung.dungeonsguide.dungeon.mechanics.predicates.PredicateArmorStand
 import kr.syeyoung.dungeonsguide.utils.RenderUtils
 import net.minecraft.entity.Entity
+import net.minecraft.entity.item.EntityArmorStand
 import org.joml.Vector3i
 import java.awt.Color
 import java.util.function.Predicate
@@ -84,7 +84,7 @@ class DungeonFairySoul : DungeonMechanic(), Cloneable {
 
             return HashSet<AbstractAction>().also {
                 it.add(ActionInteract(secretPoint!!).apply {
-                    predicate = (PredicateArmorStand.INSTANCE as Predicate<Entity?>)
+                    predicate = Predicate { entity: Entity? -> entity is EntityArmorStand }
                     radius = 3
                 })
                 it.add(ActionMove(secretPoint))

@@ -18,13 +18,14 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f7;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorNecron;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
+import kr.syeyoung.dungeonsguide.utils.BlockCache;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -54,14 +55,14 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
         if (!SkyblockStatus.isOnSkyblock()) return;
         if (!DgOneCongifConfig.simonySaysSolver) return;
 
-        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext dc = DungeonFacade.context;
         if (dc == null) return;
         if (!(dc.bossfightProcessor instanceof BossfightProcessorNecron)) return;
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
 
         BlockPos pos = event.pos.add(1, 0, 0);
         if (120 <= pos.getY() && pos.getY() <= 123 && pos.getX() == 310 && 291 <= pos.getZ() && pos.getZ() <= 294) {
-            if (DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(event.pos).getBlock() != Blocks.stone_button)
+            if (BlockCache.getBlockState(event.pos).getBlock() != Blocks.stone_button)
                 return;
             if (pos.equals(orderclick.peek())) {
                 orderclick.poll();
@@ -75,18 +76,18 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
             return;
         }
         if (!SkyblockStatus.isOnSkyblock()) return;
-        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext dc = DungeonFacade.context;
         if (dc == null) {
             wasButton = false;
             return;
         }
         if (!(dc.bossfightProcessor instanceof BossfightProcessorNecron)) return;
 
-        if (wasButton && DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.air) {
+        if (wasButton && BlockCache.getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.air) {
             orderclick.clear();
             orderbuild.clear();
             wasButton = false;
-        } else if (!wasButton && DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.stone_button) {
+        } else if (!wasButton && BlockCache.getBlockState(new BlockPos(309, 123, 291)).getBlock() == Blocks.stone_button) {
             orderclick.addAll(orderbuild);
             wasButton = true;
         }
@@ -94,7 +95,7 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
 
         if (!wasButton) {
             for (BlockPos allInBox : BlockPos.getAllInBox(new BlockPos(310, 123, 291), new BlockPos(310, 120, 294))) {
-                if (DungeonsGuide.getDungeonsGuide().getBlockCache().getBlockState(allInBox).getBlock() == Blocks.sea_lantern && !orderbuild.contains(allInBox)) {
+                if (BlockCache.getBlockState(allInBox).getBlock() == Blocks.sea_lantern && !orderbuild.contains(allInBox)) {
                     orderbuild.add(VectorUtils.BlockPosToVec3i(allInBox));
                 }
             }
@@ -105,7 +106,7 @@ public class FeatureSimonSaysSolver extends SimpleFeatureV2 {
     public void onRenderWorld(RenderWorldLastEvent e) {
         if (!SkyblockStatus.isOnSkyblock()) return;
         if (!DgOneCongifConfig.simonySaysSolver) return;
-        DungeonContext dc = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext dc = DungeonFacade.context;
         if (dc == null) {
             return;
         }

@@ -7,7 +7,6 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig
 import kr.syeyoung.dungeonsguide.oneconfig.secrets.AutoPathfindPage
@@ -18,7 +17,7 @@ import net.minecraft.client.Minecraft
 import org.joml.Vector3i
 import java.awt.Color
 
-class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(parent) {
+class AutoFinderStrategy(room: DungeonRoom) : SecretGuideStrategy(room) {
 
     private val autoPathFindCandidates: MutableMap<MechanicId, AutoGuideSecretCandidate> = HashMap()
 
@@ -36,7 +35,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
     override fun update() {
 
-        if (parent.dungeonRoom.currentState == DungeonRoom.RoomState.FINISHED) {
+        if (room.currentState == DungeonRoom.RoomState.FINISHED) {
             cancelAll()
             return
         }
@@ -50,9 +49,9 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
 
         // tick mechanics
-        for ((_, value) in parent.dungeonRoom.mechanics) {
+        for ((_, value) in room.mechanics) {
             if (value is DungeonSecret) {
-                value.tick(parent.dungeonRoom)
+                value.tick(room)
             }
         }
 
@@ -60,7 +59,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         for ((_, route) in actionPath) {
             route.onTick()
 
-            if ((route.currentAction is ActionComplete) || (route.currentAction.isComplete(parent.dungeonRoom))) {
+            if ((route.currentAction is ActionComplete) || (route.currentAction.isComplete(room))) {
                 autoPathFindCandidates[MechanicId(route.mechanicName)]?.let {
                     it.isDone = true
                 }
@@ -145,13 +144,13 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
 
     private fun calculateMechanicCosts() {
         // get all mechanics from parent if they already are not candidates
-        for ((secretName, secretMechanic) in parent.dungeonRoom.mechanics) {
+        for ((secretName, secretMechanic) in room.mechanics) {
             val mechId = MechanicId(secretName)
             if (secretMechanic is DungeonSecret) {
                 if (!autoPathFindCandidates.contains(mechId)) {
-                    val representingPoint = secretMechanic.getRepresentingPoint(parent.dungeonRoom)
+                    val representingPoint = secretMechanic.getRepresentingPoint(room)
                     val secretPos = representingPoint
-                        .getVector3i(parent.dungeonRoom)
+                        .getVector3i(room)
 
                     autoPathFindCandidates[mechId] =
                         AutoGuideSecretCandidate(
@@ -170,7 +169,7 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
         for ((key, value) in actionPath) {
             val id = MechanicId(key)
             autoPathFindCandidates[id]?.let {
-                if(value.currentAction.isComplete(parent.dungeonRoom)){
+                if(value.currentAction.isComplete(room)){
                     it.isDone = true
                 }
             }
@@ -195,16 +194,16 @@ class AutoFinderStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(par
                 value.cost += (value.mechanic.preRequisite.size * 100).toDouble()
             }
 
-            val representingPoint = value.mechanic.getRepresentingPoint(parent.dungeonRoom)
+            val representingPoint = value.mechanic.getRepresentingPoint(room)
             if (representingPoint != null) {
                 val secretPos = representingPoint
-                    .getVector3i(parent.dungeonRoom)
+                    .getVector3i(room)
 
                 value.cost += if (DgOneCongifConfig.usePathfindCostCacls) {
-                    DungeonsGuide.getDungeonsGuide().dungeonFacade.calculatePathLenght(
+                    DungeonsGuide.getDungeonsGuide().dungeonFacade.calculatePathLength(
                         playerPos,
                         secretPos,
-                        parent.dungeonRoom
+                        room
                     ).toDouble()
                 } else {
                     secretPos.distance(playerPos)

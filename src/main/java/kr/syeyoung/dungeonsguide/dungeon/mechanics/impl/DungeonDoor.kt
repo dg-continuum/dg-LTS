@@ -101,7 +101,4 @@ class DungeonDoor : DungeonMechanic(), RouteBlocker, Cloneable {
         return thatPt!!
     }
 
-    companion object {
-        private const val serialVersionUID = -1011605722415475761L
-    }
 }

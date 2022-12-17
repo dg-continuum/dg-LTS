@@ -101,7 +101,4 @@ class OffsetPoint : Cloneable, Serializable {
                 '}'
     }
 
-    companion object {
-        private const val serialVersionUID = 3102336358774967540L
-    }
 }

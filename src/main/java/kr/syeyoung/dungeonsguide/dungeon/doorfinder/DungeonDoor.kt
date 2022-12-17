@@ -1,21 +1,16 @@
 package kr.syeyoung.dungeonsguide.dungeon.doorfinder
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.utils.BlockCache
-import net.minecraft.block.Block
 import net.minecraft.init.Blocks
-import net.minecraft.world.World
 import org.joml.Vector3i
 
-class DungeonDoor(world: World, pos: Vector3i, type: EDungeonDoorType) {
-    private val w: World
+class DungeonDoor(pos: Vector3i, type: EDungeonDoorType) {
     val position: Vector3i
     val type: EDungeonDoorType
     var isZDir = false
 
     init {
         var type = type
-        w = world
         position = pos
         if (type == EDungeonDoorType.WITHER && BlockCache.getBlockState(pos).block === Blocks.air) type =
             EDungeonDoorType.WITHER_FAIRY
@@ -62,13 +57,5 @@ class DungeonDoor(world: World, pos: Vector3i, type: EDungeonDoorType) {
         }
     }
 
-    companion object {
-        private val legalBlocks: Set<Block> = Sets.newHashSet(
-            Blocks.coal_block,
-            Blocks.barrier,
-            Blocks.monster_egg,
-            Blocks.air,
-            Blocks.stained_hardened_clay
-        )
-    }
+
 }

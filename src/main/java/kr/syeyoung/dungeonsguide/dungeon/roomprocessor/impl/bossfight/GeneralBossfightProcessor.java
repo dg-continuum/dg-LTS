@@ -18,6 +18,7 @@
 
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight;
 
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.BlockUpdateEvent;
 import kr.syeyoung.dungeonsguide.events.impl.KeyBindPressedEvent;
 import kr.syeyoung.dungeonsguide.events.impl.PlayerInteractEntityEvent;

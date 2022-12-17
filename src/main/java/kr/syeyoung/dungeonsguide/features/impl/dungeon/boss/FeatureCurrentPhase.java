@@ -19,9 +19,9 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 
 public class FeatureCurrentPhase extends SingleTextHud {
     public FeatureCurrentPhase() {
@@ -31,7 +31,7 @@ public class FeatureCurrentPhase extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor != null;
+        return SkyblockStatus.isOnDungeon() && DungeonFacade.context != null && DungeonFacade.context.bossfightProcessor != null;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class FeatureCurrentPhase extends SingleTextHud {
             return "fight-2";
         }
 
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         if(context == null) return "";
         if(context.bossfightProcessor == null) return "";
         return context.bossfightProcessor.getCurrentPhase();

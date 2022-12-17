@@ -18,6 +18,18 @@ package kr.syeyoung.dungeonsguide.utils.simple;
 public class SimpleFuse {
     volatile boolean state = false;
 
+    /**
+     * first time you call its true, then the fuse is blown
+     */
+    public boolean checkAndBlow(){
+        if(!state) {
+            state = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean isBlown(){
         return state;
     }

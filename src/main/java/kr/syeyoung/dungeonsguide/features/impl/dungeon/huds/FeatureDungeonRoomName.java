@@ -19,11 +19,9 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.huds;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import lombok.val;
-import net.minecraft.client.Minecraft;
-import org.joml.Vector3i;
 
 public class FeatureDungeonRoomName extends SingleTextHud {
     public FeatureDungeonRoomName() {
@@ -32,9 +30,8 @@ public class FeatureDungeonRoomName extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor != null;
+        return SkyblockStatus.isOnDungeon() && DungeonFacade.context != null;
     }
-
 
     @Override
     protected String getText(boolean example) {
@@ -42,15 +39,10 @@ public class FeatureDungeonRoomName extends SingleTextHud {
             return "puzzle-tictactoe";
         }
 
-        val player = Minecraft.getMinecraft().thePlayer;
-        if(player == null) return "";
+        val context = DungeonFacade.context;
+        if(context == null) return "";
 
-        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
-        if(context == null || context.mapProcessor == null) return "";
-        val roomPt = context.mapProcessor.worldPointToRoomPoint(new Vector3i(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ()));
-        if(roomPt == null) return "";
-
-        val dungeonRoom = context.roomMapper.get(roomPt);
+        val dungeonRoom = context.getCurrentRoom();
         if(dungeonRoom == null) return "";
         return dungeonRoom.getDungeonRoomInfo().getName();
     }

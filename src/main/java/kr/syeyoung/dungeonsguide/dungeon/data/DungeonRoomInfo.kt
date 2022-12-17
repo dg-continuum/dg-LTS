@@ -1,5 +1,6 @@
 package kr.syeyoung.dungeonsguide.dungeon.data
 
+import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic
 import java.io.Serializable
 import java.util.*
 
@@ -22,11 +23,7 @@ class DungeonRoomInfo() : Serializable {
     var name: String = uuid.toString()
     var processorId = "default"
     var properties: Map<String, Any> = HashMap()
-    var mechanics: HashMap<String, kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic> = HashMap()
+    var mechanics: HashMap<String, DungeonMechanic> = HashMap()
     var totalSecrets = -1
 
-
-    companion object {
-        private const val serialVersionUID = -8291811286448196640L
-    }
 }

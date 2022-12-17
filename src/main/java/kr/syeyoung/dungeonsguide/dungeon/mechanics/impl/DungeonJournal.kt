@@ -65,7 +65,4 @@ class DungeonJournal : DungeonMechanic(), Cloneable {
         return secretPoint
     }
 
-    companion object {
-        private const val serialVersionUID = 4117372070037496743L
-    }
 }

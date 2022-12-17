@@ -58,7 +58,7 @@ class DungeonListener {
     }
 
     @SubscribeEvent
-    fun onPostDraw(e: DrawScreenEvent.Post?) {
+    fun onPostDraw(e: DrawScreenEvent.Post) {
         if (!SkyblockStatus.isOnDungeon()) return
 
         Minecraft.getMinecraft().thePlayer ?: return
@@ -80,7 +80,7 @@ class DungeonListener {
     }
 
     @SubscribeEvent
-    fun onEntityUpdate(e: LivingUpdateEvent?) {
+    fun onEntityUpdate(e: LivingUpdateEvent) {
         if (!SkyblockStatus.isOnDungeon()) return
         Minecraft.getMinecraft().thePlayer ?: return
 
@@ -216,13 +216,11 @@ class DungeonListener {
 
             context.bossfightProcessor?.chatReceived(message)
 
-            val roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i())
-
-            context.roomMapper[roomPt]?.let { dungeonRoom ->
+            context.currentRoom?.let { dungeonRoom ->
                 dungeonRoom.roomProcessor?.let { roomProcessor ->
                     roomProcessor.chatReceived(message)
                     for (globalRoomProcessor in context.globalRoomProcessors) {
-                        if (globalRoomProcessor !== roomProcessor) {
+                        if (globalRoomProcessor != roomProcessor) {
                             globalRoomProcessor.chatReceived(message)
                         }
                     }
@@ -290,7 +288,7 @@ class DungeonListener {
     }
 
     @SubscribeEvent
-    fun onKey2(keyInputEvent: KeyBindPressedEvent?) {
+    fun onKey2(keyInputEvent: KeyBindPressedEvent) {
         if (!SkyblockStatus.isOnDungeon()) return
 
         DungeonFacade.context?.let { context ->
@@ -300,7 +298,7 @@ class DungeonListener {
     }
 
     @SubscribeEvent
-    fun onInteract(interact: PlayerInteractEntityEvent?) {
+    fun onInteract(interact: PlayerInteractEntityEvent) {
         if (!SkyblockStatus.isOnDungeon()) return
 
         DungeonFacade.context?.let { context ->
@@ -311,9 +309,7 @@ class DungeonListener {
 
     val currentRoomName: String
         get() {
-            val context = DungeonFacade.context
-            val roomPt = context?.mapProcessor?.worldPointToRoomPoint(VectorUtils.getPlayerVector3i())
-            val dungeonRoom = context?.roomMapper?.get(roomPt)
+            val dungeonRoom = DungeonFacade.context?.currentRoom
             var `in` = "unknown"
             if (dungeonRoom != null) {
                 `in` = dungeonRoom.dungeonRoomInfo.name
@@ -322,7 +318,7 @@ class DungeonListener {
         }
 
     @SubscribeEvent
-    fun onBlockChange(blockUpdateEventPost: BlockUpdateEvent.Post?) {
+    fun onBlockChange(blockUpdateEventPost: BlockUpdateEvent.Post) {
         if (!SkyblockStatus.isOnDungeon()) return
 
         DungeonFacade.context?.let { context ->

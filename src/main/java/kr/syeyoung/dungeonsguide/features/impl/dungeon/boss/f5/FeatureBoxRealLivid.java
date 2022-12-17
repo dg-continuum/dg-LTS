@@ -18,12 +18,12 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f5;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorLivid;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.RenderUtils;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import lombok.val;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -40,7 +40,7 @@ public class FeatureBoxRealLivid extends SimpleFeatureV2 {
     public void onRenderWorld(RenderWorldLastEvent postRender) {
         if (!DgOneCongifConfig.boxRealLivid) return;
         if (!SkyblockStatus.isOnDungeon()) return;
-        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        val context = DungeonFacade.context;
         if (context == null) {
             return;
         }

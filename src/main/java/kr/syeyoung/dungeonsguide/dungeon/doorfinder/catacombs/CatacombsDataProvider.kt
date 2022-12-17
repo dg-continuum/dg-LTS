@@ -28,7 +28,7 @@ abstract class CatacombsDataProvider : DungeonSpecificDataProvider {
             for (i in 0..4) {
                 for (vector2d in directions) {
                     val test = pos.add(vector2d.x * i, 0.0, vector2d.y * i)
-                    if (BlockCache.getBlock(test) === Blocks.iron_bars) {
+                    if (BlockCache.getBlock(test) == Blocks.iron_bars) {
                         return pos.add(vector2d.x * (i + 2), -2.0, vector2d.y * (i + 2))
                     }
                 }

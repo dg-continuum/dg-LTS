@@ -19,8 +19,9 @@
 package kr.syeyoung.dungeonsguide.dungeon;
 
 import com.google.common.collect.Sets;
+import kotlin.Pair;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
-import kr.syeyoung.dungeonsguide.dungeon.detection.RoomMatcher;
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.RoomMatcher;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
@@ -30,7 +31,6 @@ import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.BlockCache;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.block.Block;
@@ -41,8 +41,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Tuple;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
@@ -58,8 +56,23 @@ public class DungeonRoom implements DungeonRoomAccessor {
     public static final IBlockState preBuilt = Blocks.stone.getStateFromMeta(2);
     private static final Set<Vector2d> directions = Sets.newHashSet(new Vector2d(0, 16), new Vector2d(0, -16), new Vector2d(16, 0), new Vector2d(-16, 0));
     private static final float playerWidth = 0.3f;
+
+    public List<Vector2i> getUnitPoints() {
+        return unitPoints;
+    }
+
     private final List<Vector2i> unitPoints;
+
+    public short getShape() {
+        return shape;
+    }
+
     private final short shape;
+
+    public byte getColor() {
+        return color;
+    }
+
     private final byte color;
 
     public static boolean isValidBlock(IBlockState state) {
@@ -158,7 +171,7 @@ public class DungeonRoom implements DungeonRoomAccessor {
 
     private RoomMatcher roomMatcher = null;
 
-    public DungeonRoom(List<Vector2i> points, short shape, byte color, Vector3i min, Vector3i max, DungeonContext context, Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
+    public DungeonRoom(List<Vector2i> points, short shape, byte color, Vector3i min, Vector3i max, DungeonContext context, Set<Pair<org.joml.Vector2d, EDungeonDoorType>> doorsAndStates) {
         this.unitPoints = points;
         this.shape = shape;
         this.color = color;
@@ -207,27 +220,33 @@ public class DungeonRoom implements DungeonRoomAccessor {
         this.currentState = currentState;
     }
 
-    private void buildDoors(Set<Tuple<Vector2d, EDungeonDoorType>> doorsAndStates) {
+    private void buildDoors(Set<Pair<org.joml.Vector2d, EDungeonDoorType>> doorsAndStates) {
         Set<Tuple<Vector3i, EDungeonDoorType>> positions = new HashSet<>();
         Vector3i pos = context.mapProcessor.roomPointToWorldPoint(minRoomPt).add(16, 0, 16);
-        for (Tuple<Vector2d, EDungeonDoorType> doorsAndState : doorsAndStates) {
-            Vector2d vector2d = doorsAndState.getFirst();
+        for (Pair<org.joml.Vector2d, EDungeonDoorType> doorsAndState : doorsAndStates) {
+            org.joml.Vector2d vector2d = doorsAndState.getFirst();
             Vector3i neu = pos.add((int) (vector2d.x * 32), 0, (int) (vector2d.y * 32));
             positions.add(new Tuple<>(neu, doorsAndState.getSecond()));
         }
 
         for (Tuple<Vector3i, EDungeonDoorType> door : positions) {
-            doors.add(new DungeonDoor(Minecraft.getMinecraft().theWorld, door.getFirst(), door.getSecond()));
+            doors.add(new DungeonDoor(door.getFirst(), door.getSecond()));
         }
     }
 
     private void buildRoom() {
-        if (roomMatcher == null)
+        if (roomMatcher == null) {
             roomMatcher = new RoomMatcher(this);
+        }
         DungeonRoomInfo dungeonRoomInfo = roomMatcher.match();
+
         if (dungeonRoomInfo == null) {
-            dungeonRoomInfo = roomMatcher.createNew();
-            if (color == 18) dungeonRoomInfo.setProcessorId("bossroom");
+            throw new RuntimeException("Could not find room for " + this);
+//            this.didntMatchRoomData = true;
+//            dungeonRoomInfo = roomMatcher.createNew();
+//            if (color == 18) {
+//                dungeonRoomInfo.setProcessorId("bossroom");
+//            }
         }
         this.dungeonRoomInfo = dungeonRoomInfo;
         totalSecrets = dungeonRoomInfo.getTotalSecrets();
@@ -389,12 +408,6 @@ public class DungeonRoom implements DungeonRoomAccessor {
         int bitIdx = dx * leny * lenz + dy * lenz + dz;
         int location = bitIdx / 4;
         arr[location] = 0;
-    }
-
-    @Nullable
-    @Override
-    public IBlockState getBlockState(@NotNull org.joml.Vector3d location) {
-        return BlockCache.getBlockState(VectorUtils.Vec3ToBlockPos(location));
     }
 
     @AllArgsConstructor

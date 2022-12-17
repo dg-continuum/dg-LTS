@@ -19,10 +19,10 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f6;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorSadan;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraft.entity.boss.BossStatus;
 
@@ -34,7 +34,7 @@ public class FeatureTerracotaTimer extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         return SkyblockStatus.isOnDungeon() && context != null
                 && context.bossfightProcessor instanceof BossfightProcessorSadan
                 && "fight-1".equalsIgnoreCase(context.bossfightProcessor.getCurrentPhase());

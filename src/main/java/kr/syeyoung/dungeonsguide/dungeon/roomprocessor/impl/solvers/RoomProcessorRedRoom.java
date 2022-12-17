@@ -57,10 +57,10 @@ public class RoomProcessorRedRoom extends GeneralRoomProcessor {
             }
         }
         if (real != null) {
-            OffsetPoint offsetPoint = new OffsetPoint(getDungeonRoom(), real.getPosition());
+            OffsetPoint offsetPoint = new OffsetPoint(getDungeonRoom(), new Vector3i(real.getPosition()));
             offsetPoint = new OffsetPoint(33 - offsetPoint.getX(), offsetPoint.getY(), 33 - offsetPoint.getZ());
             Vector3i opposite = offsetPoint.getVector3i(getDungeonRoom());
-            Vector3i dir = new Vector3i(real.getPosition().sub(opposite));
+            Vector3i dir = new Vector3i(real.getPosition()).sub(opposite);
             dir = new Vector3i(MathHelper.clamp_int(dir.x / 10, -1, 1), 0, MathHelper.clamp_int(dir.z / 10, -1, 1));
 
             this.basePt = new Vector3d(opposite.add(dir.x * 6 + dir.z, 3, dir.z * 6 - dir.x));

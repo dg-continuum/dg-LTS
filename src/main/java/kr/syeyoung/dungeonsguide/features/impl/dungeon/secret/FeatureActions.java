@@ -19,17 +19,14 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret;
 
 import cc.polyfrost.oneconfig.hud.TextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import lombok.val;
 import lombok.var;
-import net.minecraft.client.Minecraft;
-import org.joml.Vector2i;
 
 import java.util.List;
 
@@ -42,11 +39,10 @@ public class FeatureActions extends TextHud {
     @Override
     protected boolean shouldShow() {
         if (!SkyblockStatus.isOnDungeon()) return false;
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor.isInitialized()) return false;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
+        if (context == null || !context.mapProcessor.isInitialized()) return false;
 
-        Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(Minecraft.getMinecraft().thePlayer.getPosition()));
-        DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
+        DungeonRoom dungeonRoom = context.getCurrentRoom();
         if (dungeonRoom == null) return false;
         return dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor;
     }
@@ -63,15 +59,11 @@ public class FeatureActions extends TextHud {
             return;
         }
 
-
-        val thePlayer = Minecraft.getMinecraft().thePlayer;
-
-        val context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        val context = DungeonFacade.context;
         if(context == null) return;
 
-        val roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.BlockPosToVec3i(thePlayer.getPosition()));
-
-        val dungeonRoom = context.roomMapper.get(roomPt);
+        val dungeonRoom = context.getCurrentRoom();
+        if(dungeonRoom == null) return;
         if(!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
 
         for (final ActionPlan path : ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getStrategy().getActionPath().values()) {

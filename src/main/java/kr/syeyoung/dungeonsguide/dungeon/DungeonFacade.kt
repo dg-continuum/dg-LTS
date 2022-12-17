@@ -32,13 +32,12 @@ class DungeonFacade {
         cachedPathFinder = CachedPathFinder()
     }
 
-    fun calculatePathLenght(from: Vector3i, to: Vector3i, r: DungeonRoom?): Float {
+    fun calculatePathLength(from: Vector3i, to: Vector3i, r: DungeonRoom?): Float {
         var distance = -1f
         val fromv3 = Vector3d(from.x.toDouble(), from.y.toDouble(), from.z.toDouble())
         val tov3 = Vector3d(to.x.toDouble(), to.y.toDouble(), to.z.toDouble())
         val a = genPathfind(fromv3, tov3, r)
-        val b: List<Vector3d>
-        b = try {
+        val b: List<Vector3d> = try {
             a.get()
         } catch (e: InterruptedException) {
             throw RuntimeException(e)

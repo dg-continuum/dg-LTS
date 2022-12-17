@@ -3,15 +3,14 @@ package kr.syeyoung.dungeonsguide.dungeon
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry.getDoorFinder
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.BossfightProcessor
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
 import net.minecraft.util.BlockPos
 import org.joml.Vector2i
 import org.joml.Vector3i
 import java.awt.Rectangle
-import java.util.*
 
 class DungeonContext {
     @JvmField
@@ -23,7 +22,7 @@ class DungeonContext {
     @JvmField
     val mapProcessor: MapProcessor = MapProcessor(this)
     @JvmField
-    val roomMapper: MutableMap<Vector2i?, DungeonRoom> = HashMap()
+    val roomMapper: MutableMap<Vector2i, DungeonRoom> = HashMap()
     @JvmField
     val dungeonRoomList: MutableList<DungeonRoom> = ArrayList()
     @JvmField
@@ -71,15 +70,9 @@ class DungeonContext {
 
     val currentRoom: DungeonRoom?
         get() = roomMapper[mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i())]
+
     val currentRoomProcessor: RoomProcessor?
-        get() {
-            val dungeonRoomOpt =
-                Optional.ofNullable(DungeonFacade.context).map { obj: DungeonContext -> obj.mapProcessor }
-                    .map { a: MapProcessor -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()) }
-                    .map { a: Vector2i? -> DungeonFacade.context!!.roomMapper[a] }
-            val dungeonRoom = dungeonRoomOpt.orElse(null) ?: return null
-            return dungeonRoom.roomProcessor
-        }
+        get() = currentRoom?.roomProcessor
 
     companion object {
         val roomBoundary = Rectangle(-10, -10, 138, 138)

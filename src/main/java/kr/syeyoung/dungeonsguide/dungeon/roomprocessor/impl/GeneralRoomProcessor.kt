@@ -2,7 +2,6 @@ package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl
 
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext
-import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionMove
@@ -51,14 +50,13 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     private var isLast = false
     private var previousChest: BlockPos? = null
 
-    val context: DungeonContext = DungeonFacade.context!!
+    val context: DungeonContext = dungeonRoom.context
 
-    var strategy: SecretGuideStrategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, this)
+    var strategy: SecretGuideStrategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, dungeonRoom)
 
     private val tickedFuse = SimpleFuse()
     override fun tick() {
-        if (!tickedFuse.isBlown) {
-            tickedFuse.blow()
+        if (tickedFuse.checkAndBlow()) {
             logger.info("Creating Pathfinding lines")
             strategy.init()
         }
@@ -99,9 +97,11 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         strategy.draw(partialTicks)
         val finalSmallest = findClosestActionRoute(partialTicks)
         strategy.actionPath.forEach { (_, actionRoute) ->
-            actionRoute.onRenderWorld(partialTicks, finalSmallest === actionRoute)
+            actionRoute.onRenderWorld(partialTicks, finalSmallest == actionRoute)
         }
-        if (DgOneCongifConfig.debugMode && EditingContext.getEditingContext() != null && EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
+        if (DgOneCongifConfig.debugMode &&
+            EditingContext.getEditingContext() != null &&
+            EditingContext.getEditingContext().current is GuiDungeonRoomEdit) {
             dungeonRoom.mechanics.forEach { (key, dungeonMechanic) ->
                 dungeonMechanic?.highlight(Color(0, 255, 255, 50), key, dungeonRoom, partialTicks)
             }
@@ -213,27 +213,27 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
         }
     }
 
-    override fun onInteractBlock(playerInteractEvent: PlayerInteractEvent) {
+    override fun onInteractBlock(event: PlayerInteractEvent) {
         strategy.actionPath.values.forEach {
-            it.onPlayerInteract(playerInteractEvent)
+            it.onPlayerInteract(event)
         }
 
-        playerInteractEvent.pos?.let {
-            val block = playerInteractEvent.world.getBlockState(it).block
+        event.pos?.let {
+            val block = event.world.getBlockState(it).block
             if (block == Blocks.chest || block == Blocks.trapped_chest) {
                 previousChest = it
             }
         }
 
-        if (playerInteractEvent.entityPlayer.heldItem != null && playerInteractEvent.entityPlayer.heldItem.item == Items.stick && DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
+        if (event.entityPlayer.heldItem != null && event.entityPlayer.heldItem.item == Items.stick && DgOneCongifConfig.debugRoomEdit && DgOneCongifConfig.debugMode) {
             val ec = EditingContext.getEditingContext() ?: return
             if (ec.current !is GuiDungeonAddSet) return
             val gdas = ec.current as GuiDungeonAddSet
-            if (playerInteractEvent.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
                 if (isLast) gdas.end.setPosInWorld(
-                    dungeonRoom, VectorUtils.BlockPosToVec3i(playerInteractEvent.pos)
+                    dungeonRoom, VectorUtils.BlockPosToVec3i(event.pos)
                 ) else gdas.start.setPosInWorld(
-                    dungeonRoom, VectorUtils.BlockPosToVec3i(playerInteractEvent.pos)
+                    dungeonRoom, VectorUtils.BlockPosToVec3i(event.pos)
                 )
                 isLast = !isLast
             }
@@ -312,7 +312,7 @@ open class GeneralRoomProcessor(val dungeonRoom: DungeonRoom) : RoomProcessor {
     }
 
     fun updateStrategy() {
-        strategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, this)
+        strategy = buildSecretStrategy(DgOneCongifConfig.secretFindMode, dungeonRoom)
     }
 
     companion object {

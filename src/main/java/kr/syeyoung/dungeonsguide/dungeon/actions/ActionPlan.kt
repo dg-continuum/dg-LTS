@@ -15,7 +15,7 @@ class ActionPlan(
     dungeonRoom: DungeonRoom,
     val mechanicName: String,
     val state: ActionState,
-    val actionPlanProperties: ActionPlanProperties
+    val actionPlanProperties: ActionPlanProperties,
 ) {
 
 
@@ -29,7 +29,7 @@ class ActionPlan(
         val tree = ActionTree.buildActionTree(actionChangeState, dungeonRoom)
         actions = tree?.let { linearityActionTree(it) } as MutableList<AbstractAction>
         actions.add(ActionComplete())
-        ChatTransmitter.sendDebugChat("Created ActionRoute with " + actions.size + " steps")
+        ChatTransmitter.sendDebugChat("Created ActionPlan with " + actions.size + " steps")
         ChatTransmitter.sendDebugChat("========== STEPS ==========")
         for (action in actions) {
             ChatTransmitter.sendDebugChat(action.toString())
@@ -85,16 +85,14 @@ class ActionPlan(
     }
 
     fun onTick() {
-        val currentAction = currentAction
-        currentAction.onTick(dungeonRoom, actionPlanProperties)
+        this.currentAction.onTick(dungeonRoom, actionPlanProperties)
         if (current - 1 >= 0 && (actions[current - 1] is ActionMove || actions[current - 1] is ActionMoveNearestAir)) actions[current - 1].onTick(
-            dungeonRoom,
-            actionPlanProperties
+            dungeonRoom, actionPlanProperties
         )
         if (dungeonRoom.mechanics[mechanicName]!!.getCurrentState(dungeonRoom) == state.state) {
             current = actions.size - 1
         }
-        if (currentAction.isComplete(dungeonRoom)) {
+        if (this.currentAction.isComplete(dungeonRoom)) {
             next()
         }
     }

@@ -19,10 +19,10 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f4;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorThorn;
 import kr.syeyoung.dungeonsguide.events.impl.TitleEvent;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -36,7 +36,7 @@ public class FeatureThornSpiritBowTimer extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        return SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor instanceof BossfightProcessorThorn && time > System.currentTimeMillis();
+        return SkyblockStatus.isOnDungeon() && DungeonFacade.context != null && DungeonFacade.context.bossfightProcessor instanceof BossfightProcessorThorn && time > System.currentTimeMillis();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class FeatureThornSpiritBowTimer extends SingleTextHud {
 
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
-        if (!(SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor instanceof BossfightProcessorThorn)) return;
+        if (!(SkyblockStatus.isOnDungeon() && DungeonFacade.context != null && DungeonFacade.context.bossfightProcessor instanceof BossfightProcessorThorn)) return;
         String text = e.message.getFormattedText();
         if (text.equals("§r§a§lThe §r§5§lSpirit Bow §r§a§lhas dropped!§r")) {
             time = System.currentTimeMillis() + 16000;
@@ -74,7 +74,7 @@ public class FeatureThornSpiritBowTimer extends SingleTextHud {
     @SubscribeEvent
     public void onTitle(TitleEvent e) {
         if (!SkyblockStatus.isOnSkyblock()) return;
-        if (!(SkyblockStatus.isOnDungeon() && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context != null && DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.bossfightProcessor instanceof BossfightProcessorThorn)) return;
+        if (!(SkyblockStatus.isOnDungeon() && DungeonFacade.context != null && DungeonFacade.context.bossfightProcessor instanceof BossfightProcessorThorn)) return;
         if (e.getPacketTitle().getMessage().getFormattedText().contains("picked up")) {
             time = System.currentTimeMillis() + 21000;
         }

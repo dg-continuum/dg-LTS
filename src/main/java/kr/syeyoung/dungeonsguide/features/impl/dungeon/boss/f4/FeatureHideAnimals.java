@@ -18,12 +18,12 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.boss.f4;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessorThorn;
 import kr.syeyoung.dungeonsguide.features.SimpleFeatureV2;
 import kr.syeyoung.dungeonsguide.oneconfig.dungeon.HideAnimalPage;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraft.entity.passive.*;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -38,7 +38,7 @@ public class FeatureHideAnimals extends SimpleFeatureV2 {
     public void onRenderPre(RenderLivingEvent.Pre preRender) {
         if (!HideAnimalPage.enabled) return;
         if (!SkyblockStatus.isOnDungeon()) return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         if (context == null) return;
         if (context.bossfightProcessor == null) return;
         if (!(context.bossfightProcessor instanceof BossfightProcessorThorn)) return;

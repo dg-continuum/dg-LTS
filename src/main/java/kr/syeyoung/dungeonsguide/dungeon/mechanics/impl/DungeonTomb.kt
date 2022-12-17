@@ -1,6 +1,5 @@
 package kr.syeyoung.dungeonsguide.dungeon.mechanics.impl
 
-import com.google.common.collect.Sets
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.AbstractAction
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionBreakWithSuperBoom
@@ -92,22 +91,19 @@ class DungeonTomb : DungeonMechanic(), RouteBlocker, Cloneable {
     override fun getCurrentState(dungeonRoom: DungeonRoom): String {
         var b = Blocks.air
         if (secretPoint.offsetPointList.isNotEmpty()) b = secretPoint.offsetPointList[0].getBlock(dungeonRoom)
-        return if (b === Blocks.air) "open" else "closed"
+        return if (b == Blocks.air) "open" else "closed"
     }
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return if (isBlocking(dungeonRoom)) Sets.newHashSet("open", "navigate") else Sets.newHashSet("navigate")
+        return if (isBlocking(dungeonRoom)) setOf("open", "navigate") else setOf("navigate")
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return Sets.newHashSet("open", "closed")
+        return setOf("open", "closed")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint? {
         return if (secretPoint.offsetPointList.size == 0) null else secretPoint.offsetPointList[0]
     }
 
-    companion object {
-        private const val serialVersionUID = -7347076019472222115L
-    }
 }

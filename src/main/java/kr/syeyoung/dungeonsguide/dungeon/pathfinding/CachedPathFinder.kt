@@ -27,18 +27,19 @@ class CachedPathFinder {
         if (DgOneCongifConfig.debugMode) {
             println("Requested pathfinding: from ${job.from} to: ${job.to}")
         }
-        return cache.get(job) {
+//        return cache.get(job) {
             buildPfStrategy(job.room).let {
                 val now = System.nanoTime()
                 it.pathfind(job)
                 if (DgOneCongifConfig.debugMode) {
                     println("Finished pathfinding in ${System.nanoTime() - now}")
                 }
-                return@get PfPath(it.route)
+//                return@get PfPath(it.route)
+                return PfPath(it.route)
 
             }
 
-        }
+//        }
     }
 
 

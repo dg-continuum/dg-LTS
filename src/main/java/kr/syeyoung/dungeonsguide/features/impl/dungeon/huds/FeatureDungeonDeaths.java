@@ -22,6 +22,7 @@ import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.utils.DungeonUtil;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
@@ -48,7 +49,7 @@ public class FeatureDungeonDeaths extends TextHud {
     public void onChat(ClientChatReceivedEvent event) {
         if (event.type == 2) return;
         if (!SkyblockStatus.isOnDungeon()) return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         if (context == null) return;
 
         String txt = event.message.getFormattedText();

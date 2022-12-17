@@ -18,11 +18,11 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret.mechanicbrowser;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionPlan;
+import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
@@ -83,12 +83,9 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
         if (Minecraft.getMinecraft().thePlayer == null) return;
 
 
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonFacade.context)
-                .map(context -> context.mapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
-                .map(a -> DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.roomMapper.get(a));
-
-
-        DungeonRoom dungeonRoom = dungeonRoomOpt.orElse(null);
+        DungeonContext ctx = DungeonFacade.context;
+        if(ctx == null) return;
+        DungeonRoom dungeonRoom = ctx.getCurrentRoom();
         renderTick(dungeonRoom);
         if (dungeonRoom == null) return;
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
@@ -209,19 +206,19 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
                             + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
                 }
             }
-            found = false;
-            for (Map.Entry<String, DungeonMechanic> value : dungeonRoom.getMechanics().entrySet()) {
-                if (value.getValue() instanceof DungeonRoomDoor) {
-                    if (!found) {
-                        mList.add(new MechanicBrowserElement(() -> "Gates", true, null));
-                        found = true;
-                    }
-                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
-                            (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
-                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
-                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
-                }
-            }
+//            found = false;
+//            for (Map.Entry<String, DungeonMechanic> value : dungeonRoom.getMechanics().entrySet()) {
+//                if (value.getValue() instanceof DungeonRoomDoor) {
+//                    if (!found) {
+//                        mList.add(new MechanicBrowserElement(() -> "Gates", true, null));
+//                        found = true;
+//                    }
+//                    mList.add(new MechanicBrowserElement(() -> value.getKey() + " §7(" + value.getValue().getCurrentState(dungeonRoom) + ", " +
+//                            (value.getValue().getRepresentingPoint(dungeonRoom) != null ?
+//                                    String.format("%.1f", MathHelper.sqrt_double(value.getValue().getRepresentingPoint(dungeonRoom).getVector3i(dungeonRoom).distance(VectorUtils.getPlayerVector3i()))) : "")
+//                            + "m)", false, (me, pt) -> onElementClick(value.getKey(), value.getValue(), pt, me)));
+//                }
+//            }
             found = false;
             for (Map.Entry<String, DungeonMechanic> value : dungeonRoom.getMechanics().entrySet()) {
                 if (value.getValue() instanceof DungeonDoor || value.getValue() instanceof DungeonBreakableWall || value.getValue() instanceof DungeonLever
@@ -244,15 +241,11 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
 
     public void onElementClick(String id, DungeonMechanic dungeonMechanic, Point pt, MechanicBrowserElement mechanicBrowserElement) {
 
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonsGuide.getDungeonsGuide().getDungeonFacade().context)
-                .map(context -> context.mapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
-                .map(a -> {
-
-                    return DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.roomMapper.get(a);
-                });
+        DungeonContext ctx = DungeonFacade.context;
+        if(ctx == null) return;
+        DungeonRoom dungeonRoom = ctx.getCurrentRoom();
         selectedID = id;
 
-        DungeonRoom dungeonRoom = dungeonRoomOpt.orElse(null);
         if (dungeonRoom == null) return;
         DungeonMechanic dungeonMechanic1 = dungeonRoom.getMechanics().get(id);
         if (dungeonMechanic1 != dungeonMechanic) return;
@@ -288,12 +281,13 @@ public class PanelMechanicBrowser extends MPanelScaledGUI {
 
     public void cancel(MechanicBrowserElement mechanicBrowserElement) {
 
-        Optional<DungeonRoom> dungeonRoomOpt = Optional.ofNullable(DungeonFacade.context)
-                .map(context -> context.mapProcessor).map(a -> a.worldPointToRoomPoint(VectorUtils.getPlayerVector3i()))
-                .map(a -> DungeonFacade.context.roomMapper.get(a));
+        DungeonContext ctx = DungeonFacade.context;
+        if(ctx == null) return;
+        DungeonRoom dungeonRoom = ctx.getCurrentRoom();
+        if(dungeonRoom == null) return;
+
+
         mechanicBrowserElement.setFocused(false);
-        if (!dungeonRoomOpt.isPresent()) return;
-        DungeonRoom dungeonRoom = dungeonRoomOpt.get();
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
         ((GeneralRoomProcessor) dungeonRoom.getRoomProcessor()).getStrategy().cancel("MECH-BROWSER");
     }

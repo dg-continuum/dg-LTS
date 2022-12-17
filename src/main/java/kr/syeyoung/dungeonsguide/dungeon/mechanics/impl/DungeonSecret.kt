@@ -229,16 +229,16 @@ class DungeonSecret : DungeonMechanic(), Cloneable {
 
     override fun getPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
         return if (getSecretStatus(dungeonRoom) == SecretStatus.FOUND) {
-            hashSetOf(
+            setOf(
                 "navigate"
             )
         } else {
-            hashSetOf("found", "navigate")
+            setOf("found", "navigate")
         }
     }
 
     override fun getTotalPossibleStates(dungeonRoom: DungeonRoom): Set<String> {
-        return hashSetOf("found")
+        return setOf("found")
     }
 
     override fun getRepresentingPoint(dungeonRoom: DungeonRoom): OffsetPoint {

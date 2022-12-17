@@ -19,11 +19,11 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.huds;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.utils.DungeonUtil;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 
 public class FeatureDungeonSecrets extends SingleTextHud {
 
@@ -32,7 +32,7 @@ public class FeatureDungeonSecrets extends SingleTextHud {
     }
 
     public String getTotalSecrets() {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         if (context == null) return "?";
         int totalSecrets = 0;
         boolean allknown = true;
@@ -56,7 +56,7 @@ public class FeatureDungeonSecrets extends SingleTextHud {
             return "999/2+";
         }
 
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         if(context == null) return "";
 
         return DungeonUtil.getSecretsFound() +

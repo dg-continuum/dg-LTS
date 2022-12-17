@@ -19,8 +19,8 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.huds;
 
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.utils.TextUtils;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -33,9 +33,7 @@ public class FeatureDungeonRealTime extends SingleTextHud {
 
     @Override
     protected boolean shouldShow() {
-        DungeonContext ctx = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
-
-        return ctx != null && ctx.started != -1;
+        return DungeonFacade.context != null && DungeonFacade.context.started != -1;
     }
 
 

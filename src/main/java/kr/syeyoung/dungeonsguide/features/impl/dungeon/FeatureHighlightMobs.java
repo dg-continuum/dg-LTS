@@ -34,6 +34,7 @@ public class FeatureHighlightMobs extends SimpleFeatureV2 {
             List<EntityArmorStand> skeletonList = Minecraft.getMinecraft().theWorld.getEntities(EntityArmorStand.class, input -> {
                 if (playerPosition.distanceSq(input.getPosition()) > sq) return false;
                 if (!input.getAlwaysRenderNameTag()) return false;
+                if (input.isDead) return false;
                 return input.getName().contains("✯");
             });
 
@@ -48,6 +49,7 @@ public class FeatureHighlightMobs extends SimpleFeatureV2 {
             val sq = radius * radius;
             List<EntityBat> batList = Minecraft.getMinecraft().theWorld.getEntities(EntityBat.class, input -> {
                 if (input != null && input.isInvisible()) return false;
+                if (input.isDead) return false;
                 return input != null && input.getDistanceSq(playerPosition) < sq;
             });
 
@@ -63,6 +65,7 @@ public class FeatureHighlightMobs extends SimpleFeatureV2 {
             List<EntityArmorStand> skeletonMasterList = Minecraft.getMinecraft().theWorld.getEntities(EntityArmorStand.class, input -> {
                 if (playerPosition.distanceSq(input.getPosition()) > sq) return false;
                 if (!input.getAlwaysRenderNameTag()) return false;
+                if (input.isDead) return false;
                 return input.getName().contains("Skeleton Master");
             });
 

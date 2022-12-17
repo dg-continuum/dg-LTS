@@ -24,12 +24,10 @@ import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.features.GuiFeature;
 import kr.syeyoung.dungeonsguide.oneconfig.DgOneCongifConfig;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
-import kr.syeyoung.dungeonsguide.utils.VectorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import org.apache.commons.lang3.StringUtils;
-import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -51,8 +49,7 @@ public class FeatureRoomDebugInfo extends GuiFeature {
         if (!DgOneCongifConfig.debugMode) return;
         DungeonContext context = DungeonFacade.context;
         if (context == null) return;
-        Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
-        DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
+        DungeonRoom dungeonRoom = context.getCurrentRoom();
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 
         GlStateManager.enableBlend();

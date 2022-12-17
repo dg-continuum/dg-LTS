@@ -29,8 +29,9 @@ import com.google.common.collect.Ordering;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.BossroomEnterEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonStartedEvent;
@@ -66,7 +67,6 @@ import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import javax.vecmath.Vector2d;
 import java.util.List;
 
 public class FeatureDungeonMap extends BasicHud {
@@ -203,7 +203,7 @@ public class FeatureDungeonMap extends BasicHud {
     }
 
     void drawHUD(float partialTicks) {
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        DungeonContext context = DungeonFacade.context;
         if (context == null || !context.mapProcessor.isInitialized()) return;
         GlStateManager.pushMatrix();
 
@@ -236,7 +236,7 @@ public class FeatureDungeonMap extends BasicHud {
         GlStateManager.scale(postScale, postScale, 0);
 
         EntityPlayer p = Minecraft.getMinecraft().thePlayer;
-        Vector2d pt = mapProcessor.worldPointToMapPointFLOAT(p.getPositionEyes(partialTicks));
+        org.joml.Vector2d pt = mapProcessor.worldPointToMapPointFLOAT(p.getPositionEyes(partialTicks));
         if (centerMapOnPlayer) {
             if (shouldRotateWithPlayer) {
                 GlStateManager.rotate((float) (180.0 - p.rotationYaw), 0, 0, 1);
@@ -447,7 +447,7 @@ public class FeatureDungeonMap extends BasicHud {
 
             EntityPlayer entityplayer = Minecraft.getMinecraft().theWorld.getPlayerEntityByName(name);
 
-            Vector2d pt2 = null;
+            org.joml.Vector2d pt2 = null;
             double yaw2 = 0;
 
             if (entityplayer != null && (!entityplayer.isInvisible() || entityplayer == thePlayer)) {
@@ -490,7 +490,7 @@ public class FeatureDungeonMap extends BasicHud {
      * @param pt2
      * @param yaw2
      */
-    private void drawHead(float scale, float postScale, NetworkPlayerInfo networkPlayerInfo, EntityPlayer entityplayer, Vector2d pt2, float yaw2) {
+    private void drawHead(float scale, float postScale, NetworkPlayerInfo networkPlayerInfo, EntityPlayer entityplayer, org.joml.Vector2d pt2, float yaw2) {
         GlStateManager.pushMatrix();
         boolean flag1 = entityplayer != null && entityplayer.isWearing(EnumPlayerModelParts.CAPE);
         GlStateManager.enableTexture2D();
@@ -509,7 +509,7 @@ public class FeatureDungeonMap extends BasicHud {
         // cutting out the player head out of the skin texture
         Gui.drawScaledCustomSizeModalRect(-4, -4, 8.0F, l2, 8, i3, 8, 8, 64.0F, 64.0F);
         GL11.glLineWidth(1);
-        RenderUtils.drawUnfilledBox(-4, -4, 4, 4, DgOneCongifConfig.oneconftodgcolor(this.playerColor));
+        RenderUtils.drawUnfilledBox(-4, -4, 4, 4, DgOneCongifConfig.oneconftodgcolor(playerColor));
         GlStateManager.popMatrix();
     }
 
@@ -519,14 +519,14 @@ public class FeatureDungeonMap extends BasicHud {
         int k = 0;
         Minecraft.getMinecraft().getTextureManager().bindTexture(mapIcons);
         for (Vec4b vec4b : mapData.mapDecorations.values()) {
-            if (vec4b.func_176110_a() == 1 || this.shouldShowOtherPlayers) {
+            if (vec4b.func_176110_a() == 1 || shouldShowOtherPlayers) {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(vec4b.func_176112_b() / 2.0F + 64.0F, vec4b.func_176113_c() / 2.0F + 64.0F, -0.02F);
                 GlStateManager.rotate((vec4b.func_176111_d() * 360) / 16.0F, 0.0F, 0.0F, 1.0F);
 
                 GlStateManager.scale(1 / scale, 1 / scale, 0);
                 GlStateManager.scale(1 / postScale, 1 / postScale, 0);
-                GlStateManager.scale(this.playerHeadScale * 5, this.playerHeadScale * 5, 0);
+                GlStateManager.scale(playerHeadScale * 5, playerHeadScale * 5, 0);
 
                 GlStateManager.translate(-0.125F, 0.125F, 0.0F);
                 byte b0 = vec4b.func_176110_a();

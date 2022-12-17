@@ -19,12 +19,12 @@
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.huds;
 
 import cc.polyfrost.oneconfig.hud.TextHud;
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
-import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonEndedEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
+import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -60,7 +60,7 @@ public class FeatureWatcherWarning extends TextHud {
         if (!SkyblockStatus.isOnSkyblock()) return;
         if (event.message.getFormattedText().equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")) {
             warning = System.currentTimeMillis() + 2500;
-            DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+            DungeonContext context = DungeonFacade.context;
             if (context == null) return;
             for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
                 if (dungeonRoom != null && dungeonRoom.getColor() == 18)

@@ -1,15 +1,15 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomprocessor.secretfinderstrategies
 
+import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.oneconfig.secrets.PathfindToALlPage
 
-class PathfindToAllStrategy(parent: GeneralRoomProcessor) : SecretGuideStrategy(parent) {
+class PathfindToAllStrategy(room: DungeonRoom) : SecretGuideStrategy(room) {
     override fun init() {
-        parent.dungeonRoom.dungeonRoomInfo.mechanics.forEach { (mechanicName, mechanic) ->
-            if (mechanic is DungeonSecret && mechanic.getSecretStatus(parent.dungeonRoom) != DungeonSecret.SecretStatus.FOUND) {
+        room.dungeonRoomInfo.mechanics.forEach { (mechanicName, mechanic) ->
+            if (mechanic is DungeonSecret && mechanic.getSecretStatus(room) != DungeonSecret.SecretStatus.FOUND) {
                 if (PathfindToALlPage.pfTaBAT && mechanic.secretType == DungeonSecret.SecretType.BAT) {
                     createActionRoute(
                         mechanicName,

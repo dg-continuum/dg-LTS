@@ -121,7 +121,4 @@ class DungeonBreakableWall : DungeonMechanic(), RouteBlocker, Cloneable {
         return if (secretPoint.offsetPointList.size == 0) null else secretPoint.offsetPointList[secretPoint.offsetPointList.size / 2]
     }
 
-    companion object {
-        private const val serialVersionUID = 1161593374765852217L
-    }
 }

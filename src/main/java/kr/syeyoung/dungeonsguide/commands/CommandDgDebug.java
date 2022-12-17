@@ -9,15 +9,16 @@ import kr.syeyoung.dungeonsguide.dungeon.*;
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
 import kr.syeyoung.dungeonsguide.dungeon.data.OffsetPoint;
-import kr.syeyoung.dungeonsguide.dungeon.detection.blockbased.BlockDetector;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*;
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.blockbased.BlockDetector;
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.RoomDataBundle;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit;
+import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
-import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.bossfight.BossfightProcessor;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.features.AbstractFeature;
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry;
@@ -135,7 +136,7 @@ public class CommandDgDebug extends CommandBase {
             sender.addChatMessage(new ChatComponentText("§eDungeons Guide §7:: §e" + serverBrand));
         } else if ("pathfind".equals(arg)) {
             try {
-                DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+                DungeonContext context = DungeonFacade.context;
                 EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
                 if (thePlayer == null) return;
                 if (context.bossfightProcessor != null) context.bossfightProcessor.tick();
@@ -314,7 +315,7 @@ public class CommandDgDebug extends CommandBase {
             MapProcessor mapProcessor = fakeContext.mapProcessor;
             mapProcessor.setUnitRoomDimension(new Dimension(16, 16));
             mapProcessor.setDoorDimensions(new Dimension(4, 4));
-            mapProcessor.setTopLeftMapPoint(new Point(0, 0));
+            mapProcessor.setTopLeftMapPoint(new Vector2i(0, 0));
             fakeContext.dungeonMin = new BlockPos(0, 70, 0);
 
             DungeonRoom dungeonRoom = new DungeonRoom(Collections.singletonList(new Vector2i(0, 0)), ShortUtils.topLeftifyInt((short) 1), (byte) 63, new Vector3i(0, 70, 0), new Vector3i(31, 70, 31), fakeContext, Collections.emptySet());
@@ -373,8 +374,8 @@ public class CommandDgDebug extends CommandBase {
                     stringBuilder.append(prefix).append("    - F ").append(abstractFeature.getName()).append(" / ").append(abstractFeature.getDescription().replace("\n", "$NEW_LINE$")).append("\n");
                 }
             }
-            System.out.println(stringBuilder.toString());
-            System.out.println(stringBuilder2.toString());
+            System.out.println(stringBuilder);
+            System.out.println(stringBuilder2);
         } else if ("connectwhois".equals(arg)) {
             DungeonsGuide.getDungeonsGuide().getWhosOnlineManager().close();
             DungeonsGuide.getDungeonsGuide().setWhosOnlineManager(new WhosOnlineManager("wss://virginity.kokoniara.software/ws"));
@@ -438,12 +439,15 @@ public class CommandDgDebug extends CommandBase {
                 System.out.println("OWNER UUID: " + uuid);
                 System.out.println("   " + activeCosmetic);
             });
-        } else if ("dungeonrmtp".equals(arg)) {
-//            sender.addChatMessage(new ChatComponentText("top of room: " + (new BlockDetector()).getTopOfRoom()));
-
+        } else if ("getroomshape".equals(arg)) {
             BlockDetector a = new BlockDetector();
+            long start = System.currentTimeMillis();
 
-            a.getCornersSquare(a.getTopOfRoom());
+            RoomDataBundle roomShape = a.generateRoomDataBundle(a.getTopOfRoom(VectorUtils.getPlayerVector3i()).sub(0, 1, 0));
+            long stop = System.currentTimeMillis();
+
+            long yes = stop - start;
+            sender.addChatMessage(new ChatComponentText("Got " + roomShape.component1() + " in " + yes + "ms"));
 
 
         } else if ("mockcosmetics".equals(arg)) {

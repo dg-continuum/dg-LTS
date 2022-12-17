@@ -18,10 +18,10 @@
 
 package kr.syeyoung.dungeonsguide.features.impl.dungeon.secret.mechanicbrowser;
 
-import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.config.guiconfig.location.GuiGuiLocationConfig;
 import kr.syeyoung.dungeonsguide.config.types.GUIRectangle;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
+import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor;
 import kr.syeyoung.dungeonsguide.features.FeatureParameter;
@@ -42,7 +42,6 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.joml.Vector2i;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
@@ -146,16 +145,14 @@ public class FeatureMechanicBrowse extends GuiFeature {
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent postRender) {
-        if (!SkyblockStatus.isOnSkyblock()) return;
         if (!isEnabled()) return;
-        SkyblockStatus skyblockStatus = DungeonsGuide.getDungeonsGuide().getSkyblockStatus();
-        if (!skyblockStatus.isOnDungeon()) return;
-        if (DungeonsGuide.getDungeonsGuide().getDungeonFacade().context == null || !DungeonsGuide.getDungeonsGuide().getDungeonFacade().context.mapProcessor.isInitialized())
+        if (!SkyblockStatus.isOnDungeon()) return;
+        DungeonContext context = DungeonFacade.context;
+        if (context == null || !context.mapProcessor.isInitialized()) {
             return;
-        DungeonContext context = DungeonsGuide.getDungeonsGuide().getDungeonFacade().context;
+        }
 
-        Vector2i roomPt = context.mapProcessor.worldPointToRoomPoint(VectorUtils.getPlayerVector3i());
-        DungeonRoom dungeonRoom = context.roomMapper.get(roomPt);
+        DungeonRoom dungeonRoom = context.getCurrentRoom();
         if (dungeonRoom == null) return;
         if (!(dungeonRoom.getRoomProcessor() instanceof GeneralRoomProcessor)) return;
         String id = mGuiMechanicBrowser.getPanelMechanicBrowser().getSelectedID();
