@@ -31,7 +31,6 @@ import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.ProcessorFactory;
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor;
 import kr.syeyoung.dungeonsguide.utils.BlockCache;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -410,10 +409,4 @@ public class DungeonRoom implements DungeonRoomAccessor {
         arr[location] = 0;
     }
 
-    @AllArgsConstructor
-    @Getter
-    public enum RoomState {
-        DISCOVERED(0), COMPLETE_WITHOUT_SECRETS(0), FINISHED(0), FAILED(-14);
-        private final int scoreModifier;
-    }
 }

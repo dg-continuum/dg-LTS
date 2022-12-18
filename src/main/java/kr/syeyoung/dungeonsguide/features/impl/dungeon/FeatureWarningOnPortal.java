@@ -21,6 +21,7 @@ package kr.syeyoung.dungeonsguide.features.impl.dungeon;
 import com.google.common.base.Supplier;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
+import kr.syeyoung.dungeonsguide.dungeon.RoomState;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
 import kr.syeyoung.dungeonsguide.config.guiconfig.ConfigPanelCreator;
 import kr.syeyoung.dungeonsguide.config.guiconfig.MFeatureEdit;
@@ -28,7 +29,6 @@ import kr.syeyoung.dungeonsguide.config.guiconfig.MParameterEdit;
 import kr.syeyoung.dungeonsguide.config.guiconfig.RootConfigPanel;
 import kr.syeyoung.dungeonsguide.config.types.AColor;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
 import kr.syeyoung.dungeonsguide.features.FeatureParameter;
 import kr.syeyoung.dungeonsguide.features.SimpleFeature;
 import kr.syeyoung.dungeonsguide.features.text.PanelTextParameterConfig;
@@ -113,7 +113,7 @@ public class FeatureWarningOnPortal extends SimpleFeature implements StyledTextP
         DungeonContext context = DungeonFacade.context;
         DungeonScoreUtil.ScoreCalculation scoreCalculation = DungeonScoreUtil.calculateScore();
 
-        boolean failed = context.dungeonRoomList.stream().anyMatch(a -> a.getCurrentState() == DungeonRoom.RoomState.FAILED);
+        boolean failed = context.dungeonRoomList.stream().anyMatch(a -> a.getCurrentState() == RoomState.FAILED);
         if (context.mapProcessor.getUndiscoveredRoom() > 0) {
             texts.add(new StyledText("There are at least "+ context.mapProcessor.getUndiscoveredRoom()+" undiscovered rooms!\n", "warning"));
         } else if (failed) {

@@ -1,12 +1,10 @@
-package kr.syeyoung.dungeonsguide.cosmetics.data;
+package kr.syeyoung.dungeonsguide.cosmetics.data
 
-import lombok.Data;
-import java.util.UUID;
+import java.util.*
 
-@Data
-public class ActiveCosmetic {
-    private UUID activityUID;
-    private UUID playerUID;
-    private UUID cosmeticData;
-    private String username;
-}
+data class ActiveCosmetic(
+    var activityUID: UUID? = null,
+    var playerUID: UUID? = null,
+    var cosmeticData: UUID? = null,
+    var username: String? = null,
+)

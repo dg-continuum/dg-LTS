@@ -36,15 +36,35 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class CosmeticsManager {
-    @Getter
+    public Map<UUID, CosmeticData> getCosmeticDataMap() {
+        return cosmeticDataMap;
+    }
+
+    public Map<UUID, ActiveCosmetic> getActiveCosmeticMap() {
+        return activeCosmeticMap;
+    }
+
+    public Map<String, List<ActiveCosmetic>> getActiveCosmeticByType() {
+        return activeCosmeticByType;
+    }
+
+    public Map<UUID, List<ActiveCosmetic>> getActiveCosmeticByPlayer() {
+        return activeCosmeticByPlayer;
+    }
+
+    public Map<String, List<ActiveCosmetic>> getActiveCosmeticByPlayerNameLowerCase() {
+        return activeCosmeticByPlayerNameLowerCase;
+    }
+
+
     private Map<UUID, CosmeticData> cosmeticDataMap = new ConcurrentHashMap<>();
-    @Getter
+
     private Map<UUID, ActiveCosmetic> activeCosmeticMap = new ConcurrentHashMap<>();
-    @Getter
+
     private Map<String, List<ActiveCosmetic>> activeCosmeticByType = new ConcurrentHashMap<>();
-    @Getter
+
     private Map<UUID, List<ActiveCosmetic>> activeCosmeticByPlayer = new ConcurrentHashMap<>();
-    @Getter
+
     private Map<String, List<ActiveCosmetic>> activeCosmeticByPlayerNameLowerCase = new ConcurrentHashMap<>();
     @Getter
     private Set<String> perms = new CopyOnWriteArraySet<>();

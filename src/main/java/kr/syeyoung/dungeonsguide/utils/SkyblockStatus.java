@@ -25,8 +25,6 @@ import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.events.impl.HypixelJoinedEvent;
 import kr.syeyoung.dungeonsguide.events.impl.SkyblockJoinedEvent;
 import kr.syeyoung.dungeonsguide.events.impl.SkyblockLeftEvent;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -89,7 +87,14 @@ public class SkyblockStatus {
     private boolean isOnSkyblock;
     private boolean isOnDungeon;
 
-    @Getter @Setter
+    public boolean isForceIsOnDungeon() {
+        return forceIsOnDungeon;
+    }
+
+    public void setForceIsOnDungeon(boolean forceIsOnDungeon) {
+        this.forceIsOnDungeon = forceIsOnDungeon;
+    }
+
     private boolean forceIsOnDungeon;
 
     public boolean isOnHypixel() {

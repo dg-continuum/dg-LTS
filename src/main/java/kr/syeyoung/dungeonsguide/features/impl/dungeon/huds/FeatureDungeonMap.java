@@ -28,10 +28,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
-import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
-import kr.syeyoung.dungeonsguide.dungeon.MapProcessor;
+import kr.syeyoung.dungeonsguide.dungeon.*;
 import kr.syeyoung.dungeonsguide.events.impl.BossroomEnterEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonStartedEvent;
@@ -281,7 +278,7 @@ public class FeatureDungeonMap extends BasicHud {
                     str += dungeonRoom.getTotalSecrets() + " ";
                 }
 
-                DungeonRoom.RoomState currentState = dungeonRoom.getCurrentState();
+                RoomState currentState = dungeonRoom.getCurrentState();
                 switch (currentState) {
                     case FINISHED:
                     case COMPLETE_WITHOUT_SECRETS:
@@ -299,7 +296,7 @@ public class FeatureDungeonMap extends BasicHud {
                 GlStateManager.enableBlend();
                 GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                if (currentState == DungeonRoom.RoomState.FINISHED) {
+                if (currentState == RoomState.FINISHED) {
                     fr.drawString(str, -(fr.getStringWidth(str) / 2), -(fr.FONT_HEIGHT / 2), 0xFF00FF00);
                 } else {
                     if (dungeonRoom.getColor() == 74) {

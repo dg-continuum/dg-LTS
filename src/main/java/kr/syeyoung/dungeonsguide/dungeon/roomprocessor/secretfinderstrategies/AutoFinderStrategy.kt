@@ -4,6 +4,7 @@ import kr.syeyoung.dungeonsguide.DungeonsGuide
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
+import kr.syeyoung.dungeonsguide.dungeon.RoomState
 import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState
 import kr.syeyoung.dungeonsguide.dungeon.actions.impl.ActionComplete
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.DungeonSecret
@@ -35,7 +36,7 @@ class AutoFinderStrategy(room: DungeonRoom) : SecretGuideStrategy(room) {
 
     override fun update() {
 
-        if (room.currentState == DungeonRoom.RoomState.FINISHED) {
+        if (room.currentState == RoomState.FINISHED) {
             cancelAll()
             return
         }

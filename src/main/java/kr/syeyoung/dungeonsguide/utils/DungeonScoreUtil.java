@@ -3,6 +3,7 @@ package kr.syeyoung.dungeonsguide.utils;
 import kr.syeyoung.dungeonsguide.DungeonsGuide;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.RoomState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.client.Minecraft;
@@ -60,11 +61,11 @@ public class DungeonScoreUtil {
             for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
 //                if (dungeonRoom.getColor() == 74 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
 //                    bossroomIncomplete = false;
-                if (dungeonRoom.getColor() == 62 && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
+                if (dungeonRoom.getColor() == 62 && dungeonRoom.getCurrentState() != RoomState.DISCOVERED)
                     traproomIncomplete = false;
-                if (dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED)
+                if (dungeonRoom.getCurrentState() != RoomState.DISCOVERED)
                     totalCompRooms += dungeonRoom.getUnitPoints().size();
-                if (dungeonRoom.getColor() == 66 && (dungeonRoom.getCurrentState() == DungeonRoom.RoomState.DISCOVERED || dungeonRoom.getCurrentState() == DungeonRoom.RoomState.FAILED)) // INCOMPLETE PUZZLE ON MAP
+                if (dungeonRoom.getColor() == 66 && (dungeonRoom.getCurrentState() == RoomState.DISCOVERED || dungeonRoom.getCurrentState() == RoomState.FAILED)) // INCOMPLETE PUZZLE ON MAP
                     incompletePuzzles++;
                 roomCnt += dungeonRoom.getUnitPoints().size();
             }
@@ -91,7 +92,7 @@ public class DungeonScoreUtil {
             double total = 0;
 
             for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
-                if (dungeonRoom.getCurrentState() != DungeonRoom.RoomState.DISCOVERED && dungeonRoom.getCurrentState() != DungeonRoom.RoomState.FAILED)
+                if (dungeonRoom.getCurrentState() != RoomState.DISCOVERED && dungeonRoom.getCurrentState() != RoomState.FAILED)
                     completed += dungeonRoom.getUnitPoints().size();
                 total += dungeonRoom.getUnitPoints().size();
             }

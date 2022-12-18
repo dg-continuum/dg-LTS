@@ -10,6 +10,11 @@ import org.joml.Vector3i
 
 class BlockDetector: IDungeonRoomDetector {
 
+    companion object {
+        val roopShapeToRoomShape = mapOf(
+            1 to RoomShape.ONEBYONE
+        )
+    }
 
     /**
      * this function treats pos as immutable, only use the output of the function

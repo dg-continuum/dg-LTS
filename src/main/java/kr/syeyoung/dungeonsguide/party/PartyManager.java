@@ -36,7 +36,11 @@ import java.util.function.Consumer;
 
 public class PartyManager {
     public static final PartyManager INSTANCE = new PartyManager();
-    @Getter
+
+    public PartyContext getPartyContext() {
+        return partyContext;
+    }
+
     private PartyContext partyContext;
 
     public PartyContext getPartyContext(boolean createIfNeeded) {

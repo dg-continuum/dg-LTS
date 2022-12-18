@@ -21,7 +21,6 @@ import kr.syeyoung.dungeonsguide.utils.TimeScoreUtil;
 import kr.syeyoung.dungeonsguide.utils.TitleRender;
 import kr.syeyoung.dungeonsguide.whosonline.WhosOnlineManager;
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -42,7 +41,10 @@ public class DungeonsGuide {
     public boolean verbose = false;
     private SkyblockStatus skyblockStatus;
 
-    @Getter
+    public CosmeticsManager getCosmeticsManager() {
+        return cosmeticsManager;
+    }
+
     private CosmeticsManager cosmeticsManager;
 
     public DungeonFacade getDungeonFacade() {
@@ -53,7 +55,15 @@ public class DungeonsGuide {
 
     @Getter
     private BlockCache blockCache;
-    @Getter @Setter
+
+    public WhosOnlineManager getWhosOnlineManager() {
+        return whosOnlineManager;
+    }
+
+    public void setWhosOnlineManager(WhosOnlineManager whosOnlineManager) {
+        this.whosOnlineManager = whosOnlineManager;
+    }
+
     private WhosOnlineManager whosOnlineManager;
 
     public DungeonsGuide(){

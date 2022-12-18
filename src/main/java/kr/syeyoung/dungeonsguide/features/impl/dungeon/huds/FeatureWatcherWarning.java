@@ -22,6 +22,7 @@ import cc.polyfrost.oneconfig.hud.TextHud;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonContext;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonFacade;
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom;
+import kr.syeyoung.dungeonsguide.dungeon.RoomState;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonEndedEvent;
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent;
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus;
@@ -64,7 +65,7 @@ public class FeatureWatcherWarning extends TextHud {
             if (context == null) return;
             for (DungeonRoom dungeonRoom : context.dungeonRoomList) {
                 if (dungeonRoom != null && dungeonRoom.getColor() == 18)
-                    dungeonRoom.setCurrentState(DungeonRoom.RoomState.DISCOVERED);
+                    dungeonRoom.setCurrentState(RoomState.DISCOVERED);
             }
         }
     }

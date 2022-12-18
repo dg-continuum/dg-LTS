@@ -1,14 +1,10 @@
-package kr.syeyoung.dungeonsguide.cosmetics.data;
+package kr.syeyoung.dungeonsguide.cosmetics.data
 
+import java.util.*
 
-import lombok.Data;
-
-import java.util.UUID;
-
-@Data
-public class CosmeticData {
-    private UUID id;
-    private String cosmeticType;
-    private String reqPerm;
-    private String data;
-}
+data class CosmeticData(
+    val id: UUID? = null,
+    val cosmeticType: String? = null,
+    val reqPerm: String? = null,
+    val data: String? = null,
+)

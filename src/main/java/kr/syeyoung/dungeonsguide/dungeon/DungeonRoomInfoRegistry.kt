@@ -48,9 +48,11 @@ object DungeonRoomInfoRegistry {
         .addSerializationExclusionStrategy(SuperclassExclusionStrategy())
         .create();
 
+    val thashapes: MutableSet<Short> = HashSet()
+
     @JvmStatic
     fun register(dungeonRoomInfo: DungeonRoomInfo) {
-        println("loading room ${dungeonRoomInfo.name}")
+        logger.info("loading room ${dungeonRoomInfo.name} shape: ${dungeonRoomInfo.shape} ")
         if (uuidMap.containsKey(dungeonRoomInfo.uuid)) {
             val dri1 = uuidMap[dungeonRoomInfo.uuid]
             registered.remove(dri1)
@@ -64,7 +66,16 @@ object DungeonRoomInfoRegistry {
         val roomInfos = shapeMap[dungeonRoomInfo.shape] ?: ArrayList()
 
         roomInfos.add(dungeonRoomInfo)
+
+
+
         dungeonRoomInfo.shape?.let {
+
+            if (!thashapes.contains(it)) {
+                logger.info("found new shape $it, amount of shapes ${thashapes.size}")
+                thashapes.add(it)
+            }
+
             shapeMap[it] = roomInfos
         }
 

@@ -28,6 +28,10 @@ import java.util.TreeSet;
 
 @Data
 public class PartyContext {
+    public String getPartyID() {
+        return partyID;
+    }
+
     private String partyID;
 
     private String partyOwner;

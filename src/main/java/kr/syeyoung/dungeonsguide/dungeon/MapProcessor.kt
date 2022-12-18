@@ -277,13 +277,13 @@ class MapProcessor(private val context: DungeonContext) {
                 val dungeonRoom = context.roomMapper[currentPoint]
 
                 if (dungeonRoom != null) {
-                    if ((currentColor == MapColor.RED) && (dungeonRoom.currentState != DungeonRoom.RoomState.FINISHED)) {
-                        dungeonRoom.currentState = DungeonRoom.RoomState.COMPLETE_WITHOUT_SECRETS
+                    if ((currentColor == MapColor.RED) && (dungeonRoom.currentState != RoomState.FINISHED)) {
+                        dungeonRoom.currentState = RoomState.COMPLETE_WITHOUT_SECRETS
                         dungeonRoom.totalSecrets = 0
                     } else if (currentColor == MapColor.GREEN) {
-                        dungeonRoom.currentState = DungeonRoom.RoomState.FINISHED
+                        dungeonRoom.currentState = RoomState.FINISHED
                         dungeonRoom.totalSecrets = 0
-                    } else if (dungeonRoom.currentState != DungeonRoom.RoomState.FINISHED) {
+                    } else if (dungeonRoom.currentState != RoomState.FINISHED) {
                         MapUtils.record(
                             mapData,
                             mapPoint.x + unitRoomDimensionCopy.width / 2,
@@ -299,15 +299,15 @@ class MapProcessor(private val context: DungeonContext) {
                         )
                         when (centerColor) {
                             MapColor.MAYBEBROWN -> {
-                                dungeonRoom.currentState = DungeonRoom.RoomState.COMPLETE_WITHOUT_SECRETS
+                                dungeonRoom.currentState = RoomState.COMPLETE_WITHOUT_SECRETS
                             }
 
                             MapColor.GREEN -> {
-                                dungeonRoom.currentState = DungeonRoom.RoomState.FINISHED
+                                dungeonRoom.currentState = RoomState.FINISHED
                             }
 
                             MapColor.RED -> {
-                                dungeonRoom.currentState = DungeonRoom.RoomState.FAILED
+                                dungeonRoom.currentState = RoomState.FAILED
                             }
 
                             else -> {}
