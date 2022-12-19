@@ -7,6 +7,7 @@ import kr.syeyoung.dungeonsguide.Main
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*
+import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomShape
 import kr.syeyoung.dungeonsguide.utils.RuntimeTypeAdapterFactory
 import kr.syeyoung.dungeonsguide.utils.SuperclassExclusionStrategy
 import lombok.Getter
@@ -83,6 +84,12 @@ object DungeonRoomInfoRegistry {
     @JvmStatic
     fun getByShape(shape: Short): MutableList<DungeonRoomInfo> {
         return shapeMap[shape]?.toMutableList() ?: mutableListOf()
+    }
+
+    @JvmStatic
+    fun getRoomInfosByShape(shape: RoomShape): MutableList<DungeonRoomInfo> {
+//        return shapeMap[shape]?.toMutableList() ?: mutableListOf()
+        return TODO()
     }
 
     @JvmStatic

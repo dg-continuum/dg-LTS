@@ -21,7 +21,7 @@ package kr.syeyoung.dungeonsguide.dungeon;
 import com.google.common.collect.Sets;
 import kotlin.Pair;
 import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo;
-import kr.syeyoung.dungeonsguide.dungeon.roomdetection.RoomMatcher;
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.legacy.RoomMatcher;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonDoor;
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.EDungeonDoorType;
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic;

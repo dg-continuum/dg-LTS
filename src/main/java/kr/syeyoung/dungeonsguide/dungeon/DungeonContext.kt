@@ -3,6 +3,7 @@ package kr.syeyoung.dungeonsguide.dungeon
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry.getDoorFinder
+import kr.syeyoung.dungeonsguide.dungeon.room.NewDungeonRoom
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.BossfightProcessor
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor
 import kr.syeyoung.dungeonsguide.utils.SkyblockStatus
@@ -11,6 +12,7 @@ import net.minecraft.util.BlockPos
 import org.joml.Vector2i
 import org.joml.Vector3i
 import java.awt.Rectangle
+import java.util.*
 
 class DungeonContext {
     @JvmField
@@ -56,6 +58,9 @@ class DungeonContext {
     var isEnded = false
     var isDefeated = false
     val dataProvider: DungeonSpecificDataProvider? = getDoorFinder(SkyblockStatus.dungeonNameStrriped)
+
+    val rooms: MutableMap<UUID, NewDungeonRoom> = HashMap()
+    var currentNewRoom: NewDungeonRoom? = null
 
     init {
         if (dataProvider != null) {

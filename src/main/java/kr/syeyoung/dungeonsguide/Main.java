@@ -100,7 +100,7 @@ public class Main {
 
         finishUpProgressBar(progressBar);
         isLoaded = true;
-
+        throw new RuntimeException("You arent supposed to run this build!!");
     }
 
 

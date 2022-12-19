@@ -1,7 +1,10 @@
 package kr.syeyoung.dungeonsguide.dungeon
 
+import com.google.common.base.Throwables
 import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.config.Config
+import kr.syeyoung.dungeonsguide.dungeon.room.NewDungeonRoom
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.NewDungeonRoomBuilder
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonAddSet
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonParameterEdit
@@ -38,6 +41,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.io.IOException
+import java.util.*
 
 class DungeonListener {
     @SubscribeEvent
@@ -49,7 +53,7 @@ class DungeonListener {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload?) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         try {
             Config.saveConfig()
         } catch (e: IOException) {
@@ -91,7 +95,7 @@ class DungeonListener {
     }
 
     @SubscribeEvent
-    fun onDungeonLeave(ev: DungeonLeftEvent?) {
+    fun onDungeonLeave(ev: DungeonLeftEvent) {
         DungeonFacade.context?.let {
             it.batSpawnedLocations.clear()
             it.killedBats.clear()
@@ -117,6 +121,29 @@ class DungeonListener {
             return
         }
 
+        // this is in a try-catch since creating a room might fail
+        val currentRoom: NewDungeonRoom? = try {
+            val playerPos = VectorUtils.getPlayerVector3i()
+            // check if we are in an existing room
+            val anRoom: NewDungeonRoom? = context.rooms.values
+                .firstOrNull { it.isInRoom(playerPos) }
+
+            // if we don't find one, create it
+            anRoom ?: NewDungeonRoomBuilder.build(context).also {
+                // put itself in the context
+                context.rooms[UUID.randomUUID()] = it
+            }
+
+        } catch (e: Exception) {
+            println("failed to find/create a room with: ${Throwables.getRootCause(e)}")
+            null
+        }
+
+        // if we found/created a room we set it as current room
+        if(currentRoom != null){
+            context.currentNewRoom = currentRoom
+        }
+
         context.mapProcessor.tick()
 
         context.mapProcessor.worldPointToMapPoint(thePlayer.positionVector)?.let {
@@ -136,6 +163,7 @@ class DungeonListener {
                 }
             }
         }
+
 
 
         context.players.clear()

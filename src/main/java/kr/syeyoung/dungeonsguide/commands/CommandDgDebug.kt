@@ -13,7 +13,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState.Companion.turnIntoF
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*
-import kr.syeyoung.dungeonsguide.dungeon.roomdetection.blockbased.BlockDetector
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.SizeBundleBuilder
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.BossfightProcessor
@@ -304,7 +304,7 @@ class CommandDgDebug : CommandBase() {
                 }
             }
             "getroomshape" -> {
-                val a = BlockDetector()
+                val a = SizeBundleBuilder()
                 val start = System.currentTimeMillis()
                 val (roomshape) = a.generateRoomDataBundle(a.getTopOfRoom(VectorUtils.getPlayerVector3i()).sub(0, 1, 0))
                 val stop = System.currentTimeMillis()
