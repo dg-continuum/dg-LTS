@@ -13,6 +13,7 @@ import kr.syeyoung.dungeonsguide.dungeon.actions.ActionState.Companion.turnIntoF
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProvider
 import kr.syeyoung.dungeonsguide.dungeon.doorfinder.DungeonSpecificDataProviderRegistry
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.NewDungeonRoomBuilder
 import kr.syeyoung.dungeonsguide.dungeon.roomdetection.SizeBundleBuilder
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit
@@ -303,10 +304,14 @@ class CommandDgDebug : CommandBase() {
                     it.currentRoom?.updateRoomProcessor()
                 }
             }
+            "checkroom" -> {
+                val room = NewDungeonRoomBuilder.build(DungeonContext())
+                sender.addChatMessage(ChatComponentText("Got room: " + room.roomInfo.name))
+            }
             "getroomshape" -> {
                 val a = SizeBundleBuilder()
                 val start = System.currentTimeMillis()
-                val (roomshape) = a.generateRoomDataBundle(a.getTopOfRoom(VectorUtils.getPlayerVector3i()).sub(0, 1, 0))
+                val (roomshape) = a.generateRoomDataBundle(a.getTopOfRoom(VectorUtils.getPlayerVector3i()).sub(0, 2, 0))
                 val stop = System.currentTimeMillis()
                 val yes = stop - start
                 sender.addChatMessage(ChatComponentText("Got " + roomshape + " in " + yes + "ms"))

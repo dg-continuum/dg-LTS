@@ -8,6 +8,7 @@ import kr.syeyoung.dungeonsguide.dungeon.data.DungeonRoomInfo
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.DungeonMechanic
 import kr.syeyoung.dungeonsguide.dungeon.mechanics.impl.*
 import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomShape
+import kr.syeyoung.dungeonsguide.dungeon.roomdetection.NewDungeonRoomBuilder
 import kr.syeyoung.dungeonsguide.utils.RuntimeTypeAdapterFactory
 import kr.syeyoung.dungeonsguide.utils.SuperclassExclusionStrategy
 import lombok.Getter
@@ -74,6 +75,15 @@ object DungeonRoomInfoRegistry {
 
             if (!thashapes.contains(it)) {
                 logger.info("found new shape $it, amount of shapes ${thashapes.size}")
+                val builder = StringBuilder()
+                (0..3).forEach { dy ->
+                    builder.append("\n")
+                    (0..3).forEach { dx ->
+                        val isSet = it.toInt() shr dy * 4 + dx and 0x1 != 0
+                        builder.append(if (isSet) "O" else "X")
+                    }
+                }
+                println("Shape visual: $builder")
                 thashapes.add(it)
             }
 
@@ -87,9 +97,16 @@ object DungeonRoomInfoRegistry {
     }
 
     @JvmStatic
-    fun getRoomInfosByShape(shape: RoomShape): MutableList<DungeonRoomInfo> {
-//        return shapeMap[shape]?.toMutableList() ?: mutableListOf()
-        return TODO()
+    fun getRoomInfosByShape(inShape: RoomShape): List<DungeonRoomInfo> {
+
+        val tempMap: MutableList<DungeonRoomInfo> = ArrayList()
+        NewDungeonRoomBuilder.shapeMap.forEach { (thaShortShape, shape) ->
+            if (shape == inShape) {
+                tempMap.addAll(shapeMap[thaShortShape.toShort()] ?: ArrayList())
+            }
+        }
+
+        return tempMap
     }
 
     @JvmStatic

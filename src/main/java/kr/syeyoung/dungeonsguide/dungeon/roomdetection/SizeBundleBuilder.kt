@@ -1,6 +1,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomdetection
 
 import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomDataBundle
+import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomRotation
 import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomShape
 import kr.syeyoung.dungeonsguide.utils.BlockCache
 import net.minecraft.block.state.IBlockState
@@ -8,6 +9,7 @@ import net.minecraft.init.Blocks
 import org.joml.Vector3i
 
 class SizeBundleBuilder {
+
 
     /**
      * this function treats pos as immutable, only use the output of the function
@@ -112,10 +114,14 @@ class SizeBundleBuilder {
             throw IllegalStateException("RoomShape not found")
         }
 
-        val roomRotation = TODO("calc the rotation you dhummy")
+//        val roomRotation = TODO("calc the rotation you dhummy")
+        val roomRotation = RoomRotation.UP
 
-        val depth = getBottomOfRoom(playerPos).distance(topOfRoom).toInt()
-        return RoomDataBundle(shape, width, height, depth, roomRotation)
+        val bottomOfRoom = getBottomOfRoom(playerPos)
+        val depth = bottomOfRoom.distance(topOfRoom).toInt()
+        rightTopShot.y = topOfRoom.y
+        leftBottomShot.y = bottomOfRoom.y
+        return RoomDataBundle(shape, width, height, depth, roomRotation, rightTopShot, leftBottomShot, listOf())
     }
 
     fun getTopOfRoom(userpos: Vector3i): Vector3i {
@@ -126,7 +132,7 @@ class SizeBundleBuilder {
             userpos.y -= 1
         }
 
-        userpos.y += 1
+//        userpos.y += 1
 
         return userpos
     }

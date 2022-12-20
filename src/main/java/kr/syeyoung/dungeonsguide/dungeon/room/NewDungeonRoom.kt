@@ -11,15 +11,16 @@ import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.RoomProcessor
 import kr.syeyoung.dungeonsguide.utils.BlockCache
 import net.minecraft.block.Block
 import net.minecraft.util.BlockPos
+import org.joml.Vector2i
 import org.joml.Vector3d
 import org.joml.Vector3i
 
+
 class NewDungeonRoom(val contextHandle: DungeonContext): DungeonRoomAccessor {
-    lateinit var min: Vector3i
-    lateinit var max: Vector3i
     lateinit var roomColor: RoomColor
     lateinit var roomInfo: DungeonRoomInfo
     lateinit var roomShape: RoomDataBundle
+    var lShapeCorners: List<Vector3i> = ArrayList()
 
     private val cachedMechanics: Map<String, DungeonMechanic> = HashMap()
     val mechanics: Map<String, DungeonMechanic>
@@ -38,8 +39,32 @@ class NewDungeonRoom(val contextHandle: DungeonContext): DungeonRoomAccessor {
         TODO("Not yet implemented")
     }
 
+    /**
+     * MADE BY CHATGPT, IF IT VIOLATES COPYRIGHT PLEASE CONTACT ME
+     */
+    fun isVectorWithinShape(vector: Vector2i, shape: List<Vector3i>): Boolean {
+
+        // Check if the vector is within the shape by testing if it is inside all the
+        // lines formed by the shape's vertices
+        var inside = false
+        var i = 0
+        var j = shape.size - 1
+        while (i < shape.size) {
+            if (shape[i].y > vector.y != shape[j].y > vector.y && vector.x < (shape[j].x - shape[i].x) * (vector.y - shape[i].y) / (shape[j].y - shape[i].y) + shape[i].x) {
+                inside = !inside
+            }
+            j = i++
+        }
+        return inside
+    }
+
+
     fun isWithinBounds(x: Int, z: Int): Boolean {
-        TODO()
+        return if(roomShape.roomshape != RoomShape.LSHAPE){
+            x >= roomShape.min.x && x <= roomShape.max.x && z >= roomShape.min.z && z <= roomShape.max.z
+        } else {
+            return isVectorWithinShape(Vector2i(x, z), lShapeCorners)
+        }
     }
 
     fun isWithinBoundsAbsolute(pos: Vector3i?): Boolean {
@@ -49,20 +74,20 @@ class NewDungeonRoom(val contextHandle: DungeonContext): DungeonRoomAccessor {
     fun getRelativeBlockAt(x: Int, y: Int, z: Int): Block? {
         // validate x y z's
         return if (isWithinBounds(x, z)) {
-            BlockCache.getBlock(Vector3i(x, y, z).add(min.x, min.y, min.z))
+            BlockCache.getBlock(Vector3i(x, y, z).add(roomShape.min.x, roomShape.min.y, roomShape.min.z))
         } else {
             null
         }
     }
 
     fun getRelativeBlockPosAt(x: Int, y: Int, z: Int): Vector3i {
-        return Vector3i(x, y, z).add(min.x, min.y, min.z)
+        return Vector3i(x, y, z).add(roomShape.min.x, roomShape.min.y, roomShape.min.z)
     }
 
     fun getRelativeBlockDataAt(x: Int, y: Int, z: Int): Int {
         // validate x y z's
         if (isWithinBounds(x, z)) {
-            val pos = BlockPos(x, y, z).add(min.x, min.y, min.z)
+            val pos = BlockPos(x, y, z).add(roomShape.min.x, roomShape.min.y, roomShape.min.z)
             val blockState = BlockCache.getBlockState(pos)
             return blockState.block.getMetaFromState(blockState)
         }
@@ -72,7 +97,7 @@ class NewDungeonRoom(val contextHandle: DungeonContext): DungeonRoomAccessor {
 
     fun isInRoom(pos: Vector3i): Boolean {
         if (roomShape.roomshape != RoomShape.LSHAPE){
-            return pos.x >= min.x && pos.y >= min.y && pos.z >= min.z && pos.x <= max.x && pos.y <= max.y && pos.z <= max.z
+            return pos.x >= roomShape.min.x && pos.y >= roomShape.min.y && pos.z >= roomShape.min.z && pos.x <= roomShape.max.x && pos.y <= roomShape.max.y && pos.z <= roomShape.max.z
         } else {
             TODO("no so easy copilot huh, we have L shape to worry about")
         }
