@@ -1,5 +1,6 @@
 package kr.syeyoung.dungeonsguide.dungeon.roomdetection
 
+import kr.syeyoung.dungeonsguide.chat.ChatTransmitter
 import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomDataBundle
 import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomRotation
 import kr.syeyoung.dungeonsguide.dungeon.room.data.RoomShape
@@ -7,6 +8,7 @@ import kr.syeyoung.dungeonsguide.utils.BlockCache
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import org.joml.Vector3i
+import java.text.DecimalFormat
 
 class SizeBundleBuilder {
 
@@ -31,8 +33,13 @@ class SizeBundleBuilder {
     private fun getWidthHeight(l1: Int, l2: Int, l3: Int, l4: Int): Pair<Int, Int> {
         val edges = arrayOf(l1, l2, l3, l4)
         edges.sort()
-        val width = edges[0]
-        val height = edges[2]
+        var width = edges[0]
+        var height = edges[2]
+        if (height > width) {
+            val temp = width
+            width = height
+            height = temp
+        }
         return Pair(width, height)
     }
 
@@ -58,11 +65,6 @@ class SizeBundleBuilder {
         val rightEdgeLength = rightBottomShot.distance(rightTopShot)
 
         println("leftEdgeLength: $leftEdgeLength, rightEdgeLength: $rightEdgeLength")
-
-        if (leftEdgeLength != rightEdgeLength) {
-            shape = RoomShape.LSHAPE
-        }
-
         val topShot = getToEdge(topOfRoom, Vector3i(0, 0, -1))
         val bottomShot = getToEdge(topOfRoom, Vector3i(0, 0, 1))
 
@@ -73,81 +75,87 @@ class SizeBundleBuilder {
         val bottomTopShot = getToEdge(bottomShot, Vector3i(1, 0, 0))
         val bottomBottomShot = getToEdge(bottomShot, Vector3i(-1, 0, 0))
         val bottomEdgeLength = bottomBottomShot.distance(bottomTopShot)
-
-
         println("topEdgeLength: $topEdgeLength, bottomEdgeLength: $bottomEdgeLength")
 
-
-        var (width, height) = getWidthHeight(
+        val (width, height) = getWidthHeight(
             leftEdgeLength.toInt(), rightEdgeLength.toInt(), topEdgeLength.toInt(), bottomEdgeLength.toInt()
         )
-
         println("width: $width, height: $height")
-
-        // if width and height are equal, we have a square
-        if (width == height) {
-            // square rooms are 30 blocks but wtf do I care lmao
-            if (width < 40) {
-                shape = RoomShape.ONEBYONE
-            } else {
-                shape = RoomShape.TWOBYTWO
+        if (leftEdgeLength != rightEdgeLength) {
+            shape = RoomShape.LSHAPE
+        } else {
+            // if width and height are equal, we have a square
+            if (width == height) {
+                // square rooms are 30 blocks but wtf do I care lmao
+                shape = if (width < 40) {
+                    RoomShape.ONEBYONE
+                } else {
+                    RoomShape.TWOBYTWO
+                }
             }
-        }
 
-        if (height > width) {
-            width = height
-        }
+            if (width in 61..89) {
+                shape = RoomShape.ONEBYTWO
+            }
 
-        if (width in 61..89) {
-            shape = RoomShape.ONEBYTWO
-        }
+            if (width in 91..119) {
+                shape = RoomShape.ONEBYTHREE
+            }
 
-        if (width in 91..119) {
-            shape = RoomShape.ONEBYTHREE
-        }
+            if (width > 120) {
+                shape = RoomShape.ONEBYFOUR
+            }
 
-        if (width > 120) {
-            shape = RoomShape.ONEBYFOUR
         }
 
         if (shape == null) {
             throw IllegalStateException("RoomShape not found")
         }
 
+
+
 //        val roomRotation = TODO("calc the rotation you dhummy")
         val roomRotation = RoomRotation.UP
 
         val bottomOfRoom = getBottomOfRoom(playerPos)
+        ChatTransmitter.addToQueue("Room bottom: ${bottomOfRoom.toString(DecimalFormat("#"))}")
+        ChatTransmitter.addToQueue("Room top: ${topOfRoom.toString(DecimalFormat("#"))}")
         val depth = bottomOfRoom.distance(topOfRoom).toInt()
-        rightTopShot.y = topOfRoom.y
-        leftBottomShot.y = bottomOfRoom.y
-        return RoomDataBundle(shape, width, height, depth, roomRotation, rightTopShot, leftBottomShot, listOf())
+        val min = Vector3i(rightTopShot)
+        val max = Vector3i(leftBottomShot)
+        min.y = bottomOfRoom.y
+        max.y = topOfRoom.y
+        ChatTransmitter.addToQueue("Room min: ${rightTopShot.toString(DecimalFormat("#"))}")
+        ChatTransmitter.addToQueue("Room max: ${leftBottomShot.toString(DecimalFormat("#"))}")
+        return RoomDataBundle(shape, width, height, depth, roomRotation, min = min, max = max, listOf())
     }
 
     fun getTopOfRoom(userpos: Vector3i): Vector3i {
-        userpos.y = 255
+        val topOfRoom = Vector3i(userpos)
+        topOfRoom.y = 255
 
         // if previous is not air, and current is air stop
-        while (isBlockAir(BlockCache.getBlockState(userpos))) {
-            userpos.y -= 1
+        while (isBlockAir(BlockCache.getBlockState(topOfRoom))) {
+            topOfRoom.y -= 1
         }
 
-//        userpos.y += 1
+//        topOfRoom.y += 1
 
-        return userpos
+        return topOfRoom
     }
 
     private fun getBottomOfRoom(userpos: Vector3i): Vector3i {
-        userpos.y = 0
+        val posCLone = Vector3i(userpos)
+        posCLone.y = 0
 
         // if previous is not air, and current is air stop
-        while (isBlockAir(BlockCache.getBlockState(userpos))) {
-            userpos.y += 1
+        while (isBlockAir(BlockCache.getBlockState(posCLone))) {
+            posCLone.y += 1
         }
 
-        userpos.y -= 1
+        posCLone.y -= 1
 
-        return userpos
+        return posCLone
     }
 
 

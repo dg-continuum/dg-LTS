@@ -19,6 +19,7 @@ import kr.syeyoung.dungeonsguide.dungeon.roomedit.EditingContext
 import kr.syeyoung.dungeonsguide.dungeon.roomedit.gui.GuiDungeonRoomEdit
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.BossfightProcessor
 import kr.syeyoung.dungeonsguide.dungeon.roomprocessor.impl.GeneralRoomProcessor
+import kr.syeyoung.dungeonsguide.dungeon.test.RoomMechanicsDebug
 import kr.syeyoung.dungeonsguide.events.impl.DungeonLeftEvent
 import kr.syeyoung.dungeonsguide.features.FeatureRegistry
 import kr.syeyoung.dungeonsguide.party.PartyContext
@@ -305,8 +306,18 @@ class CommandDgDebug : CommandBase() {
                 }
             }
             "checkroom" -> {
-                val room = NewDungeonRoomBuilder.build(DungeonContext())
+                val secretAmountOverride: Int = if(args.size >= 2){
+                    args[1].toInt()
+                } else {
+                    -1
+                }
+                val room = NewDungeonRoomBuilder.build(DungeonContext(), amountOfSecrets = secretAmountOverride)
                 sender.addChatMessage(ChatComponentText("Got room: " + room.roomInfo.name))
+                sender.addChatMessage(ChatComponentText("RoomShape: ${room.roomShape}"))
+                if(RoomMechanicsDebug.INSTANCE == null){
+                    RoomMechanicsDebug.INSTANCE = RoomMechanicsDebug()
+                }
+                RoomMechanicsDebug.visualiseRoom = room
             }
             "getroomshape" -> {
                 val a = SizeBundleBuilder()

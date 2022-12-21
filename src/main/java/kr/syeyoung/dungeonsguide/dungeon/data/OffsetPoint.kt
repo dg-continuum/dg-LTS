@@ -2,6 +2,7 @@
 package kr.syeyoung.dungeonsguide.dungeon.data
 
 import kr.syeyoung.dungeonsguide.dungeon.DungeonRoom
+import kr.syeyoung.dungeonsguide.dungeon.room.NewDungeonRoom
 import kr.syeyoung.dungeonsguide.utils.VectorUtils
 import net.minecraft.block.Block
 import net.minecraft.util.BlockPos
@@ -58,12 +59,27 @@ class OffsetPoint : Cloneable, Serializable {
         return Vector3i(rot.x.toInt(), y, rot.y.toInt())
     }
 
+    fun toRotatedRelBlockPos(dungeonRoom: NewDungeonRoom): Vector3i {
+        var rot = Vector2d(x.toDouble(), z.toDouble())
+
+        rot = VectorUtils.rotateCounterClockwise(rot)
+        rot.y += (dungeonRoom.roomShape.max.z - dungeonRoom.roomShape.min.z + 1).toDouble() // + Z
+
+
+        return Vector3i(rot.x.toInt(), y, rot.y.toInt())
+    }
+
     fun getBlock(dungeonRoom: DungeonRoom): Block {
         val relBp = toRotatedRelBlockPos(dungeonRoom)
         return dungeonRoom.getRelativeBlockAt(relBp.x, relBp.y, relBp.z)
     }
 
     fun getVector3i(dungeonRoom: DungeonRoom): Vector3i {
+        val relBp = toRotatedRelBlockPos(dungeonRoom)
+        return dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z)
+    }
+
+    fun getVector3i(dungeonRoom: NewDungeonRoom): Vector3i {
         val relBp = toRotatedRelBlockPos(dungeonRoom)
         return dungeonRoom.getRelativeBlockPosAt(relBp.x, relBp.y, relBp.z)
     }

@@ -24,7 +24,7 @@ class NewDungeonRoom(val contextHandle: DungeonContext): DungeonRoomAccessor {
 
     private val cachedMechanics: Map<String, DungeonMechanic> = HashMap()
     val mechanics: Map<String, DungeonMechanic>
-        get() = TODO()
+        get() = roomInfo.mechanics
     lateinit var roomProcessor: RoomProcessor
         private set
 
